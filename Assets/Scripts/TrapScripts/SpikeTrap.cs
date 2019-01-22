@@ -51,6 +51,7 @@ public class SpikeTrap : BaseTrap {
 
     SpikeState myState = SpikeState.NONE;
 
+    //Init function
     public override void Init()
     {
         base.Init();
@@ -101,6 +102,7 @@ public class SpikeTrap : BaseTrap {
         }
     }
 
+    //Starts spikes 
     public void StartTell()
     {
         if(myState == SpikeState.NONE)
@@ -111,6 +113,8 @@ public class SpikeTrap : BaseTrap {
         }
     }
 
+    //Does a tell for the spikes
+    //spikes will come out of the holes but not deal damage
     private void DoTell()
     {
         if(_spikes.transform.localPosition.y <= _currBound.y)
@@ -126,6 +130,7 @@ public class SpikeTrap : BaseTrap {
         }
     }
 
+    //delay inbetween the tell and attack
     private void StartAttackDelay()
     {
         _currTime = (Time.time - _startTIme) / _attackDelayDuration;
@@ -139,6 +144,8 @@ public class SpikeTrap : BaseTrap {
         }
     }
 
+    //spike shoot up from the ground
+    //damages the player if they are on top of the plates
     private void Attack()
     {
         if (_spikes.transform.localPosition.y <= _currBound.y)
@@ -159,6 +166,7 @@ public class SpikeTrap : BaseTrap {
         }
     }
 
+    //delay before the retreat
     private void StartRetreatDelay()
     {
         _currTime = (Time.time - _startTIme) / _attackDelayDuration;
@@ -172,6 +180,7 @@ public class SpikeTrap : BaseTrap {
         }
     }
 
+    //spikes will slowly retreat
     private void RetreatSpikes()
     {
         if (_spikes.transform.localPosition.y >= _currBound.y)
@@ -186,6 +195,8 @@ public class SpikeTrap : BaseTrap {
         }
     }
 
+    //if the room finishes while the spikes are doing anything
+    //spikes will retreat
     private void RoomDoneRetreat()
     {
         if (_spikes.transform.localPosition.y >= _currBound.y)
@@ -200,6 +211,7 @@ public class SpikeTrap : BaseTrap {
         }
     }
 
+    //stops the trap if room is finished
     public override void DisableTrap()
     {
         if (myState != SpikeState.NONE)
@@ -213,6 +225,7 @@ public class SpikeTrap : BaseTrap {
         }
     }
 
+    //reset function
     public override void ResetTrap()
     {
         _spikes.transform.localPosition = _startPos;

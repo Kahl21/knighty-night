@@ -39,6 +39,8 @@ public class FireStatueTrap : BaseTrap {
     ParticleSystem _myFire;
 
     FireState _mystate = FireState.NONE;
+
+    //Start Function
     protected override void Start()
     {
         _myFire = transform.GetChild(0).transform.GetComponent<ParticleSystem>();
@@ -46,6 +48,7 @@ public class FireStatueTrap : BaseTrap {
         base.Start();
     }
 
+    //Initilizes trap
     public override void Init()
     {
         base.Init();
@@ -82,6 +85,7 @@ public class FireStatueTrap : BaseTrap {
         }
     }
 
+    //starts delay to spit out fire
     void StartingDelay()
     {
         _currDelay = (Time.time - _startDelay) / _beginningDelay;
@@ -95,6 +99,7 @@ public class FireStatueTrap : BaseTrap {
         }
     }
 
+    //plays fire animation after a delay
     void StartFire()
     {
         _currDelay = (Time.time - _startDelay) / _fireDelay;
@@ -109,6 +114,8 @@ public class FireStatueTrap : BaseTrap {
         }
     }
 
+    //shoots out three raycasts along with the fire animation
+    //player will take damage if he walks through the fire
     void IncreaseFire()
     {
         _currDelay = (Time.time - _startDelay) / _fireIncDuration;
@@ -128,6 +135,7 @@ public class FireStatueTrap : BaseTrap {
         }
     }
 
+    //Keeps the animation playing and damage raycasts up for a certain amount of time
     void BurnBabyBurn()
     {
         _currDelay = (Time.time - _startDelay) / _burningDuration;
@@ -146,6 +154,8 @@ public class FireStatueTrap : BaseTrap {
 
     }
 
+    //stops fire animation
+    //receeds raycasts with fire animation
     void StopFire()
     {
         _currDelay = (Time.time - _startDelay) / _fireIncDuration;
@@ -165,6 +175,7 @@ public class FireStatueTrap : BaseTrap {
         }
     }
 
+    //detecction for fire
     void LookForPlayer()
     {
         for (int i = -1; i < 2; i++)
@@ -206,11 +217,13 @@ public class FireStatueTrap : BaseTrap {
         }
     }
 
+    //stops trap once the room is finished
     public override void DisableTrap()
     {
         _mystate = FireState.ROOMDONE;
     }
 
+    //reset function
     public override void ResetTrap()
     {
         _mystate = FireState.NONE;

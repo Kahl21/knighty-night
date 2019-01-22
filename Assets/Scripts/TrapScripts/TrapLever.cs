@@ -20,6 +20,7 @@ public class TrapLever : MonoBehaviour {
 
     DungeonMechanic _myRoom;
 
+    //init function while in a room
     public void Init(DungeonMechanic Room)
     {
         _myRoom = Room;
@@ -37,6 +38,8 @@ public class TrapLever : MonoBehaviour {
         }
     }
 
+    //called when player hits the lever
+    //checks to see if all levers are hit
     public void StartRotation()
     {
         _activated = true;
@@ -46,6 +49,7 @@ public class TrapLever : MonoBehaviour {
         _startRotate = Time.time;
     }
 
+    //rotates the lever to show its activated
     private void activateSwitch()
     {
         _currRotate = (Time.time - _startRotate) / _rotateDuration;
@@ -60,6 +64,7 @@ public class TrapLever : MonoBehaviour {
         }
     }
 
+    //reset function
     public void ResetLever()
     {
         _activated = false;

@@ -6,7 +6,7 @@ using UnityEngine.AI;
 
 public class SpinBossGlhost : BossEnemy
 {
-
+    //Strategy Enum for the Spin Boss
     protected enum SPINSTRATS
     {
         DOWNTIME,
@@ -144,6 +144,7 @@ public class SpinBossGlhost : BossEnemy
 
     SPINSTRATS _MyAttack = SPINSTRATS.FOLLOW;
 
+    //intro cutscene function
     protected override void PlayIntro()
     {
         if(!_cameraInPosition)
@@ -239,6 +240,7 @@ public class SpinBossGlhost : BossEnemy
         }
     }
 
+    //called when any other objects for the cutscene are done with their intros
     public override void CheckForIntroEnd()
     {
         for (int i = 0; i < _GlhostsUnderMe.Count; i++)
@@ -255,6 +257,7 @@ public class SpinBossGlhost : BossEnemy
         _cameraInPosition = true;
     }
 
+    //called for Init, after the cutscene
     public override void Init()
     {
         if(!_hasInit)
@@ -311,7 +314,9 @@ public class SpinBossGlhost : BossEnemy
         _startAttackTime = Time.time;
         _myAI = BossAI.INTRO;
     }
-
+    
+    //called when init and cutscene are done
+    //starts fight
     protected override void StartFight()
     {
         _bossBar.SetActive(true);
@@ -375,6 +380,7 @@ public class SpinBossGlhost : BossEnemy
         }
     }
 
+    //decides what the attack the boss will do next
     private void WhatDoNext()
     {
         _currAttackTime = (Time.time - _startAttackTime) / _realTimeBetweenAttacks;
@@ -410,7 +416,8 @@ public class SpinBossGlhost : BossEnemy
         }
     }
 
-
+    //Attack
+    //Enemy just follows the player for a certain amount of time
     private void FollowPlayer()
     {
         _enemyAgent.SetDestination(_playerRef.transform.position);
@@ -453,6 +460,9 @@ public class SpinBossGlhost : BossEnemy
         _calcAngle = _startAngle;
     }
 
+    //Attack
+    //Boss will spin in place
+    //Boss will spawn and shoot ghosts out in random directions
     private void SpinInPlace()
     {
         _currAttackTime = (Time.time - _startAttackTime) / _realSpinAttackDuration;
@@ -504,6 +514,9 @@ public class SpinBossGlhost : BossEnemy
         }
     }
 
+    //Attack
+    //Boss will spin
+    //Boss will shoot out towards the player and richochet off of walls for a duration
     private void PlaySomePinball()
     {
         if(_tellPinballing)
@@ -587,6 +600,8 @@ public class SpinBossGlhost : BossEnemy
         
     }
 
+    //once the boss is done with their attack
+    //will do nothing for an amount of time
     private void Stunned()
     {
         _currAttackTime = (Time.time - _startAttackTime) / _realStunnedDuration;
@@ -601,6 +616,7 @@ public class SpinBossGlhost : BossEnemy
 
     }
 
+    //called when boss gets hit and takes damage
     public override void GotHit(float _damageTaken)
     {
         if (!_amHit && !_invincible)
@@ -620,6 +636,7 @@ public class SpinBossGlhost : BossEnemy
         }
     }
 
+    //called once the boss is defeated
     protected override void Die()
     {
         _myRoom.CheckForEnd();
@@ -642,6 +659,7 @@ public class SpinBossGlhost : BossEnemy
         _myAI = BossAI.OUTRO;
     }
 
+    //plays ending cutscene
     protected override void PlayEnd()
     {
         if (!_cameraInPosition)
@@ -714,7 +732,7 @@ public class SpinBossGlhost : BossEnemy
         }
     }
 
-
+    //Reset function
     public override void MyReset()
     {
         if (_init)

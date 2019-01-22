@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ColorBossGlhost : BossEnemy {
 
+    //Strategies for the Color Boss
     protected enum ColorStrats
     {
         DOWNTIME,
@@ -152,6 +153,8 @@ public class ColorBossGlhost : BossEnemy {
 
 
     ColorStrats _myAttack = ColorStrats.FOLLOW;
+
+    //intro cutscene function
     protected override void PlayIntro()
     {
         if (!_cameraInPosition)
@@ -262,6 +265,7 @@ public class ColorBossGlhost : BossEnemy {
         }
     }
 
+    //called when any other objects for the cutscene are done with their intros
     public override void CheckForIntroEnd()
     {
         for (int i = 0; i < _introGlhostList.Count; i++)
@@ -278,6 +282,7 @@ public class ColorBossGlhost : BossEnemy {
         _cameraInPosition = true;
     }
 
+    //checks when the boss is done eating the ghosts on screen
     private bool CheckForIntroEatingDone()
     {
         for (int i = 0; i < _introGlhostList.Count; i++)
@@ -291,6 +296,7 @@ public class ColorBossGlhost : BossEnemy {
         return true;
     }
 
+    //called for Init, after the cutscene
     public override void Init()
     {
         if (!_hasInit)
@@ -362,6 +368,8 @@ public class ColorBossGlhost : BossEnemy {
         _myAI = BossAI.INTRO;
     }
 
+    //called when init and cutscene are done
+    //starts fight
     protected override void StartFight()
     {
         _bossBar.SetActive(true);
@@ -427,6 +435,7 @@ public class ColorBossGlhost : BossEnemy {
         }
     }
 
+    //decides what the attack the boss will do next
     private void WhatDoNext()
     {
         _currAttackTime = (Time.time - _startAttackTime) / _realTimeBetweenAttacks;
@@ -465,7 +474,8 @@ public class ColorBossGlhost : BossEnemy {
         }
     }
 
-
+    //Attack
+    //Enemy just follows the player for a certain amount of time
     private void FollowPlayer()
     {
         _enemyAgent.SetDestination(_playerRef.transform.position);
@@ -508,6 +518,9 @@ public class ColorBossGlhost : BossEnemy {
         _calcAngle = _startAngle;
     }
 
+    //Attack
+    //Boss will jump into the air and slam down onto the players position
+    //will do it any number of times
     private void BounceAttack()
     {
         _currAttackTime = (Time.time - _startAttackTime) / _realBouncingAirtime;
@@ -578,6 +591,9 @@ public class ColorBossGlhost : BossEnemy {
         }
     }
 
+    //Attack
+    //Boss will rev up by moving backwards
+    //boss will then charge at the player and stop once it hits something
     private void ChargePlayer()
     {
         if (_tellCharging)
@@ -655,6 +671,7 @@ public class ColorBossGlhost : BossEnemy {
         }
     }
 
+    //spawn the glhosts that can damage him
     private void SpawnGlhosts(float _spawnAngle, float _angleOffset)
     {
         _calcAngle = _spawnAngle;
@@ -682,6 +699,8 @@ public class ColorBossGlhost : BossEnemy {
         _ColorsLeft = _currColors;
     }
 
+    //once the boss is done with their attack
+    //will do nothing for an amount of time
     private void Stunned()
     {
         _currAttackTime = (Time.time - _startAttackTime) / _realStunnedDuration;
@@ -702,6 +721,7 @@ public class ColorBossGlhost : BossEnemy {
         }
     }
 
+    //called once the boss is done being stunned and will suck up any remaining glhosts
     private void WaitingForFood()
     {
         if(_myRoom.GetCurrEnemyList.Count == 0)
@@ -711,6 +731,8 @@ public class ColorBossGlhost : BossEnemy {
         }
     }
 
+    //called by ghlosts once they get hit into me
+    //checks to see if the ghlost has the same color
     public bool CheckForColor(float _damageTaken, Color _incColor)
     {
         if(_incColor == _myColor)
@@ -724,6 +746,7 @@ public class ColorBossGlhost : BossEnemy {
         }
     }
 
+    //called when boss gets hit and takes damage
     public override void GotHit(float _damageTaken)
     {
         if (!_amHit && !_invincible)
@@ -743,6 +766,7 @@ public class ColorBossGlhost : BossEnemy {
         }
     }
 
+    //called once the boss is defeated
     protected override void Die()
     {
         _myRoom.CheckForEnd();
@@ -765,6 +789,7 @@ public class ColorBossGlhost : BossEnemy {
         _myAI = BossAI.OUTRO;
     }
 
+    //plays ending cutscene
     protected override void PlayEnd()
     {
         if (!_cameraInPosition)
@@ -837,7 +862,7 @@ public class ColorBossGlhost : BossEnemy {
         }
     }
 
-
+    //Reset function
     public override void MyReset()
     {
         if (_init)

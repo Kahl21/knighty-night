@@ -25,6 +25,7 @@ public class BasicGlhost : BaseEnemy {
         }       
 	}
 
+    //Movement just makes all of the ghosts slowly move towards the player using an enemyAgent
     protected override void Move()
     {
         if(Vector3.Distance(transform.position, _target.transform.position) <= _damageRange)
@@ -42,6 +43,9 @@ public class BasicGlhost : BaseEnemy {
         }
     }
 
+    //shoots a raycast in front of the enemy
+    //if the raycast hits the player
+    //the player takes damage
     protected override void CheckForHit()
     {
         if(Physics.Raycast(transform.position + Vector3.up, transform.forward, out hit, _damageRange))
@@ -54,6 +58,7 @@ public class BasicGlhost : BaseEnemy {
         }
     }
 
+    //changes how clear the ghost is depending on how close they are to the player
     protected override void ChangeSpookiness()
     {
         _spookColor.a = (_spookDistance - Vector3.Distance(transform.position, _target.transform.position))/7.5f;
@@ -61,6 +66,8 @@ public class BasicGlhost : BaseEnemy {
         _myRenderer.materials[1] = _mySpookiness;
     }
 
+    //function to be called when the player hits them
+    //sets the ghost to the "Dead" state
     public override void GotHit(Vector3 _flyDir, float _knockBackForce)
     {
         if(!_hit)
@@ -76,6 +83,8 @@ public class BasicGlhost : BaseEnemy {
         }
     }
 
+    //makes the ghost die in a certain way
+    //depending on what kind of room the ghost is in
     protected override void Die()
     { 
         //Debug.DrawLine(transform.position, transform.position + _deathDirection*_collisionCheckDist);
@@ -161,6 +170,8 @@ public class BasicGlhost : BaseEnemy {
         }
     }
 
+    //called when the room that the ghost is in is complete
+    //removes the ghost from the game
     public override void Stop()
     {
         _canMove = false;

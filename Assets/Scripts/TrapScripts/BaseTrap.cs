@@ -12,6 +12,9 @@ public class BaseTrap : MonoBehaviour {
 
     protected PlayerController _playerRef;
 
+    //start Function
+    //checks if the trap is independent of a room
+    //calls Init based on whether or not independent
     protected virtual void Start()
     {
         if(_independentTrap)
@@ -20,17 +23,21 @@ public class BaseTrap : MonoBehaviour {
         }
     }
 
+    //init function
+    //starts the trap
     public virtual void Init()
     {
         _playerRef = PlayerController.Instance;
         transform.parent = null;
     }
 
+    //Stops trap from working
     public virtual void DisableTrap()
     {
 
     }
 
+    //reset function
     public virtual void ResetTrap()
     {
 

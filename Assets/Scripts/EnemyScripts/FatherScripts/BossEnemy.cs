@@ -6,6 +6,7 @@ using UnityEngine.AI;
 
 public class BossEnemy : MonoBehaviour {
 
+    //enum to keep track of What the boss is doing during update
     protected enum BossAI
     {
         NONE,
@@ -94,16 +95,21 @@ public class BossEnemy : MonoBehaviour {
 
     protected bool _hasInit = false;
     
+    //function that is called once the player enters the room
+    //plays the intro cutscene
     protected virtual void PlayIntro()
     {
 
     }
 
+    //if the cutscene requires other objects
+    //objects will call this once they are done with their setup
     public virtual void CheckForIntroEnd()
     {
 
     }
 
+    //base Init that is called when the player enters the room
     public virtual void Init()
     {
         _startPos = transform.position;
@@ -148,6 +154,7 @@ public class BossEnemy : MonoBehaviour {
         _hasInit = true;
     }
 
+    //called after the beginning cutscene is called to actually start the fight
     protected virtual void StartFight()
     {
 
@@ -165,6 +172,7 @@ public class BossEnemy : MonoBehaviour {
         }
     }
 
+    //makes the yellow bar, behind the red bar on the boss healthbar, go down lerp from its current health to its new health
     protected virtual void LagHealthBar()
     {
         _currHealthTime = (Time.time - _startHealthTime) / _healthLagDuration;
@@ -175,9 +183,9 @@ public class BossEnemy : MonoBehaviour {
             _startHealthTime = Time.time;
             _updatingHealth = true;
         }
-
     }
 
+    //makes the red bar on the boss healthbar go down lerp from its current health to its new health
     protected virtual void UpdateHealthBar()
     {
         _currHealthTime = (Time.time - _startHealthTime) / _healthUpdateDuration;
@@ -194,6 +202,9 @@ public class BossEnemy : MonoBehaviour {
         _laggedBossHealthBar.fillAmount = h01 / _actualMaxHealth;
     }
 
+    //function that is called when damage is taken
+    //boss takes damage
+    //boss enters invulnerable state
     public virtual void GotHit(float _damageTaken)
     {
         if (!_updatingHealth)
@@ -220,6 +231,8 @@ public class BossEnemy : MonoBehaviour {
         }
     }
 
+    //resets the invulerable state that the boss is in
+    //after certain amount of time defined by "InvincibleDuration"
     protected virtual void ResetAmHit()
     {
         _currInvincibleTime = (Time.time - _startInvincibleTime) / _InvincibleDuration;
@@ -233,21 +246,26 @@ public class BossEnemy : MonoBehaviour {
             _amHit = false;
         }
     }
-
+    
+    //Function that tells that boss that it is dead and should start to play the ending cutscene
     protected virtual void Die()
     {
 
     }
 
+    //called whe the boss dies and the ending cutscene starts to play
     protected virtual void PlayEnd()
     {
 
     }
 
+    //Reset function
     public virtual void MyReset()
     {
 
     }
+
+    //Various Getters and Setters
 
     public virtual bool AmHit { get { return _amHit; } }
     public virtual bool AmInvincible { get { return _invincible; } }

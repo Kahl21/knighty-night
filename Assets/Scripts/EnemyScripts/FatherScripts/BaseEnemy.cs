@@ -122,6 +122,8 @@ public class BaseEnemy : MonoBehaviour {
        
     }
 
+    //various Getters and Setters
+
     public virtual Color SetColor { set { _myColor = value; } }
     public virtual GameObject SetPillar { set { _myPillar = value; } }
     public virtual bool AmHit { get { return _hit; } }

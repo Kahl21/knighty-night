@@ -28,6 +28,7 @@ public class DartTrap : BaseTrap {
 
     DartState _myState = DartState.NONE;
     
+    //Initilize function
     public override void Init()
     {
         base.Init();
@@ -57,6 +58,7 @@ public class DartTrap : BaseTrap {
         }
     }
 
+    //creates a dart behind whatever wall the plate in on
     private void SpawnDart()
     {
         _currDelay = (Time.time - _startDelay) / _spawnDelay;
