@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ColorBossGlhost : BossEnemy
+public class MiniBossColor : BossEnemy
 {
 
     //Strategies for the Color Boss
@@ -11,7 +11,6 @@ public class ColorBossGlhost : BossEnemy
         DOWNTIME,
         FOLLOW,
         BOUNCE,
-        CHARGE,
         STUNNED,
         EATGLHOSTS
     }
@@ -71,9 +70,6 @@ public class ColorBossGlhost : BossEnemy
     [SerializeField]
     float _bouncePercentage;
     float _realBouncePercentage;
-    [SerializeField]
-    float _chargePercentage;
-    float _realChargePercentage;
     float _totalPercentage;
 
     [Header("Follow Player Variables")]
@@ -97,26 +93,7 @@ public class ColorBossGlhost : BossEnemy
     float _bounceSpawnAngleOffset;
     Vector3 c0, c1, c2;
 
-    [Header("Charge Attack Variables")]
-    [SerializeField]
-    float _chargeUpDuration;
-    float _realChargeUpDuration;
-    [SerializeField]
-    float _chargeUpBackwardsSpeed;
-    float _realChargeUpBackwardsSpeed;
-    [SerializeField]
-    float _chargeMoveSpeed;
-    float _realChargeSpeed;
-    [SerializeField]
-    float _chargeDetectionAngle;
-    [SerializeField]
-    int _chargeNumOfCasts;
-    [SerializeField]
-    float _chargeSpawnAngle;
-    [SerializeField]
-    float _chargeSpawnAngleOffset;
-    Vector3 _moveDir;
-    bool _tellCharging;
+
 
     [Header("Color Boss Hard Variables")]
     [SerializeField]
@@ -131,8 +108,7 @@ public class ColorBossGlhost : BossEnemy
     float _hardFollowPercentage;
     [SerializeField]
     float _hardBouncePercentage;
-    [SerializeField]
-    float _hardChargePercentage;
+
 
     [Header("Hard Follow Player Varibales")]
     [SerializeField]
@@ -144,13 +120,7 @@ public class ColorBossGlhost : BossEnemy
     [SerializeField]
     float _hardBounceAirtime;
 
-    [Header("Hard Charge Variables")]
-    [SerializeField]
-    float _hardChargeMoveSpeed;
-    [SerializeField]
-    float _hardChargeUpDuration;
-    [SerializeField]
-    float _hardChargeUpBackwardsSpeed;
+
 
 
     ColorStrats _myAttack = ColorStrats.FOLLOW;
@@ -314,30 +284,22 @@ public class ColorBossGlhost : BossEnemy
                 _realColorsForMinions = _colorsForMinions;
                 _realFollowPercentage = _followPercentage;
                 _realBouncePercentage = _bouncePercentage;
-                _realChargePercentage = _chargePercentage;
                 _realTimeBetweenAttacks = _timeBetweenAttacks;
                 _realStunnedDuration = _stunnedDuration;
                 _realFollowDuration = _followDuration;
                 _realNumOfBounces = _numberOfBounces;
                 _realBouncingAirtime = _bouncingAirtime;
-                _realChargeSpeed = _chargeMoveSpeed;
-                _realChargeUpDuration = _chargeUpDuration;
-                _realChargeUpBackwardsSpeed = _chargeUpBackwardsSpeed;
             }
             else
             {
                 _realColorsForMinions = _hardColorsForMinions;
                 _realFollowPercentage = _hardFollowPercentage;
                 _realBouncePercentage = _hardBouncePercentage;
-                _realChargePercentage = _hardChargePercentage;
                 _realTimeBetweenAttacks = _hardTimeBetweenAttacks;
                 _realStunnedDuration = _hardStunnedDuration;
                 _realFollowDuration = _hardFollowDuration;
                 _realNumOfBounces = _hardNumofBounces;
                 _realBouncingAirtime = _hardBounceAirtime;
-                _realChargeSpeed = _hardChargeMoveSpeed;
-                _realChargeUpDuration = _hardChargeUpDuration;
-                _realChargeUpBackwardsSpeed = _hardChargeUpBackwardsSpeed;
             }
 
             _ColorsLeft = _realColorsForMinions;
@@ -363,7 +325,7 @@ public class ColorBossGlhost : BossEnemy
         cam1.x = _midpoint / _introGlhostList.Count;
         _cameraRef.AmFollowingPlayer = false;
 
-        _totalPercentage = _realFollowPercentage + _realBouncePercentage + _realChargePercentage;
+        _totalPercentage = _realFollowPercentage + _realBouncePercentage;
 
         _startAttackTime = Time.time;
         _myAI = BossAI.INTRO;
@@ -413,9 +375,6 @@ public class ColorBossGlhost : BossEnemy
                             break;
                         case ColorStrats.BOUNCE:
                             BounceAttack();
-                            break;
-                        case ColorStrats.CHARGE:
-                            ChargePlayer();
                             break;
                         case ColorStrats.STUNNED:
                             Stunned();
@@ -467,10 +426,8 @@ public class ColorBossGlhost : BossEnemy
             else
             {
                 //Debug.Log("Charge Chosen");
-                _tellCharging = true;
                 _enemyAgent.enabled = false;
                 _startAttackTime = Time.time;
-                _myAttack = ColorStrats.CHARGE;
             }
         }
     }
@@ -592,85 +549,7 @@ public class ColorBossGlhost : BossEnemy
         }
     }
 
-    //Attack
-    //Boss will rev up by moving backwards
-    //boss will then charge at the player and stop once it hits something
-    private void ChargePlayer()
-    {
-        if (_tellCharging)
-        {
-            _currAttackTime = (Time.time - _startAttackTime) / _realChargeUpDuration;
 
-            if (_currAttackTime >= 1)
-            {
-                _currAttackTime = 1;
-                _tellCharging = false;
-                _moveDir = (_playerRef.transform.position - transform.position).normalized;
-                _moveDir.y = 0;
-
-                _calcAngle = _startAngle;
-                _startAttackTime = Time.time;
-            }
-            transform.LookAt(_playerRef.transform.position);
-
-            if (!Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), -transform.forward, _bossCollisionDetectDistance))
-            {
-                transform.position -= transform.forward * _realChargeUpBackwardsSpeed * Time.deltaTime;
-            }
-
-        }
-        else
-        {
-            //Debug.Log("charging");
-
-            for (int i = 0; i <= _chargeNumOfCasts; i++)
-            {
-                float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
-                float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
-
-                Vector3 RayDir = (transform.forward * Zpos) + (transform.right * Xpos);
-
-                if (_debug)
-                {
-                    Debug.DrawRay(transform.position + (Vector3.up * _vertDetectOffset), RayDir * _bossCollisionDetectDistance, Color.red);
-                }
-
-                _calcAngle += _detectionAngle / _chargeNumOfCasts;
-
-                if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
-                {
-                    if (hit.collider.GetComponent<PlayerController>())
-                    {
-                        hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
-                    }
-                    else if (!hit.collider.GetComponent<PlayerController>())
-                    {
-                        int _randomColor = Random.Range(0, _ColorsLeft.Count);
-                        _myColor = _ColorsLeft[_randomColor];
-                        _myMaterial.color = _myColor;
-                        _myRenderer.materials[1] = _myMaterial;
-
-                        SpawnGlhosts(_chargeSpawnAngle, _chargeSpawnAngleOffset);
-
-                        _enemyAgent.enabled = true;
-                        _myAttack = ColorStrats.STUNNED;
-                        _startAttackTime = Time.time;
-                        return;
-                    }
-                }
-
-            }
-
-            if (_debug)
-            {
-                Debug.DrawRay(transform.position + (Vector3.up * _vertDetectOffset), _moveDir * _bossCollisionDetectDistance, Color.blue);
-            }
-
-            _calcAngle = _startAngle;
-
-            transform.position += _moveDir * _realChargeSpeed * Time.deltaTime;
-        }
-    }
 
     //spawn the glhosts that can damage him
     private void SpawnGlhosts(float _spawnAngle, float _angleOffset)
@@ -909,4 +788,5 @@ public class ColorBossGlhost : BossEnemy
 
     public Color GetColor { get { return _myColor; } }
 }
+
 
