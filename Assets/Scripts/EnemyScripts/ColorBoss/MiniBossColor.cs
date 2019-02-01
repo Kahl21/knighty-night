@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ColorBossGlhost : BossEnemy
+public class MiniBossColor : BossEnemy
 {
 
     //Strategies for the Color Boss

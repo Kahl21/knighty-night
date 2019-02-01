@@ -53,6 +53,8 @@ public class SpinBossGlhost : BossEnemy
     int _numOfCasts;
     float _calcAngle;
     [SerializeField]
+    float _maxDistanceOut;
+    [SerializeField]
     bool _debug;
 
     [Header("Percentages of Attacks")]
@@ -87,7 +89,7 @@ public class SpinBossGlhost : BossEnemy
     float _realSpawnDelayDuration;
     float _currSpawnTime;
     float _startSpawnTime;
-    
+
     [Header("Pinball Variables")]
     [SerializeField]
     float _pinballDetectionAngle;
@@ -147,14 +149,14 @@ public class SpinBossGlhost : BossEnemy
     //intro cutscene function
     protected override void PlayIntro()
     {
-        if(!_cameraInPosition)
+        if (!_cameraInPosition)
         {
             _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-            
+
             if (_currAttackTime >= 1)
             {
                 _currAttackTime = 1;
-                if(!_glhostsCrushed)
+                if (!_glhostsCrushed)
                 {
                     for (int i = 0; i < _GlhostsUnderMe.Count; i++)
                     {
@@ -192,15 +194,15 @@ public class SpinBossGlhost : BossEnemy
             }
 
             Vector3 fall = Vector3.down * Time.deltaTime * _introFallSpeed;
-            if(Physics.Raycast(transform.position, fall, _downCheckDistance))
+            if (Physics.Raycast(transform.position, fall, _downCheckDistance))
             {
-                
+
                 fall = Vector3.zero;
             }
 
             transform.position += fall;
         }
-        else if(!_turnToPlayerFinished)
+        else if (!_turnToPlayerFinished)
         {
             _currAttackTime = (Time.time - _startAttackTime) / _introTurnAroundDuration;
 
@@ -245,7 +247,7 @@ public class SpinBossGlhost : BossEnemy
     {
         for (int i = 0; i < _GlhostsUnderMe.Count; i++)
         {
-            if(!_GlhostsUnderMe[i].AmDone)
+            if (!_GlhostsUnderMe[i].AmDone)
             {
                 //Debug.Log("returned");
                 return;
@@ -260,11 +262,11 @@ public class SpinBossGlhost : BossEnemy
     //called for Init, after the cutscene
     public override void Init()
     {
-        if(!_hasInit)
+        if (!_hasInit)
         {
             base.Init();
 
-            if(!_managerRef.HardModeOn)
+            if (!_managerRef.HardModeOn)
             {
                 _realFollowPercentage = _followPercentage;
                 _realSpinAttackPercentage = _spinAttackPercentage;
@@ -302,7 +304,7 @@ public class SpinBossGlhost : BossEnemy
                 _GlhostsUnderMe.Add(_enemiesToCrush.transform.GetChild(i).GetComponent<CutsceneGlhosts>());
             }
         }
-        
+
         _ogCamPos = _cameraRef.transform.position;
         cam0 = _cameraRef.transform.position;
         cam1 = transform.position + _camOffset;
@@ -314,19 +316,23 @@ public class SpinBossGlhost : BossEnemy
         _startAttackTime = Time.time;
         _myAI = BossAI.INTRO;
     }
-    
+
     //called when init and cutscene are done
     //starts fight
     protected override void StartFight()
     {
-        _bossBar.SetActive(true);
-        _laggedBossHealthBar.fillAmount = 1;
-        _actualBossHealthBar.fillAmount = 1;
+        if (!_init)
+        {
+            _bossBar.SetActive(true);
+            _laggedBossHealthBar.fillAmount = 1;
+            _actualBossHealthBar.fillAmount = 1;
 
-        _enemyAgent.enabled = true;
-        _cameraRef.AmFollowingPlayer = true;
-        _calcAngle = _startAngle;
+            _enemyAgent.enabled = true;
+            _cameraRef.AmFollowingPlayer = true;
+            _calcAngle = _startAngle;
 
+            
+        }
         _myAI = BossAI.FIGHTING;
         _init = true;
     }
@@ -399,7 +405,7 @@ public class SpinBossGlhost : BossEnemy
             else if (_nextAttack > _realFollowPercentage && _nextAttack <= (_realFollowPercentage + _realSpinAttackPercentage))
             {
                 //Debug.Log("spin Chosen");
-                
+
                 _enemyAgent.enabled = false;
                 _startAttackTime = Time.time;
                 _startSpawnTime = Time.time;
@@ -448,9 +454,9 @@ public class SpinBossGlhost : BossEnemy
 
             _calcAngle += _detectionAngle / _numOfCasts;
 
-            if(Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
+            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
             {
-                if(hit.collider.GetComponent<PlayerController>())
+                if (hit.collider.GetComponent<PlayerController>())
                 {
                     hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
                 }
@@ -505,7 +511,7 @@ public class SpinBossGlhost : BossEnemy
             _startAttackTime = Time.time;
         }
 
-        if(_currSpawnTime >= 1)
+        if (_currSpawnTime >= 1)
         {
             _currSpawnTime = 1;
             GameObject _newEnemy = Instantiate<GameObject>(_enemyToSpawn, transform.position, transform.rotation);
@@ -519,10 +525,10 @@ public class SpinBossGlhost : BossEnemy
     //Boss will shoot out towards the player and richochet off of walls for a duration
     private void PlaySomePinball()
     {
-        if(_tellPinballing)
+        if (_tellPinballing)
         {
             _currAttackTime = (Time.time - _startAttackTime) / _realPinballTellDuration;
-            
+
             if (_currAttackTime >= 1)
             {
                 _currAttackTime = 1;
@@ -530,7 +536,7 @@ public class SpinBossGlhost : BossEnemy
                 _moveDir = (_playerRef.transform.position - transform.position).normalized;
                 _moveDir.y = 0;
                 _startAttackTime = Time.time;
-            } 
+            }
 
             _currSpinningSpeed = _realSpinningSpeed * _currAttackTime;
 
@@ -570,13 +576,13 @@ public class SpinBossGlhost : BossEnemy
                 Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (_moveDir * _bossCollisionDetectDistance), Color.blue);
             }
 
-            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), _moveDir,out hit, _bossCollisionDetectDistance +1f))
+            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), _moveDir, out hit, _bossCollisionDetectDistance + 1f))
             {
                 Vector3 checkDir = _moveDir;
                 GameObject thingHit = hit.collider.gameObject;
 
                 //Debug.Log("reflected");
-                if(!thingHit.GetComponent<BaseEnemy>() && !thingHit.GetComponent<BossEnemy>() && !thingHit.GetComponent<PlayerController>())
+                if (!thingHit.GetComponent<BaseEnemy>() && !thingHit.GetComponent<BossEnemy>() && !thingHit.GetComponent<PlayerController>())
                 {
                     _moveDir = Vector3.Reflect(checkDir, hit.normal);
                 }
@@ -591,13 +597,14 @@ public class SpinBossGlhost : BossEnemy
             {
                 _invincible = false;
                 _enemyAgent.enabled = true;
+                checkIfOffMap();
                 _MyAttack = SPINSTRATS.STUNNED;
                 _startAttackTime = Time.time;
                 return;
             }
         }
 
-        
+
     }
 
     //once the boss is done with their attack
@@ -680,7 +687,7 @@ public class SpinBossGlhost : BossEnemy
 
             _cameraRef.transform.position = cam01;
         }
-        else if(!_showingDeath)
+        else if (!_showingDeath)
         {
             _currAttackTime = (Time.time - _startAttackTime) / _deathDuration;
             //Debug.Log("showing death");
@@ -698,7 +705,7 @@ public class SpinBossGlhost : BossEnemy
                 _startAttackTime = Time.time;
                 _showingDeath = true;
             }
-            
+
             _myColor.a = 1 - _currAttackTime;
             _myMaterial.color = _myColor;
             _myRenderer.materials[1] = _myMaterial;
@@ -757,10 +764,10 @@ public class SpinBossGlhost : BossEnemy
             _actualBossHealthBar.fillAmount = 1;
 
             _bossBar.SetActive(false);
-             _cameraInPosition = false;
-             _fallFinished = false;
-             _turnToPlayerFinished = false;
-             _glhostsCrushed = false;
+            _cameraInPosition = false;
+            _fallFinished = false;
+            _turnToPlayerFinished = false;
+            _glhostsCrushed = false;
 
             _endingPlaying = false;
             _laggingHealth = false;
@@ -772,6 +779,17 @@ public class SpinBossGlhost : BossEnemy
             _myAI = BossAI.NONE;
             _MyAttack = SPINSTRATS.FOLLOW;
             _init = false;
+        }
+    }
+
+    private void checkIfOffMap()
+    {
+        if (Vector3.Distance(_startPos, transform.position) >= _maxDistanceOut)
+        {
+            transform.position = _startPos;
+            
+            _myAI = BossAI.INTRO;
+            _fallFinished = false;
         }
     }
 }
