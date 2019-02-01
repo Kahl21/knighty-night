@@ -775,9 +775,9 @@ public class PlayerController : MonoBehaviour {
     //checks to see if the player has reached the end of a level
     private void EndLevel(bool didtheywin)
     {
-        _menuRef.SetMenu(4);
-        _winImage = _menuRef.GetMenus[4].transform.GetChild(1).gameObject;
-        _loseImage = _menuRef.GetMenus[4].transform.GetChild(2).gameObject;
+        _menuRef.SetMenu(WhichUIMenu.WIN);
+        _winImage = _menuRef.GetMenus[(int)WhichUIMenu.WIN].transform.GetChild(1).gameObject;
+        _loseImage = _menuRef.GetMenus[(int)WhichUIMenu.WIN].transform.GetChild(2).gameObject;
         if (didtheywin)
         {
             _winImage.SetActive(true);

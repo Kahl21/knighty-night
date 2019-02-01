@@ -10,6 +10,16 @@ public enum MenuOrient
     HORIZ
 }
 
+public enum WhichUIMenu
+{
+    MAINMENU,
+    OPTIONS,
+    PLAYER,
+    PAUSE,
+    WIN
+}
+
+
 public class Menuing : MonoBehaviour {
 
     private static Menuing _instance;
@@ -97,12 +107,12 @@ public class Menuing : MonoBehaviour {
         _playerRef = PlayerController.Instance;
         _playerRef.SetMenus = _menus;
 
-        SetMenu(4);
+        SetMenu(WhichUIMenu.WIN);
 
-        _playerRef.SetWinImage = _menus[4].transform.GetChild(1).gameObject;
-        _playerRef.SetLoseImage = _menus[4].transform.GetChild(2).gameObject;
+        _playerRef.SetWinImage = _menus[(int)WhichUIMenu.WIN].transform.GetChild(1).gameObject;
+        _playerRef.SetLoseImage = _menus[(int)WhichUIMenu.WIN].transform.GetChild(2).gameObject;
 
-        SetMenu(0);
+        SetMenu(WhichUIMenu.MAINMENU);
     }
 
     private void Update()
@@ -118,17 +128,17 @@ public class Menuing : MonoBehaviour {
         }
     }
 
-    public void SetMenu(int _whichMenu)
+    public void SetMenu(WhichUIMenu _whichMenu)
     {
         for (int i = 0; i < transform.childCount; i++)
         {
             _menus[i].SetActive(false);
         }
-        _menus[_whichMenu].SetActive(true);
+        _menus[(int)_whichMenu].SetActive(true);
 
-        if (_whichMenu != 2)
+        if (_whichMenu != WhichUIMenu.PLAYER)
         {
-            SetButtons(_whichMenu);
+            SetButtons((int)_whichMenu);
             currSelectableButtons[currSelected].Select();
         }
     }
@@ -158,14 +168,14 @@ public class Menuing : MonoBehaviour {
     {
         if(_paused)
         {
-            SetMenu(2);
+            SetMenu(WhichUIMenu.PLAYER);
             Time.timeScale = 1;
             _playerRef.InMenu = false;
             _paused = false;
         }
         else
         {
-            SetMenu(3);
+            SetMenu(WhichUIMenu.PAUSE);
             Time.timeScale = 0;
             _playerRef.InMenu = true;
             _paused = true;
@@ -180,7 +190,7 @@ public class Menuing : MonoBehaviour {
 
         _playerRef.InMenu = false;
         _playerRef.ResetPlayer();
-        SetMenu(2);
+        SetMenu(WhichUIMenu.PLAYER);
     }
 
     public void NextLevel()
@@ -191,12 +201,12 @@ public class Menuing : MonoBehaviour {
         _playerRef.InMenu = false;
         Time.timeScale = 1;
         _paused = false;
-        SetMenu(2);
+        SetMenu(WhichUIMenu.PLAYER);
     }
 
     public void RetryLevel()
     {
-        SetMenu(2);
+        SetMenu(WhichUIMenu.PLAYER);
         _playerRef.InMenu = false;
         Time.timeScale = 1;
         _paused = false;
@@ -206,7 +216,7 @@ public class Menuing : MonoBehaviour {
     public void RestartGame()
     {
         SceneManager.LoadScene(1);
-        SetMenu(2);
+        SetMenu(WhichUIMenu.PLAYER);
         _playerRef.InMenu = false;
         Time.timeScale = 1;
         _paused = false;
@@ -235,12 +245,12 @@ public class Menuing : MonoBehaviour {
 
     public void ToOptions()
     {
-        SetMenu(1);
+        SetMenu(WhichUIMenu.OPTIONS);
     }
 
     public void MenuBack()
     {
-        SetMenu(0);
+        SetMenu(WhichUIMenu.MAINMENU);
     }
 
     public void EndGame()
