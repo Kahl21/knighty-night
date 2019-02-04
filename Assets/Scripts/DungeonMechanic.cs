@@ -26,6 +26,8 @@ public class DungeonMechanic : MonoBehaviour {
     Mechanic _roomMechanic;
     [SerializeField]
     List<DoorMovement> _doors;
+    [SerializeField]
+    DungeonMechanic _secondaryMechanic;
 
     [Header("If Room Has Enemies")]
     [SerializeField]
@@ -36,7 +38,6 @@ public class DungeonMechanic : MonoBehaviour {
     List<BaseTrap> _trapsInRoom;
 
     [Header("If Swarm Room Variables")]
-
     [SerializeField]
     float _startSpawnDelay;
     [SerializeField]
@@ -50,7 +51,11 @@ public class DungeonMechanic : MonoBehaviour {
     bool _roomStarted = false;
     bool _spawning = false;
 
-    //[Header("If Chase Room Variables")]
+    [Header("If Chase Room Variables")]
+    [SerializeField]
+    GameObject _spawnPoint;
+    [SerializeField]
+    float _howManyGlhostsToSpawn;
 
     [Header("If Color Room Variables")]
     [SerializeField]
@@ -86,7 +91,7 @@ public class DungeonMechanic : MonoBehaviour {
 
         _myCollider.enabled = false;
 
-        if(_doors.Count > 0)
+        if(_doors.Count > 0 && _roomMechanic != Mechanic.CHASE)
         {
             for (int i = 0; i < _doors.Count; i++)
             {
@@ -116,6 +121,10 @@ public class DungeonMechanic : MonoBehaviour {
                 _roomStarted = true;
                 break;
             case Mechanic.CHASE:
+                for (int i = 0; i < _howManyGlhostsToSpawn; i++)
+                {
+                    SpawnEnemy(0);
+                }
                 break;
             case Mechanic.COLOR:
                 for (int i = 0; i < _coloredBlocks.Count; i++)
@@ -140,22 +149,45 @@ public class DungeonMechanic : MonoBehaviour {
             default:
                 break;
         }
+
+        if (_secondaryMechanic != null)
+        {
+            if (_secondaryMechanic.GetMechanic != Mechanic.CHASE)
+            {
+                _secondaryMechanic.Init();
+            }
+            else
+            {
+                for (int i = 0; i < _secondaryMechanic.GetDoors.Count; i++)
+                {
+                    _secondaryMechanic.GetDoors[i].Init();
+                }
+            }
+        }
+       
     }
 
     private void Update()
-    { 
-        if(_roomMechanic == Mechanic.SWARM && _roomStarted)
+    {
+        if(_roomStarted)
         {
-            if(_glhostsSpawned < _howManyGlhostsToKill)
+            switch (_roomMechanic)
             {
-                if (_spawning)
-                {
-                    SpawningDelay();
-                }
-                else
-                {
-                    StartDelay();
-                }
+                case Mechanic.SWARM:
+                    if (_glhostsSpawned < _howManyGlhostsToKill)
+                    {
+                        if (_spawning)
+                        {
+                            SpawningDelay();
+                        }
+                        else
+                        {
+                            StartDelay();
+                        }
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -216,7 +248,6 @@ public class DungeonMechanic : MonoBehaviour {
                 }
                 else
                 {
-                    XorZ = Random.Range(-1f, 1f);
                     //Debug.Log("SecondCheck " + XorZ);
                     if (XorZ > 0)
                     {
@@ -227,8 +258,10 @@ public class DungeonMechanic : MonoBehaviour {
                     {
                         spawnPos.z = _ZMin;
                     }
-                    spawnPos.x = Random.Range(_XMin, _XMax);
                 }
+                break;
+            case Mechanic.CHASE:
+                spawnPos = _spawnPoint.transform.position;
                 break;
             case Mechanic.COLOR:
                 int spawnPosNum = Random.Range(0, _spawnPoints.Count);
@@ -268,6 +301,7 @@ public class DungeonMechanic : MonoBehaviour {
                 }
                 break;
             case Mechanic.CHASE:
+                EndAll();
                 break;
             case Mechanic.COLOR:
                 for (int i = 0; i < _coloredBlocks.Count; i++)
@@ -299,22 +333,33 @@ public class DungeonMechanic : MonoBehaviour {
 
     public void EndAll()
     {
-        AudioManager.instance.GateOpen();
-
         _roomStarted = false;
         _spawning = false;
+
+        if (_roomMechanic != Mechanic.CHASE)
+        {
+            AudioManager.instance.GateOpen();
+
+            if (_doors.Count > 0)
+            {
+                for (int i = 0; i < _doors.Count; i++)
+                {
+                    _doors[i].RoomDone();
+                }
+            }
+        }
+
+        if (_secondaryMechanic != null)
+        {
+            _secondaryMechanic.EndAll();
+        }
 
         if(_enemyList.Count > 0)
         {
             for (int i = _enemyList.Count - 1; i >= 0; i--)
             {
-               _enemyList[i].GetComponent<BaseEnemy>().Stop();
+                _enemyList[i].GetComponent<BaseEnemy>().Stop();
             }
-        }
-
-        for (int i = 0; i < _doors.Count; i++)
-        {
-            _doors[i].RoomDone();
         }
 
         if(_trapsInRoom.Count > 0)
@@ -327,6 +372,7 @@ public class DungeonMechanic : MonoBehaviour {
 
         _glhostsKilled = 0;
         _glhostsSpawned = 0;
+
     }
 
     public void AddEnemy(BaseEnemy _enemyToAdd)
@@ -356,6 +402,14 @@ public class DungeonMechanic : MonoBehaviour {
                 EndAll();
                 break;
             case Mechanic.CHASE:
+                if (_doors.Count > 0) 
+                {
+                    for (int i = 0; i < _doors.Count; i++)
+                    {
+                        _doors[i].RoomDone();
+                    }
+                }
+                EndAll();
                 break;
             case Mechanic.COLOR:
                 EndAll();
@@ -399,5 +453,6 @@ public class DungeonMechanic : MonoBehaviour {
     
     public BossEnemy GetBigBoy { get { return _BigBad; } }
     public Mechanic GetMechanic { get { return _roomMechanic; } }
+    public List<DoorMovement> GetDoors { get { return _doors; } }
     public List<BaseEnemy> GetCurrEnemyList { get { return _enemyList; } }
 }

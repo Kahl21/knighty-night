@@ -6,6 +6,8 @@ public class GraveyardGlhost : BasicGlhost {
 
     [Header("Graveyard Glhost Variables")]
     [SerializeField]
+    bool _alwaysInvincible;
+    [SerializeField]
     Color _invincibleColor;
     Color _startingColor;
     [SerializeField]
@@ -20,8 +22,17 @@ public class GraveyardGlhost : BasicGlhost {
     {
         base.Init(_spawner, _incomingMech);
         _startingColor = _spookColor;
-        _particle.SetActive(false);
-        _invStartTime = Time.time;
+        if(_alwaysInvincible)
+        {
+            _spookColor = _invincibleColor;
+            _particle.SetActive(true);
+            _invincible = true;
+        }
+        else
+        {
+            _particle.SetActive(false);
+            _invStartTime = Time.time;
+        }
     }
     
     protected override void Update()
@@ -32,7 +43,10 @@ public class GraveyardGlhost : BasicGlhost {
             {
                 if (_canMove)
                 {
-                    ChangeInvincible();
+                    if(!_alwaysInvincible)
+                    {
+                        ChangeInvincible();
+                    }
                     Move();
                     CheckForHit();
                 }
