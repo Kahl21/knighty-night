@@ -17,7 +17,7 @@ public class BossFireStatueTrap : BaseTrap {
 
     [Header("Flame Statue Variables")]
     [SerializeField]
-    float _beginningDelay;
+    public float _beginningDelay;
     [SerializeField]
     float _fireDelay;
     [SerializeField]
@@ -39,6 +39,7 @@ public class BossFireStatueTrap : BaseTrap {
     float _currDetectDistance;
     RaycastHit hit;
     ParticleSystem _myFire;
+    public GameObject bossEntity;
 
     FireState _mystate = FireState.NONE;
 
@@ -88,7 +89,7 @@ public class BossFireStatueTrap : BaseTrap {
     }
 
     //starts delay to spit out fire
-    void StartingDelay()
+    public void StartingDelay()
     {
         _currDelay = (Time.time - _startDelay) / _beginningDelay;
 
@@ -102,7 +103,7 @@ public class BossFireStatueTrap : BaseTrap {
     }
 
     //plays fire animation after a delay
-    public void StartFire()
+    void StartFire()
     {
         _currDelay = (Time.time - _startDelay) / _fireDelay;
 
@@ -144,7 +145,7 @@ public class BossFireStatueTrap : BaseTrap {
         _currDelay = (Time.time - _startDelay) / _burningDuration;
         
         LookForPlayer();
-
+        Debug.Log("burn Player");
         if (_currDelay >= 1)
         {
             _currDelay = 1;
@@ -174,6 +175,8 @@ public class BossFireStatueTrap : BaseTrap {
             _currDetectDistance = 0;
             
             _startDelay = Time.time;
+
+            bossEntity.GetComponent<TrapBossGlhost>().trapComplete = true;
             _mystate = FireState.NONE;
         }
     }

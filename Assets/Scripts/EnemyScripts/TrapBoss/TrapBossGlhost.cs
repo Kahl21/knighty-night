@@ -58,7 +58,9 @@ public class TrapBossGlhost : BossEnemy
     float _maxDistanceOut;
     [SerializeField]
     bool _debug;
+    [SerializeField]
     float _detectDistance;
+    public bool trapComplete = false;
     RaycastHit hit;
 
     [Header("Fire Trap Percentages")]
@@ -101,6 +103,8 @@ public class TrapBossGlhost : BossEnemy
     GameObject currentTrap;
 
     [Header("Fire Trap Variables")]
+    [SerializeField]
+    float _trapStartDelay;
     [SerializeField]
     float _pinballDetectionAngle;
     [SerializeField]
@@ -160,6 +164,7 @@ public class TrapBossGlhost : BossEnemy
     
     protected override void PlayIntro()
     {
+        /*
         if (!_cameraInPosition)
         {
             _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
@@ -251,6 +256,8 @@ public class TrapBossGlhost : BossEnemy
                 StartFight();
             }
         }
+        */
+        StartFight();
     }
 
     //called when any other objects for the cutscene are done with their intros
@@ -309,11 +316,12 @@ public class TrapBossGlhost : BossEnemy
             }
 
             _GlhostsUnderMe = new List<CutsceneGlhosts>();
-
+            /*
             for (int i = 0; i < _enemiesToCrush.transform.childCount; i++)
             {
                 _GlhostsUnderMe.Add(_enemiesToCrush.transform.GetChild(i).GetComponent<CutsceneGlhosts>());
             }
+            */
         }
 
         _ogCamPos = _cameraRef.transform.position;
@@ -334,6 +342,7 @@ public class TrapBossGlhost : BossEnemy
     {
         if (!_init)
         {
+            Debug.Log("start Fight");
             _bossBar.SetActive(true);
             _laggedBossHealthBar.fillAmount = 1;
             _actualBossHealthBar.fillAmount = 1;
@@ -429,22 +438,37 @@ public class TrapBossGlhost : BossEnemy
     private void findTrap()
     {
         
-        if (_enemyAgent.destination == null)
+        if (_enemyAgent.hasPath == false)
         {
+            Debug.Log("findTrap");
             fcurrentTrap = Random.Range(0, _listOfTraps.Count);
-            currentTrap = _listOfTraps[fcurrentTrap];
-            _enemyAgent.SetDestination(currentTrap.transform.position);
+            GameObject newTrap = _listOfTraps[fcurrentTrap];
+            if (newTrap == currentTrap)
+            {
+                return;
+            }
+            else
+            {
+                currentTrap = newTrap;
+                _enemyAgent.SetDestination(currentTrap.transform.position);
+            }
+            
         }
-        
+        Debug.DrawRay(transform.position + Vector3.up, this.transform.forward);
         if (Physics.Raycast(transform.position + Vector3.up, this.transform.forward, out hit, _detectDistance))
         {
+            
             GameObject hitObject = hit.collider.gameObject;
            
-            if (hitObject.GetComponent<Transform>().GetChild(0).GetComponent<BossFireStatueTrap>())
+            if (hitObject == currentTrap)
             {
-                hitObject.GetComponent<Transform>().GetChild(0).GetComponent<BossFireStatueTrap>().StartFire();
+                BossFireStatueTrap possessedTrap = hitObject.GetComponent<Transform>().GetChild(0).GetComponent<BossFireStatueTrap>();
+                possessedTrap.StartingDelay();
+                possessedTrap.bossEntity = this.gameObject;
+                possessedTrap._beginningDelay = _trapStartDelay;
+                trapComplete = false;
+                _MyAttack = TRAPSTRATS.INSIDETRAP;
             }
-            _MyAttack = TRAPSTRATS.INSIDETRAP;
         }
         
     }
@@ -454,7 +478,14 @@ public class TrapBossGlhost : BossEnemy
     //Boss will spawn and shoot ghosts out in random directions
     private void possessTrap()
     {
-
+        gameObject.GetComponent<MeshRenderer>().enabled = false;
+        gameObject.GetComponent<CapsuleCollider>().enabled = false;
+        if (trapComplete)
+        {
+            gameObject.GetComponent<MeshRenderer>().enabled = true;
+            gameObject.GetComponent<CapsuleCollider>().enabled = true;
+            _MyAttack = TRAPSTRATS.FINDTRAP;
+        }
     }
 
     private void ShootFireBeam()
