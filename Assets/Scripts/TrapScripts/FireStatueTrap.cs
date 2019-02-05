@@ -24,6 +24,8 @@ public class FireStatueTrap : BaseTrap {
     float _fireIncDuration;
     [SerializeField]
     float _burningDuration;
+    [SerializeField]
+    float _fireDistance;
     float _startDelay;
     float _currDelay;
 
@@ -44,6 +46,8 @@ public class FireStatueTrap : BaseTrap {
     protected override void Start()
     {
         _myFire = transform.GetChild(0).transform.GetComponent<ParticleSystem>();
+        var main = _myFire.main;
+        main.startLifetime = _fireDistance;
         _myFire.Stop();
         base.Start();
     }
