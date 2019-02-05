@@ -309,7 +309,6 @@ public class MiniBossColor : BossEnemy
                 _realColorsForMinions = _colorsForMinions;
                 _realFollowPercentage = _followPercentage;
                 _realBouncePercentage = _bouncePercentage;
-                _realChargePercentage = _chargePercentage;
                 _realTimeBetweenAttacks = _timeBetweenAttacks;
                 _realStunnedDuration = _stunnedDuration;
                 _realFollowDuration = _followDuration;
@@ -324,7 +323,6 @@ public class MiniBossColor : BossEnemy
                 _realColorsForMinions = _hardColorsForMinions;
                 _realFollowPercentage = _hardFollowPercentage;
                 _realBouncePercentage = _hardBouncePercentage;
-                _realChargePercentage = _hardChargePercentage;
                 _realTimeBetweenAttacks = _hardTimeBetweenAttacks;
                 _realStunnedDuration = _hardStunnedDuration;
                 _realFollowDuration = _hardFollowDuration;
@@ -358,7 +356,7 @@ public class MiniBossColor : BossEnemy
         cam1.x = _midpoint / _introGlhostList.Count;
         _cameraRef.AmFollowingPlayer = false;
 
-        _totalPercentage = _realFollowPercentage + _realBouncePercentage + _realChargePercentage;
+        _totalPercentage = _realFollowPercentage + _realBouncePercentage;
 
         _startAttackTime = Time.time;
         _myAI = BossAI.INTRO;
@@ -408,9 +406,6 @@ public class MiniBossColor : BossEnemy
                             break;
                         case ColorStrats.BOUNCE:
                             BounceAttack();
-                            break;
-                        case ColorStrats.CHARGE:
-                            ChargePlayer();
                             break;
                         case ColorStrats.STUNNED:
                             Stunned();
@@ -465,7 +460,6 @@ public class MiniBossColor : BossEnemy
                 _tellCharging = true;
                 _enemyAgent.enabled = false;
                 _startAttackTime = Time.time;
-                _myAttack = ColorStrats.CHARGE;
             }
         }
     }
