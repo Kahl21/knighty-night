@@ -47,6 +47,7 @@ public class BaseEnemy : MonoBehaviour {
     protected Menuing _menuRef;
     protected PlayerController _target;
     protected DungeonMechanic _mySpawner;
+    [SerializeField]
     protected Mechanic _myMechanic;
 
 	// Use this for initialization
