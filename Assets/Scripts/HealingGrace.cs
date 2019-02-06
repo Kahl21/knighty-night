@@ -23,6 +23,10 @@ public class HealingGrace : MonoBehaviour {
     Color _baseColor;
     Color _currentColor;
 
+    //Check If Checkpoint
+    [SerializeField]
+    public bool isCheckpoint;
+
     private void Awake()
     {
         _graceLight = GetComponent<ParticleSystem>();
