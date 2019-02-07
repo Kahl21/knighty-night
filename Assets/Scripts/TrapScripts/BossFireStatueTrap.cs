@@ -15,17 +15,18 @@ public class BossFireStatueTrap : BaseTrap {
         ROOMDONE
     }
 
-    [Header("Flame Statue Variables")]
-    [SerializeField]
+    [Header("Fire Statue Variables")]
+    public float _fireDamage;
+    [HideInInspector]
     public float _beginningDelay;
     [SerializeField]
     float _fireDelay;
     [SerializeField]
     float _fireIncDuration;
     [SerializeField]
-    float _burningDuration;
+    public float _burningDuration;
     [SerializeField]
-    float _fireDistance;
+    public float _fireDistance;
     float _startDelay;
     float _currDelay;
 
@@ -34,8 +35,8 @@ public class BossFireStatueTrap : BaseTrap {
     bool _debugDamageArea;
     [SerializeField]
     float _spaceBetweenRays;
-    [SerializeField]
-    float _maxDetectDistance;
+    [HideInInspector]
+    public float _maxDetectDistance;
     float _currDetectDistance;
     RaycastHit hit;
     ParticleSystem _myFire;
@@ -91,6 +92,11 @@ public class BossFireStatueTrap : BaseTrap {
     //starts delay to spit out fire
     public void StartingDelay()
     {
+        var main = _myFire.main;
+        main.startLifetime = _fireDistance;
+
+        _trapDamage = _fireDamage;
+
         _currDelay = (Time.time - _startDelay) / _beginningDelay;
 
         if (_currDelay >= 1)
@@ -190,7 +196,7 @@ public class BossFireStatueTrap : BaseTrap {
 
             if (_mystate != FireState.FLAMEOFF)
             {
-                _RayPos = transform.position + Vector3.up + (transform.right * _spaceBetweenRays * i);
+                _RayPos = transform.position + Vector3.down + (transform.right * _spaceBetweenRays * i);
                 if (_debugDamageArea)
                 {
                     Debug.DrawRay(_RayPos, transform.forward * _currDetectDistance);
@@ -206,7 +212,7 @@ public class BossFireStatueTrap : BaseTrap {
             }
             else
             {
-                _RayPos = transform.position + Vector3.up + (transform.right * _spaceBetweenRays * i) + (transform.forward * _maxDetectDistance);
+                _RayPos = transform.position + Vector3.down + (transform.right * _spaceBetweenRays * i) + (transform.forward * _maxDetectDistance);
                 if (_debugDamageArea)
                 {
                     Debug.DrawRay(_RayPos, -transform.forward * _currDetectDistance);

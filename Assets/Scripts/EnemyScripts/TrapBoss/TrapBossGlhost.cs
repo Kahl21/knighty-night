@@ -15,27 +15,6 @@ public class TrapBossGlhost : BossEnemy
         FIREBEAM,
         QUADFIRE
     }
-
-    
-    [Header("Spin Boss Intro Variables")]
-    [SerializeField]
-    float _introFallAndStopDuration;
-    [SerializeField]
-    float _introFallSpeed;
-    [SerializeField]
-    float _downCheckDistance;
-    [SerializeField]
-    float _introTurnAroundSpeed;
-    [SerializeField]
-    float _introTurnAroundDuration;
-    [SerializeField]
-    GameObject _enemiesToCrush;
-    List<CutsceneGlhosts> _GlhostsUnderMe;
-    Vector3 _ogCamPos;
-    bool _cameraInPosition = false;
-    bool _fallFinished = false;
-    bool _turnToPlayerFinished = false;
-    bool _glhostsCrushed = false;
     
 
     [Header("Trap Boss Variables")]
@@ -43,16 +22,11 @@ public class TrapBossGlhost : BossEnemy
     float _timeBetweenAttacks;
     float _realTimeBetweenAttacks;
     [SerializeField]
-    float _stunnedDuration;
-    float _realStunnedDuration;
-    [SerializeField]
     float _vertDetectOffset;
     [SerializeField]
     float _startAngle;
     [SerializeField]
     float _detectionAngle;
-    [SerializeField]
-    int _numOfCasts;
     float _calcAngle;
     [SerializeField]
     float _maxDistanceOut;
@@ -61,7 +35,7 @@ public class TrapBossGlhost : BossEnemy
     [SerializeField]
     float _detectDistance;
     public bool trapComplete = false;
-    RaycastHit hit;
+    RaycastHit hitObj = new RaycastHit();
 
     [Header("Fire Trap Percentages")]
     [SerializeField]
@@ -79,6 +53,20 @@ public class TrapBossGlhost : BossEnemy
     [SerializeField]
     float _followDuration;
     float _realFollowDuration;
+
+    [Header("Quad Fire Variables")]
+    [SerializeField]
+    float _quadTrapDamage;
+    [SerializeField]
+    float _quadShootDist;
+    [SerializeField]
+    float _quadDetectDist;
+    [SerializeField]
+    float _quadFireStartDelay;
+    [SerializeField]
+    float _quadBurnDuration;
+    [SerializeField]
+    bool _quadShoot;
 
     [Header("Spawn Trap Variables")]
     [SerializeField]
@@ -105,21 +93,6 @@ public class TrapBossGlhost : BossEnemy
     [Header("Fire Trap Variables")]
     [SerializeField]
     float _trapStartDelay;
-    [SerializeField]
-    float _pinballDetectionAngle;
-    [SerializeField]
-    int _pinballNumOfCasts;
-    [SerializeField]
-    float _speedWhilePinballing;
-    float _realSpeedWhilePinballing;
-    [SerializeField]
-    float _pinballTellDuration;
-    float _realPinballTellDuration;
-    bool _tellPinballing;
-    [SerializeField]
-    float _pinballAttackDuration;
-    float _realPinballAttackDuration;
-    Vector3 _moveDir;
 
     float _startAttackTime;
     float _currAttackTime;
@@ -157,6 +130,9 @@ public class TrapBossGlhost : BossEnemy
     float _hardPinballTellDuration;
     [SerializeField]
     float _hardPinballAttackDuration;
+
+    Vector3 _ogCamPos;
+    bool _cameraInPosition;
 
     TRAPSTRATS _MyAttack = TRAPSTRATS.FINDTRAP;
 
@@ -257,9 +233,13 @@ public class TrapBossGlhost : BossEnemy
             }
         }
         */
+        _playerRef.AmInCutscene = false;
+        _cameraInPosition = true;
         StartFight();
+        
     }
 
+    /*
     //called when any other objects for the cutscene are done with their intros
     public override void CheckForIntroEnd()
     {
@@ -276,6 +256,7 @@ public class TrapBossGlhost : BossEnemy
         _startAttackTime = Time.time;
         _cameraInPosition = true;
     }
+    */
 
     //called for Init, after the cutscene
     public override void Init()
@@ -290,14 +271,10 @@ public class TrapBossGlhost : BossEnemy
                 _realQuadFirePercentage = _quadFirePercentage;
                 _realFireSpinPercentage = _fireSpinPercentage;
                 _realTimeBetweenAttacks = _timeBetweenAttacks;
-                _realStunnedDuration = _stunnedDuration;
                 _realFollowDuration = _followDuration;
                 _realSpinningSpeed = _spinningSpeed;
                 _realSpinAttackDuration = _spinAttackDuration;
                 _realSpawnDelayDuration = _spawnDelayDuration;
-                _realSpeedWhilePinballing = _speedWhilePinballing;
-                _realPinballTellDuration = _pinballTellDuration;
-                _realPinballAttackDuration = _pinballAttackDuration;
             }
             else
             {
@@ -305,18 +282,15 @@ public class TrapBossGlhost : BossEnemy
                 _realQuadFirePercentage = _hardQuadFirePercentage;
                 _realFireSpinPercentage = _hardFireSpinPercentage;
                 _realTimeBetweenAttacks = _hardTimeBetweenAttacks;
-                _realStunnedDuration = _hardStunnedDuration;
                 _realFollowDuration = _hardFollowDuration;
                 _realSpinningSpeed = _hardSpinningSpeed;
                 _realSpinAttackDuration = _hardSpinAttackDuration;
                 _realSpawnDelayDuration = _hardSpawnDelayDuration;
-                _realSpeedWhilePinballing = _hardSpeedWhilePinballing;
-                _realPinballTellDuration = _hardPinballTellDuration;
-                _realPinballAttackDuration = _hardPinballAttackDuration;
             }
 
-            _GlhostsUnderMe = new List<CutsceneGlhosts>();
             /*
+            _GlhostsUnderMe = new List<CutsceneGlhosts>();
+            
             for (int i = 0; i < _enemiesToCrush.transform.childCount; i++)
             {
                 _GlhostsUnderMe.Add(_enemiesToCrush.transform.GetChild(i).GetComponent<CutsceneGlhosts>());
@@ -324,7 +298,7 @@ public class TrapBossGlhost : BossEnemy
             */
         }
 
-        _ogCamPos = _cameraRef.transform.position;
+        //_ogCamPos = _cameraRef.transform.position;
         cam0 = _cameraRef.transform.position;
         cam1 = transform.position + _camOffset;
         cam1.y = _cameraRef.transform.position.y;
@@ -405,7 +379,7 @@ public class TrapBossGlhost : BossEnemy
         }
     }
 
-    //decides what the attack the boss will do next
+    //decides what the attack the boss will do next (Currently Out of Use but setup fordifferent attacks.
     private void WhatDoNext()
     {
         _currAttackTime = (Time.time - _startAttackTime) / _realTimeBetweenAttacks;
@@ -435,6 +409,7 @@ public class TrapBossGlhost : BossEnemy
 
     //Find Trap
     //Boss will find and go towards a trap
+    //Than he will cast QuadFire, there is room to do a deciding attack for random attacks
     private void findTrap()
     {
         
@@ -454,28 +429,14 @@ public class TrapBossGlhost : BossEnemy
             }
             
         }
-        Debug.DrawRay(transform.position + Vector3.up, this.transform.forward);
-        if (Physics.Raycast(transform.position + Vector3.up, this.transform.forward, out hit, _detectDistance))
-        {
-            
-            GameObject hitObject = hit.collider.gameObject;
-           
-            if (hitObject == currentTrap)
-            {
-                BossFireStatueTrap possessedTrap = hitObject.GetComponent<Transform>().GetChild(0).GetComponent<BossFireStatueTrap>();
-                possessedTrap.StartingDelay();
-                possessedTrap.bossEntity = this.gameObject;
-                possessedTrap._beginningDelay = _trapStartDelay;
-                trapComplete = false;
-                _MyAttack = TRAPSTRATS.INSIDETRAP;
-            }
-        }
+        //Debug.DrawRay(transform.position + Vector3.up, this.transform.forward);
+        QuadFireBeams();
         
     }
 
     //Attack
-    //Boss will spin in place
-    //Boss will spawn and shoot ghosts out in random directions
+    //Boss possesses trap by disabling his own mesh and collider. (Room for animation)
+    //When the trap finishes its attack he will be reinabled and find a new trap
     private void possessTrap()
     {
         gameObject.GetComponent<MeshRenderer>().enabled = false;
@@ -493,9 +454,38 @@ public class TrapBossGlhost : BossEnemy
 
     }
 
+    //Detects when he gets to the targeted tower and starts the quad fire attack on the pillar.
     private void QuadFireBeams()
     {
+        if (Physics.Raycast(transform.position + Vector3.up, this.transform.forward, out hitObj, _detectDistance))
+        {
 
+            GameObject hitObject = hitObj.collider.gameObject;
+
+            if (hitObject == currentTrap)
+            {
+                if (_quadShoot)
+                {
+                    //Moves all the variables from the boss to each fire trap gameobject
+                    for (int z = 0; z < 4; z++)
+                    {
+                        BossFireStatueTrap possessedTrap = hitObject.GetComponent<Transform>().GetChild(z).GetComponent<BossFireStatueTrap>();
+
+                        possessedTrap.bossEntity = this.gameObject;
+                        possessedTrap._beginningDelay = _trapStartDelay;
+                        possessedTrap._fireDistance = _quadShootDist;
+                        possessedTrap._maxDetectDistance = _quadDetectDist;
+                        possessedTrap._beginningDelay = _quadFireStartDelay;
+                        possessedTrap._burningDuration = _quadBurnDuration;
+                        possessedTrap._fireDamage = _quadTrapDamage;
+                        possessedTrap.StartingDelay();
+                        trapComplete = false;
+                    }
+
+                    _MyAttack = TRAPSTRATS.INSIDETRAP;
+                }
+            }
+        }
     }
 
     //called when boss gets hit and takes damage
@@ -629,20 +619,22 @@ public class TrapBossGlhost : BossEnemy
             //Debug.Log("Boss Reset");
             transform.position = _startPos;
             transform.rotation = _startRot;
+            /*
             _enemiesToCrush.SetActive(true);
             for (int i = 0; i < _GlhostsUnderMe.Count; i++)
             {
                 _GlhostsUnderMe[i].ResetCutscene();
             }
+            */
             _currBossHealth = _actualMaxHealth;
             _laggedBossHealthBar.fillAmount = 1;
             _actualBossHealthBar.fillAmount = 1;
 
             _bossBar.SetActive(false);
             _cameraInPosition = false;
-            _fallFinished = false;
-            _turnToPlayerFinished = false;
-            _glhostsCrushed = false;
+            //_fallFinished = false;
+            //_turnToPlayerFinished = false;
+            //_glhostsCrushed = false;
 
             _endingPlaying = false;
             _laggingHealth = false;
