@@ -185,7 +185,10 @@ public class Menuing : MonoBehaviour {
 
     public void NextLevel()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
+        //Follow This Tutorial it looks like what you want to do
+        //https://blog.teamtreehouse.com/make-loading-screen-unity
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
+        StartCoroutine(LoadNewScene());
 
         _managerRef.SetGameReset = _playerRef.ResetPlayer;
         _playerRef.InMenu = false;
@@ -340,7 +343,18 @@ public class Menuing : MonoBehaviour {
         _creditsRolling = false;
     }
 
-     
+    IEnumerator LoadNewScene()
+    {
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex + 1);
+
+        while (!asyncLoad.isDone)
+        {
+            yield return null;
+        }
+    }
+
+
+
     public PlayerController SetPlayer { set { _playerRef = value; } }
     public List<GameObject> GetMenus { get { return _menus; } }
     public GameObject GetBossBar { get { return _BossBar; } }
