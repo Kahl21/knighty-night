@@ -10088,12 +10088,11 @@ MonoBehaviour:
   _debug: 1
   _detectDistance: 2
   trapComplete: 0
-  _fireBeamPercentage: 0
-  _quadFirePercentage: 0
-  _fireSpinPercentage: 0
+  _quadFirePercentage: 50
+  _xAttackPercentage: 50
   _followDuration: 5
   _quadTrapDamage: 0.5
-  _quadShootDist: 0.5
+  _quadShootDist: 2
   _quadDetectDist: 4
   _quadFireStartDelay: 1.5
   _quadBurnDuration: 1
@@ -10111,9 +10110,8 @@ MonoBehaviour:
   _trapStartDelay: 0
   _hardTimeBetweenAttacks: 0
   _hardStunnedDuration: 0
-  _hardFireBeamPercentage: 0
   _hardQuadFirePercentage: 0
-  _hardFireSpinPercentage: 0
+  _hardXAttackPercentage: 0
   _hardFollowDuration: 0
   _hardSpinningSpeed: 0
   _hardSpinAttackDuration: 0

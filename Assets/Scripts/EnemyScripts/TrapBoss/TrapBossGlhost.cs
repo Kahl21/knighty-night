@@ -13,6 +13,7 @@ public class TrapBossGlhost : BossEnemy
         FINDTRAP,
         INSIDETRAP,
         FIREBEAM,
+        XATTACK,
         QUADFIRE
     }
     
@@ -39,12 +40,12 @@ public class TrapBossGlhost : BossEnemy
 
     [Header("Fire Trap Percentages")]
     [SerializeField]
-    float _fireBeamPercentage;
-    float _realFireBeamPercentage;
+    float _xAttackPercentage;
+    float _realXAttackPercentage;
     [SerializeField]
     float _quadFirePercentage;
     float _realQuadFirePercentage;
-    [SerializeField]
+    //[SerializeField]
     float _fireSpinPercentage;
     float _realFireSpinPercentage;
     float _totalPercentageFireTrap;
@@ -105,6 +106,7 @@ public class TrapBossGlhost : BossEnemy
 
     [Header("Hard Percentages")]
     [SerializeField]
+    float _hardXAttackPercentage;
     float _hardFireBeamPercentage;
     [SerializeField]
     float _hardQuadFirePercentage;
@@ -267,7 +269,6 @@ public class TrapBossGlhost : BossEnemy
 
             if (!_managerRef.HardModeOn)
             {
-                _realFireBeamPercentage = _fireBeamPercentage;
                 _realQuadFirePercentage = _quadFirePercentage;
                 _realFireSpinPercentage = _fireSpinPercentage;
                 _realTimeBetweenAttacks = _timeBetweenAttacks;
@@ -275,10 +276,10 @@ public class TrapBossGlhost : BossEnemy
                 _realSpinningSpeed = _spinningSpeed;
                 _realSpinAttackDuration = _spinAttackDuration;
                 _realSpawnDelayDuration = _spawnDelayDuration;
+                _realXAttackPercentage = _xAttackPercentage;
             }
             else
             {
-                _realFireBeamPercentage = _hardFireBeamPercentage;
                 _realQuadFirePercentage = _hardQuadFirePercentage;
                 _realFireSpinPercentage = _hardFireSpinPercentage;
                 _realTimeBetweenAttacks = _hardTimeBetweenAttacks;
@@ -286,16 +287,8 @@ public class TrapBossGlhost : BossEnemy
                 _realSpinningSpeed = _hardSpinningSpeed;
                 _realSpinAttackDuration = _hardSpinAttackDuration;
                 _realSpawnDelayDuration = _hardSpawnDelayDuration;
+                _realXAttackPercentage = _hardXAttackPercentage;
             }
-
-            /*
-            _GlhostsUnderMe = new List<CutsceneGlhosts>();
-            
-            for (int i = 0; i < _enemiesToCrush.transform.childCount; i++)
-            {
-                _GlhostsUnderMe.Add(_enemiesToCrush.transform.GetChild(i).GetComponent<CutsceneGlhosts>());
-            }
-            */
         }
 
         //_ogCamPos = _cameraRef.transform.position;
@@ -304,7 +297,7 @@ public class TrapBossGlhost : BossEnemy
         cam1.y = _cameraRef.transform.position.y;
         _cameraRef.AmFollowingPlayer = false;
 
-        _totalPercentageFireTrap = _realFireBeamPercentage + _realQuadFirePercentage + _realFireSpinPercentage;
+        _totalPercentageFireTrap = _realQuadFirePercentage + _realXAttackPercentage;
 
         _startAttackTime = Time.time;
         _myAI = BossAI.INTRO;
@@ -358,8 +351,8 @@ public class TrapBossGlhost : BossEnemy
                             possessTrap();
                             break;
                             
-                        case TRAPSTRATS.FIREBEAM:
-                            ShootFireBeam();
+                        case TRAPSTRATS.XATTACK:
+                            XAttackFireBeams();
                             break;
                         case TRAPSTRATS.QUADFIRE:
                             QuadFireBeams();
@@ -382,29 +375,18 @@ public class TrapBossGlhost : BossEnemy
     //decides what the attack the boss will do next (Currently Out of Use but setup fordifferent attacks.
     private void WhatDoNext()
     {
-        _currAttackTime = (Time.time - _startAttackTime) / _realTimeBetweenAttacks;
-        //Debug.Log("thinking");
-
-        if (_currAttackTime >= 1)
-        {
             float _nextAttack = Random.Range(0, _totalPercentageFireTrap);
-
-            if (_nextAttack > 0 && _nextAttack <= _realFireBeamPercentage)
+            Debug.Log("Next attack: " + _nextAttack);
+            if (_nextAttack > 0 && _nextAttack <= _realQuadFirePercentage)
             {
-                //Debug.Log("Beam Chosen");
-                _startAttackTime = Time.time;
-                _MyAttack = TRAPSTRATS.FIREBEAM;
+                Debug.Log("Quad Fire");
+                _MyAttack = TRAPSTRATS.QUADFIRE;
             }
             else
             {
-                //Debug.Log("quad Fire Chosen");
-
-                _enemyAgent.enabled = false;
-                _startAttackTime = Time.time;
-                _startSpawnTime = Time.time;
-                _MyAttack = TRAPSTRATS.QUADFIRE;
+                Debug.Log("XATTACK");
+                _MyAttack = TRAPSTRATS.XATTACK;
             }
-        }
     }
 
     //Find Trap
@@ -430,7 +412,8 @@ public class TrapBossGlhost : BossEnemy
             
         }
         //Debug.DrawRay(transform.position + Vector3.up, this.transform.forward);
-        QuadFireBeams();
+
+        WhatDoNext();
         
     }
 
@@ -449,9 +432,40 @@ public class TrapBossGlhost : BossEnemy
         }
     }
 
-    private void ShootFireBeam()
+    private void XAttackFireBeams()
     {
+        if (Physics.Raycast(transform.position + Vector3.up, this.transform.forward, out hitObj, _detectDistance))
+        {
 
+            GameObject hitObject = hitObj.collider.gameObject;
+
+            if (hitObject == currentTrap)
+            {
+                if (_quadShoot)
+                {
+                    //Moves all the variables from the boss to each fire trap gameobject
+                    for (int z = 0; z < 4; z++)
+                    {
+                        BossFireStatueTrap possessedTrap = hitObject.GetComponent<Transform>().GetChild(z).GetComponent<BossFireStatueTrap>();
+
+                        possessedTrap.transform.eulerAngles += new Vector3(0, 45f, 0);
+
+                        possessedTrap.bossEntity = this.gameObject;
+                        possessedTrap._startDelay = _trapStartDelay;
+                        possessedTrap._fireDistance = _quadShootDist;
+                        possessedTrap._maxDetectDistance = _quadDetectDist;
+                        //possessedTrap._beginningDelay = _quadFireStartDelay;
+                        possessedTrap._burningDuration = _quadBurnDuration;
+                        possessedTrap._fireDamage = _quadTrapDamage;
+                        possessedTrap.StartingDelay();
+
+                        trapComplete = false;
+                    }
+
+                    _MyAttack = TRAPSTRATS.INSIDETRAP;
+                }
+            }
+        }
     }
 
     //Detects when he gets to the targeted tower and starts the quad fire attack on the pillar.
@@ -472,10 +486,10 @@ public class TrapBossGlhost : BossEnemy
                         BossFireStatueTrap possessedTrap = hitObject.GetComponent<Transform>().GetChild(z).GetComponent<BossFireStatueTrap>();
 
                         possessedTrap.bossEntity = this.gameObject;
-                        possessedTrap._beginningDelay = _trapStartDelay;
+                        //possessedTrap._beginningDelay = _trapStartDelay;
                         possessedTrap._fireDistance = _quadShootDist;
                         possessedTrap._maxDetectDistance = _quadDetectDist;
-                        possessedTrap._beginningDelay = _quadFireStartDelay;
+                        possessedTrap._startDelay = _quadFireStartDelay;
                         possessedTrap._burningDuration = _quadBurnDuration;
                         possessedTrap._fireDamage = _quadTrapDamage;
                         possessedTrap.StartingDelay();

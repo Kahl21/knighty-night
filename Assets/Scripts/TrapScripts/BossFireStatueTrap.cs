@@ -18,7 +18,7 @@ public class BossFireStatueTrap : BaseTrap {
     [Header("Fire Statue Variables")]
     public float _fireDamage;
     [HideInInspector]
-    public float _beginningDelay;
+    float _beginningDelay;
     [SerializeField]
     float _fireDelay;
     [SerializeField]
@@ -27,7 +27,7 @@ public class BossFireStatueTrap : BaseTrap {
     public float _burningDuration;
     [SerializeField]
     public float _fireDistance;
-    float _startDelay;
+    public float _startDelay;
     float _currDelay;
 
     [Header("Detection Variables")]
@@ -41,6 +41,7 @@ public class BossFireStatueTrap : BaseTrap {
     RaycastHit hit;
     ParticleSystem _myFire;
     public GameObject bossEntity;
+    public bool _XAttack;
 
     FireState _mystate = FireState.NONE;
 
@@ -183,6 +184,10 @@ public class BossFireStatueTrap : BaseTrap {
             _startDelay = Time.time;
 
             bossEntity.GetComponent<TrapBossGlhost>().trapComplete = true;
+            if (_XAttack)
+            {
+                transform.eulerAngles += new Vector3(0, 45f, 0);
+            }
             _mystate = FireState.NONE;
         }
     }
