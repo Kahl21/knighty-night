@@ -67,8 +67,12 @@ public class Menuing : MonoBehaviour {
     PlayerController _playerRef;
     GameManager _managerRef;
 
-	// Use this for initialization
-	void Awake ()
+    //loadscreen objects
+    public RawImage _loadScreen;
+    AsyncOperation asyncLoad;
+
+    // Use this for initialization
+    void Awake ()
     {
         if (Instance == this)
         {
@@ -103,6 +107,10 @@ public class Menuing : MonoBehaviour {
         _playerRef.SetLoseImage = _menus[4].transform.GetChild(2).gameObject;
 
         SetMenu(0);
+
+
+        //setloadscreen
+        //_loadScreen = _menus[5].transform.GetChild(0);
     }
 
     private void Update()
@@ -185,8 +193,6 @@ public class Menuing : MonoBehaviour {
 
     public void NextLevel()
     {
-        //Follow This Tutorial it looks like what you want to do
-        //https://blog.teamtreehouse.com/make-loading-screen-unity
         //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
         StartCoroutine(LoadNewScene());
 
@@ -345,12 +351,22 @@ public class Menuing : MonoBehaviour {
 
     IEnumerator LoadNewScene()
     {
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex + 1);
-
-        while (!asyncLoad.isDone)
+        float timer = 0;
+        float duration = 3;
+        asyncLoad  = SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex + 1);
+        asyncLoad.allowSceneActivation = false;
+        //_loadScreen.SetActive(true);
+        while (timer<=duration)
         {
+            _loadScreen.color = Color.Lerp(Color.black, Color.black, timer / duration);
+            if(asyncLoad.progress == 0.9f)
+            {
+                asyncLoad.allowSceneActivation = true;
+            }
             yield return null;
         }
+        //yield return new  WaitForSeconds(3);
+        //_loadScreen.SetActive(false);
     }
 
 
