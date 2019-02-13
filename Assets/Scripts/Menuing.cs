@@ -67,13 +67,16 @@ public class Menuing : MonoBehaviour {
     PlayerController _playerRef;
     GameManager _managerRef;
 
-    //loadscreen objects
-    public RawImage _loadScreen;
-    AsyncOperation asyncLoad;
+    //loadscreen vars
+    public Image _loadScreen;
+    public Image _fadeScreen;
+    private bool isLoading = false;
+    private float alpha;
 
     // Use this for initialization
     void Awake ()
     {
+        alpha = 0;
         if (Instance == this)
         {
             DontDestroyOnLoad(gameObject);
@@ -108,13 +111,11 @@ public class Menuing : MonoBehaviour {
 
         SetMenu(0);
 
-
-        //setloadscreen
-        //_loadScreen = _menus[5].transform.GetChild(0);
     }
 
     private void Update()
     {
+        Fading();
         if(_menuDelay)
         {
             MenuDelay();
@@ -133,6 +134,7 @@ public class Menuing : MonoBehaviour {
             _menus[i].SetActive(false);
         }
         _menus[_whichMenu].SetActive(true);
+        _menus[5].SetActive(true);
 
         if (_whichMenu != 2)
         {
@@ -193,8 +195,14 @@ public class Menuing : MonoBehaviour {
 
     public void NextLevel()
     {
+
         //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
-        StartCoroutine(LoadNewScene());
+        if (isLoading == false)
+        {
+            _menus[5].SetActive(true);
+            StartCoroutine(LoadNewScene());
+            
+        }
 
         _managerRef.SetGameReset = _playerRef.ResetPlayer;
         _playerRef.InMenu = false;
@@ -349,24 +357,32 @@ public class Menuing : MonoBehaviour {
         _creditsRolling = false;
     }
 
+    public void Fading()
+    {
+        if (isLoading)
+        {
+            _fadeScreen.color = new Color(_loadScreen.color.r, _loadScreen.color.g, _loadScreen.color.b, alpha);
+            if (_fadeScreen.color.a == 255)
+                _loadScreen.color = new Color(_loadScreen.color.r, _loadScreen.color.g, _loadScreen.color.b, 1f);
+        }
+        else
+        _loadScreen.color = new Color(_loadScreen.color.r, _loadScreen.color.g, _loadScreen.color.b, 0);
+        _fadeScreen.color = new Color(_loadScreen.color.r, _loadScreen.color.g, _loadScreen.color.b, 0);
+
+
+    }
+
     IEnumerator LoadNewScene()
     {
-        float timer = 0;
-        float duration = 3;
-        asyncLoad  = SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex + 1);
+        //alpha = 200;
+        isLoading = true;
+        AsyncOperation asyncLoad  = SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex + 1);
         asyncLoad.allowSceneActivation = false;
-        //_loadScreen.SetActive(true);
-        while (timer<=duration)
-        {
-            _loadScreen.color = Color.Lerp(Color.black, Color.black, timer / duration);
-            if(asyncLoad.progress == 0.9f)
-            {
-                asyncLoad.allowSceneActivation = true;
-            }
-            yield return null;
-        }
-        //yield return new  WaitForSeconds(3);
-        //_loadScreen.SetActive(false);
+
+        yield return new WaitForSeconds(3f);
+
+        asyncLoad.allowSceneActivation = true;
+        isLoading = false;
     }
 
 
