@@ -67,16 +67,20 @@ public class Menuing : MonoBehaviour {
     PlayerController _playerRef;
     GameManager _managerRef;
 
-    //loadscreen vars
+    //loadscreen variables
     public Image _loadScreen;
     public Image _fadeScreen;
     private bool isLoading = false;
-    private float alpha;
+    private Color blackColor = new Color(0, 0, 0, 1);
+    private Color transparentColor = new Color(0, 0, 0, 0);
+    private Color fullColor = new Color(1, 1, 1, 1);
+    private float fadeTime = 1f;
+    private float fadeUpdateTime = .01f;
+
 
     // Use this for initialization
     void Awake ()
     {
-        alpha = 0;
         if (Instance == this)
         {
             DontDestroyOnLoad(gameObject);
@@ -184,7 +188,8 @@ public class Menuing : MonoBehaviour {
 
     public void StartGame()
     {
-        SceneManager.LoadScene(1);
+        //SceneManager.LoadScene(1);
+        StartCoroutine(LoadNewScene());
         Time.timeScale = 1;
         _paused = false;
 
@@ -359,30 +364,52 @@ public class Menuing : MonoBehaviour {
 
     public void Fading()
     {
-        if (isLoading)
+       if(!isLoading && _fadeScreen.color != transparentColor)
         {
-            _fadeScreen.color = new Color(_loadScreen.color.r, _loadScreen.color.g, _loadScreen.color.b, alpha);
-            if (_fadeScreen.color.a == 255)
-                _loadScreen.color = new Color(_loadScreen.color.r, _loadScreen.color.g, _loadScreen.color.b, 1f);
+            StartCoroutine(FadeIn());
         }
-        else
-        _loadScreen.color = new Color(_loadScreen.color.r, _loadScreen.color.g, _loadScreen.color.b, 0);
-        _fadeScreen.color = new Color(_loadScreen.color.r, _loadScreen.color.g, _loadScreen.color.b, 0);
 
 
     }
 
     IEnumerator LoadNewScene()
     {
-        //alpha = 200;
+        _fadeScreen.color = transparentColor;
+        float time = 0;
+        Color wantedColor = _fadeScreen.color;
         isLoading = true;
         AsyncOperation asyncLoad  = SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex + 1);
         asyncLoad.allowSceneActivation = false;
 
-        yield return new WaitForSeconds(3f);
+        //yield return new WaitForSeconds(3f);
+        while(time < fadeTime)
+        {
+            yield return new WaitForSeconds(fadeUpdateTime);
 
+            wantedColor = Color.Lerp(transparentColor, blackColor, time);
+            _fadeScreen.color = wantedColor;
+            time += fadeUpdateTime;
+        }
+        _loadScreen.color = fullColor;
+        yield return new WaitForSeconds(2f);
+        _loadScreen.color = transparentColor;
         asyncLoad.allowSceneActivation = true;
         isLoading = false;
+    }
+
+    IEnumerator FadeIn()
+    {
+        float time = 0;
+        Color wantedColor = _fadeScreen.color;
+
+        while (time < fadeTime)
+        {
+            yield return new WaitForSeconds(fadeUpdateTime);
+
+            wantedColor = Color.Lerp(blackColor, transparentColor, time);
+            _fadeScreen.color = wantedColor;
+            time += fadeUpdateTime;
+        }
     }
 
 
