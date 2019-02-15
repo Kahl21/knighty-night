@@ -25,7 +25,6 @@ public class FireStatueTrap : BaseTrap {
     [SerializeField]
     float _burningDuration;
     [SerializeField]
-    float _fireDistance;
     float _startDelay;
     float _currDelay;
 
@@ -46,8 +45,6 @@ public class FireStatueTrap : BaseTrap {
     protected override void Start()
     {
         _myFire = transform.GetChild(0).transform.GetComponent<ParticleSystem>();
-        var main = _myFire.main;
-        main.startLifetime = _fireDistance;
         _myFire.Stop();
         base.Start();
     }
@@ -165,7 +162,7 @@ public class FireStatueTrap : BaseTrap {
         _currDelay = (Time.time - _startDelay) / _fireIncDuration;
 
         _currDetectDistance = _maxDetectDistance * (1 - _currDelay);
-
+        
         LookForPlayer();
 
         if (_currDelay >= 1)
@@ -224,6 +221,7 @@ public class FireStatueTrap : BaseTrap {
     //stops trap once the room is finished
     public override void DisableTrap()
     {
+        _myFire.Stop();
         _mystate = FireState.ROOMDONE;
     }
 

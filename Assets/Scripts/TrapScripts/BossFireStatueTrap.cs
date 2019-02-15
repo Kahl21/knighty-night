@@ -12,6 +12,7 @@ public class BossFireStatueTrap : BaseTrap {
         FLAMEON,
         BURNING,
         FLAMEOFF,
+        FLAMEBURNOUT,
         ROOMDONE
     }
 
@@ -20,7 +21,7 @@ public class BossFireStatueTrap : BaseTrap {
     [HideInInspector]
     float _beginningDelay;
     [SerializeField]
-    float _fireDelay;
+    public float _fireDelay;
     [SerializeField]
     float _fireIncDuration;
     [SerializeField]
@@ -41,7 +42,7 @@ public class BossFireStatueTrap : BaseTrap {
     RaycastHit hit;
     ParticleSystem _myFire;
     public GameObject bossEntity;
-    public bool _XAttack;
+    public bool _XAttack = false;
 
     FireState _mystate = FireState.NONE;
 
@@ -82,6 +83,9 @@ public class BossFireStatueTrap : BaseTrap {
                 break;
             case FireState.FLAMEOFF:
                 StopFire();
+                break;
+            case FireState.FLAMEBURNOUT:
+                Burnout();
                 break;
             case FireState.ROOMDONE:
                 break;
@@ -184,9 +188,22 @@ public class BossFireStatueTrap : BaseTrap {
             _startDelay = Time.time;
 
             bossEntity.GetComponent<TrapBossGlhost>().trapComplete = true;
+
+            _mystate = FireState.FLAMEBURNOUT;
+        }
+    }
+
+    void Burnout()
+    {
+        ParticleSystem.Particle[] particleArray = new ParticleSystem.Particle[_myFire.main.maxParticles];
+        int liveParticles = _myFire.GetParticles(particleArray);
+        //print(liveParticles + " Particles Alive");
+        if (liveParticles <= 0)
+        {
             if (_XAttack)
             {
                 transform.eulerAngles += new Vector3(0, 45f, 0);
+                _XAttack = false;
             }
             _mystate = FireState.NONE;
         }
@@ -237,6 +254,7 @@ public class BossFireStatueTrap : BaseTrap {
     //stops trap once the room is finished
     public override void DisableTrap()
     {
+        _myFire.Stop();
         _mystate = FireState.ROOMDONE;
     }
 
