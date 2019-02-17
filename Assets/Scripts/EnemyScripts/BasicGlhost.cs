@@ -30,18 +30,7 @@ public class BasicGlhost : BaseEnemy {
     protected override void Die()
     {
         //Debug.DrawLine(transform.position, transform.position + _deathDirection*_collisionCheckDist);
-
-        base.Die();
-        if (Physics.Raycast(transform.position + Vector3.up, _deathDirection, out hit, _collisionCheckDist))
-        {
-            if (!hit.collider.GetComponent<BaseEnemy>() && !hit.collider.GetComponent<PlayerController>())
-            {
-                _mySpawner.RemoveMe(this);
-                _mySpawner.CheckForEnd();
-                Destroy(gameObject);
-            }
-        }
-        transform.position += _deathDirection * _knockBack * Time.deltaTime;
+        
 
         switch (_myMechanic)
         {
@@ -83,6 +72,7 @@ public class BasicGlhost : BaseEnemy {
                         _newDeathDirection.x += _cheatingSensitivity;
                     }
                 }
+
                 if (Physics.Raycast(transform.position + Vector3.up, _newDeathDirection,  out hit, _collisionCheckDist))
                 {
                    
@@ -113,8 +103,8 @@ public class BasicGlhost : BaseEnemy {
                     }
                     
                 }
-
-                transform.position += _newDeathDirection * _knockBack * Time.deltaTime;
+                _deathDirection = _newDeathDirection;
+                transform.position += _deathDirection * _knockBack * Time.deltaTime;
                 break;
             default:
                 break;

@@ -6,17 +6,17 @@ public class GraveyardGlhost : BasicGlhost {
 
     [Header("Graveyard Glhost Variables")]
     [SerializeField]
-    bool _alwaysInvincible;
+    protected bool _alwaysInvincible;
     [SerializeField]
-    Color _invincibleColor;
-    Color _startingColor;
+    protected Color _invincibleColor;
+    protected Color _startingColor;
     [SerializeField]
-    GameObject _particle;
+    protected GameObject _particle;
     [SerializeField]
-    float _invincibleChangeDuration;
-    float _invCurrTime;
-    float _invStartTime;
-    bool _invincible = false;
+    protected float _invincibleChangeDuration;
+    protected float _invCurrTime;
+    protected float _invStartTime;
+    protected bool _invincible = false;
 
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {

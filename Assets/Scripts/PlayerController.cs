@@ -507,11 +507,14 @@ public class PlayerController : MonoBehaviour {
             {
                 TakeDamage(thingHit.GetComponent<BossEnemy>().GetDamage);
             }
+            else if(thingHit.GetComponent<CathedralProjectile>())
+            {
+                TakeDamage(thingHit.GetComponent<CathedralProjectile>().GetDamage);
+            }
             else if(!thingHit.GetComponent<HealingGrace>() || !thingHit.GetComponent<SpikeTrap>())
             {
                 _move = Vector3.zero;
             }
-
         }
 
         if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out hit, _collisionDetectDist))
@@ -697,6 +700,10 @@ public class PlayerController : MonoBehaviour {
                         else if(thingHit.GetComponent<TrapLever>())
                         {
                             thingHit.GetComponent<TrapLever>().StartRotation();
+                        }
+                        else if(thingHit.GetComponent<CathedralProjectile>())
+                        {
+                            thingHit.GetComponent<CathedralProjectile>().HitProjectile(transform.forward);
                         }
                     }
                 }

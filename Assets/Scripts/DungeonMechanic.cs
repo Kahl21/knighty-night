@@ -117,6 +117,8 @@ public class DungeonMechanic : MonoBehaviour {
                 _ZMin = (transform.position.z - (transform.localScale.z * 5f));
                 _XMax = (transform.position.x + (transform.localScale.x * 5f));
                 _ZMax = (transform.position.z + (transform.localScale.z * 5f));
+
+                //Debug.Log("" + _XMax + ", " + _XMin + ", " + _ZMax + ", " + _ZMin + ", ");
                 _glhostsSpawned = 0;
                 _roomStarted = true;
                 break;
@@ -221,7 +223,7 @@ public class DungeonMechanic : MonoBehaviour {
 
     private void SpawnEnemy(int listNum)
     {
-        Vector3 spawnPos = Vector3.zero;
+        Vector3 spawnPos = transform.position;
 
         switch (_roomMechanic)
         {
@@ -249,6 +251,7 @@ public class DungeonMechanic : MonoBehaviour {
                 else
                 {
                     //Debug.Log("SecondCheck " + XorZ);
+                    XorZ = Random.Range(-1f, 1f);
                     if (XorZ > 0)
                     {
                         spawnPos.z = _ZMax;
@@ -258,6 +261,7 @@ public class DungeonMechanic : MonoBehaviour {
                     {
                         spawnPos.z = _ZMin;
                     }
+                    spawnPos.x = Random.Range(_XMin, _XMax);
                 }
                 break;
             case Mechanic.CHASE:
@@ -274,6 +278,7 @@ public class DungeonMechanic : MonoBehaviour {
         }
 
         spawnPos.y = 0;
+        //Debug.Log(spawnPos);
         GameObject newEnemy = Instantiate<GameObject>(_enemyPreFab, spawnPos, _enemyPreFab.transform.rotation);
         
         if(_roomMechanic == Mechanic.COLOR)
