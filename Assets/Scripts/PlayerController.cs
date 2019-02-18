@@ -517,15 +517,11 @@ public class PlayerController : MonoBehaviour {
             {
                 TakeDamage(thingHit.GetComponent<BossEnemy>().GetDamage);                               //have the player take damage
             }
-<<<<<<< HEAD
             else if(thingHit.GetComponent<CathedralProjectile>())
             {
                 TakeDamage(thingHit.GetComponent<CathedralProjectile>().GetDamage);
             }
-            else if(!thingHit.GetComponent<HealingGrace>() || !thingHit.GetComponent<SpikeTrap>())
-=======
             else if(!thingHit.GetComponent<HealingGrace>() || !thingHit.GetComponent<SpikeTrap>())      //else if the player did not hit any of the above and it isnt a spike trap or healing spot
->>>>>>> JohnsInCaseIFuckUpBranch
             {
                 _move = Vector3.zero;                                                                   //you should probably stop cause i got not clue what you hit homeboy
             }
@@ -705,7 +701,7 @@ public class PlayerController : MonoBehaviour {
                         {
                             if (!thingHit.GetComponent<BossEnemy>().AmHit && !thingHit.GetComponent<BossEnemy>().AmInvincible)
                             {
-                                if(thingHit.GetComponent<ColorBossGlhost>())
+                                if(thingHit.GetComponent<ColorBossGlhost>() || thingHit.GetComponent<MiniBossColor>())
                                 {
                                     thingHit.GetComponent<BossEnemy>().GotHit(_playerDamage/_playerDamageDivideOffsetForSpecialBosses);
 
