@@ -456,22 +456,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1572586773812476}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5241634985b283b4ab0ceec53a86a547, type: 3}
+  m_Script: {fileID: 11500000, guid: 8b1b00291c6c40a4d938fa77520a28dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _glhostDamage: 0.5
-  _damageRange: 0.7
-  _deathTimer: 6
-  _collisionCheckDist: 1
-  _spookDistance: 10
-  _spookyOffset: 7.5
+  _damageRange: 0
+  _deathTimer: 0
+  _collisionCheckDist: 0
+  _spookDistance: 0
+  _spookyOffset: 0
   _cheatingDistance: 0
   _cheatingSensitivity: 0
   _myMechanic: 0
-  _projectilePF: {fileID: 1342206675723872, guid: db246d4d911f4e14cb12398b3b85dd77,
-    type: 2}
-  _projectileSpawnOffset: 1
-  _projectileSpawnWaitTime: 1
+  _projectilePF: {fileID: 0}
+  _projectileSpawnOffset: 0
+  _projectileSpawnWaitTime: 0
   _myProjectiles: []
 --- !u!136 &136091093296632570
 CapsuleCollider:
