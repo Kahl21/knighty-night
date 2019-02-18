@@ -4,113 +4,89 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
 
-public class SpinBossGlhost : BossEnemy
+public class TrapBossGlhost : BossEnemy
 {
     //Strategy Enum for the Spin Boss
-    protected enum SPINSTRATS
+    protected enum TRAPSTRATS
     {
         DOWNTIME,
-        FOLLOW,
-        SPIN,
-        PINBALL,
-        STUNNED
+        FINDTRAP,
+        INSIDETRAP,
+        FIREBEAM,
+        XATTACK,
+        QUADFIRE
     }
+    
 
-    [Header("Spin Boss Intro Variables")]
-    [SerializeField]
-    float _introFallAndStopDuration;
-    [SerializeField]
-    float _introFallSpeed;
-    [SerializeField]
-    float _downCheckDistance;
-    [SerializeField]
-    float _introTurnAroundSpeed;
-    [SerializeField]
-    float _introTurnAroundDuration;
-    [SerializeField]
-    GameObject _enemiesToCrush;
-    List<CutsceneGlhosts> _GlhostsUnderMe;
-    Vector3 _ogCamPos;
-    bool _cameraInPosition = false;
-    bool _fallFinished = false;
-    bool _turnToPlayerFinished = false;
-    bool _glhostsCrushed = false;
-
-    [Header("Spin Boss Variables")]
+    [Header("Trap Boss Variables")]
     [SerializeField]
     float _timeBetweenAttacks;
     float _realTimeBetweenAttacks;
-    [SerializeField]
-    float _stunnedDuration;
-    float _realStunnedDuration;
     [SerializeField]
     float _vertDetectOffset;
     [SerializeField]
     float _startAngle;
     [SerializeField]
     float _detectionAngle;
-    [SerializeField]
-    int _numOfCasts;
     float _calcAngle;
     [SerializeField]
     float _maxDistanceOut;
     [SerializeField]
     bool _debug;
+    [SerializeField]
+    float _detectDistance;
+    public bool trapComplete = false;
+    int _numOfCasts = 4;
+    RaycastHit hitObj = new RaycastHit();
 
-    [Header("Percentages of Attacks")]
+    [Header("Traps in Room")]
     [SerializeField]
-    float _followPercentage;
-    float _realFollowPercentage;
+    List<GameObject> _listOfTraps;
+    int fcurrentTrap;
+    GameObject currentTrap;
+
+    [Header("Fire Trap Percentages")]
     [SerializeField]
-    float _spinAttackPercentage;
-    float _realSpinAttackPercentage;
+    float _xAttackPercentage;
+    float _realXAttackPercentage;
     [SerializeField]
-    float _pinballAttackPercentage;
-    float _realPinballAttackPercentage;
-    float _totalPercentage;
+    float _quadFirePercentage;
+    float _realQuadFirePercentage;
+    //[SerializeField]
+    float _fireSpinPercentage;
+    float _realFireSpinPercentage;
+    float _totalPercentageFireTrap;
 
     [Header("Follow Player Varibales")]
     [SerializeField]
     float _followDuration;
     float _realFollowDuration;
 
-    [Header("Spawn Spin Variables")]
+    [Header("Quad Fire Variables")]
     [SerializeField]
-    GameObject _enemyToSpawn;
+    float _quadTrapDamage;
+    float _realQuadTrapDamage;
     [SerializeField]
-    float _spinningSpeed;
-    float _realSpinningSpeed;
-    float _currSpinningSpeed;
+    float _quadShootDist;
+    float _realQuadShootDist;
     [SerializeField]
-    float _spinAttackDuration;
-    float _realSpinAttackDuration;
+    float _quadDetectDist;
+    float _realQuadDetectDist;
     [SerializeField]
-    float _spawnDelayDuration;
-    float _realSpawnDelayDuration;
-    float _currSpawnTime;
-    float _startSpawnTime;
+    float _quadFireStartDelay;
+    float _realQuadFireStartDelay;
+    float _quadStartDelay = 1;
+    [SerializeField]
+    float _quadBurnDuration;
+    float _realQuadBurnDuration;
+    bool _xAttack = false;
 
-    [Header("Pinball Variables")]
-    [SerializeField]
-    float _pinballDetectionAngle;
-    [SerializeField]
-    int _pinballNumOfCasts;
-    [SerializeField]
-    float _speedWhilePinballing;
-    float _realSpeedWhilePinballing;
-    [SerializeField]
-    float _pinballTellDuration;
-    float _realPinballTellDuration;
-    bool _tellPinballing;
-    [SerializeField]
-    float _pinballAttackDuration;
-    float _realPinballAttackDuration;
-    Vector3 _moveDir;
+    [Header("Fire Trap Variables")]
 
     float _startAttackTime;
     float _currAttackTime;
 
-    [Header("Spin Boss Hard Variables")]
+    [Header("Trap Boss Hard Variables")]
     [SerializeField]
     float _hardTimeBetweenAttacks;
     [SerializeField]
@@ -118,37 +94,40 @@ public class SpinBossGlhost : BossEnemy
 
     [Header("Hard Percentages")]
     [SerializeField]
-    float _hardFollowPercentage;
+    float _hardXAttackPercentage;
+    float _hardFireBeamPercentage;
     [SerializeField]
-    float _hardSpinAttackPercentage;
+    float _hardQuadFirePercentage;
+    //[SerializeField]
+    float _hardFireSpinPercentage;
+
+    [Header("Hard Quad Fire Variables")]
     [SerializeField]
-    float _hardPinballAttackPercentage;
+    float _hardQuadTrapDamage;
+    [SerializeField]
+    float _hardQuadShootDist;
+    [SerializeField]
+    float _hardQuadDetectDist;
+    [SerializeField]
+    float _hardQuadFireStartDelay;
+    float _hardQuadStartDelay = 1;
+    [SerializeField]
+    float _hardQuadBurnDuration;
 
     [Header("Hard Follow Player Varibales")]
     [SerializeField]
     float _hardFollowDuration;
 
-    [Header("Hard Spawn Spin Variables")]
-    [SerializeField]
-    float _hardSpinningSpeed;
-    [SerializeField]
-    float _hardSpinAttackDuration;
-    [SerializeField]
-    float _hardSpawnDelayDuration;
+    Vector3 _ogCamPos;
+    bool _cameraInPosition;
 
-    [Header("Hard Pinball Variables")]
-    [SerializeField]
-    float _hardSpeedWhilePinballing;
-    [SerializeField]
-    float _hardPinballTellDuration;
-    [SerializeField]
-    float _hardPinballAttackDuration;
-
-    SPINSTRATS _MyAttack = SPINSTRATS.FOLLOW;
+    TRAPSTRATS _MyAttack = TRAPSTRATS.FINDTRAP;
 
     //intro cutscene function
+    
     protected override void PlayIntro()
     {
+        /*
         if (!_cameraInPosition)
         {
             _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
@@ -240,8 +219,14 @@ public class SpinBossGlhost : BossEnemy
                 StartFight();
             }
         }
+        */
+        _playerRef.AmInCutscene = false;
+        _cameraInPosition = true;
+        StartFight();
+        
     }
 
+    /*
     //called when any other objects for the cutscene are done with their intros
     public override void CheckForIntroEnd()
     {
@@ -258,6 +243,7 @@ public class SpinBossGlhost : BossEnemy
         _startAttackTime = Time.time;
         _cameraInPosition = true;
     }
+    */
 
     //called for Init, after the cutscene
     public override void Init()
@@ -268,50 +254,39 @@ public class SpinBossGlhost : BossEnemy
 
             if (!_managerRef.HardModeOn)
             {
-                _realFollowPercentage = _followPercentage;
-                _realSpinAttackPercentage = _spinAttackPercentage;
-                _realPinballAttackPercentage = _pinballAttackPercentage;
+                _realQuadFirePercentage = _quadFirePercentage;
+                _realFireSpinPercentage = _fireSpinPercentage;
                 _realTimeBetweenAttacks = _timeBetweenAttacks;
-                _realStunnedDuration = _stunnedDuration;
+                _realQuadBurnDuration = _quadBurnDuration;
+                _realQuadDetectDist = _quadDetectDist;
+                _realQuadFireStartDelay = _quadFireStartDelay;
+                _realQuadShootDist = _quadShootDist;
+                _realQuadTrapDamage = _quadTrapDamage;
                 _realFollowDuration = _followDuration;
-                _realSpinningSpeed = _spinningSpeed;
-                _realSpinAttackDuration = _spinAttackDuration;
-                _realSpawnDelayDuration = _spawnDelayDuration;
-                _realSpeedWhilePinballing = _speedWhilePinballing;
-                _realPinballTellDuration = _pinballTellDuration;
-                _realPinballAttackDuration = _pinballAttackDuration;
+                _realXAttackPercentage = _xAttackPercentage;
             }
             else
             {
-                _realFollowPercentage = _hardFollowPercentage;
-                _realSpinAttackPercentage = _hardSpinAttackPercentage;
-                _realPinballAttackPercentage = _hardPinballAttackPercentage;
+                _realQuadFirePercentage = _hardQuadFirePercentage;
+                _realFireSpinPercentage = _hardFireSpinPercentage;
                 _realTimeBetweenAttacks = _hardTimeBetweenAttacks;
-                _realStunnedDuration = _hardStunnedDuration;
+                _realQuadBurnDuration = _hardQuadBurnDuration;
+                _realQuadDetectDist = _hardQuadDetectDist;
+                _realQuadFireStartDelay = _hardQuadFireStartDelay;
+                _realQuadShootDist = _hardQuadShootDist;
+                _realQuadTrapDamage = _hardQuadTrapDamage;
                 _realFollowDuration = _hardFollowDuration;
-                _realSpinningSpeed = _hardSpinningSpeed;
-                _realSpinAttackDuration = _hardSpinAttackDuration;
-                _realSpawnDelayDuration = _hardSpawnDelayDuration;
-                _realSpeedWhilePinballing = _hardSpeedWhilePinballing;
-                _realPinballTellDuration = _hardPinballTellDuration;
-                _realPinballAttackDuration = _hardPinballAttackDuration;
-            }
-
-            _GlhostsUnderMe = new List<CutsceneGlhosts>();
-
-            for (int i = 0; i < _enemiesToCrush.transform.childCount; i++)
-            {
-                _GlhostsUnderMe.Add(_enemiesToCrush.transform.GetChild(i).GetComponent<CutsceneGlhosts>());
+                _realXAttackPercentage = _hardXAttackPercentage;
             }
         }
 
-        _ogCamPos = _cameraRef.transform.position;
+        //_ogCamPos = _cameraRef.transform.position;
         cam0 = _cameraRef.transform.position;
         cam1 = transform.position + _camOffset;
         cam1.y = _cameraRef.transform.position.y;
         _cameraRef.AmFollowingPlayer = false;
 
-        _totalPercentage = _realFollowPercentage + _realSpinAttackPercentage + _realPinballAttackPercentage;
+        _totalPercentageFireTrap = _realQuadFirePercentage + _realXAttackPercentage;
 
         _startAttackTime = Time.time;
         _myAI = BossAI.INTRO;
@@ -323,6 +298,7 @@ public class SpinBossGlhost : BossEnemy
     {
         if (!_init)
         {
+            Debug.Log("start Fight");
             _bossBar.SetActive(true);
             _laggedBossHealthBar.fillAmount = 1;
             _actualBossHealthBar.fillAmount = 1;
@@ -357,21 +333,21 @@ public class SpinBossGlhost : BossEnemy
                     base.Update();
                     switch (_MyAttack)
                     {
-                        case SPINSTRATS.DOWNTIME:
-                            WhatDoNext();
+                        case TRAPSTRATS.FINDTRAP:
+                            findTrap();
                             break;
-                        case SPINSTRATS.FOLLOW:
-                            FollowPlayer();
+                        case TRAPSTRATS.INSIDETRAP:
+                            possessTrap();
                             break;
-                        case SPINSTRATS.SPIN:
-                            SpinInPlace();
+                            
+                        case TRAPSTRATS.XATTACK:
+                            QuadFireBeams();
+                            _xAttack = true;
                             break;
-                        case SPINSTRATS.PINBALL:
-                            PlaySomePinball();
+                        case TRAPSTRATS.QUADFIRE:
+                            QuadFireBeams();
                             break;
-                        case SPINSTRATS.STUNNED:
-                            Stunned();
-                            break;
+                            
                         default:
                             //Debug.Log("No Attack Set");
                             break;
@@ -386,241 +362,130 @@ public class SpinBossGlhost : BossEnemy
         }
     }
 
-    //decides what the attack the boss will do next
+    //decides what the attack the boss will do next (Currently Out of Use but setup fordifferent attacks.
     private void WhatDoNext()
     {
-        _currAttackTime = (Time.time - _startAttackTime) / _realTimeBetweenAttacks;
-        //Debug.Log("thinking");
-
-        if (_currAttackTime >= 1)
-        {
-            float _nextAttack = Random.Range(0, _totalPercentage);
-
-            if (_nextAttack > 0 && _nextAttack <= _realFollowPercentage)
+            float _nextAttack = Random.Range(0, _totalPercentageFireTrap);
+            Debug.Log("Next attack: " + _nextAttack);
+            if (_nextAttack > 0 && _nextAttack <= _realQuadFirePercentage)
             {
-                //Debug.Log("follow Chosen");
-                _startAttackTime = Time.time;
-                _MyAttack = SPINSTRATS.FOLLOW;
-            }
-            else if (_nextAttack > _realFollowPercentage && _nextAttack <= (_realFollowPercentage + _realSpinAttackPercentage))
-            {
-                //Debug.Log("spin Chosen");
-
-                _enemyAgent.enabled = false;
-                _startAttackTime = Time.time;
-                _startSpawnTime = Time.time;
-                _MyAttack = SPINSTRATS.SPIN;
+                Debug.Log("Quad Fire");
+                _MyAttack = TRAPSTRATS.QUADFIRE;
             }
             else
             {
-                //Debug.Log("pinball Chosen");
-                _tellPinballing = true;
-                _enemyAgent.enabled = false;
-                _startAttackTime = Time.time;
-                _MyAttack = SPINSTRATS.PINBALL;
+                Debug.Log("XATTACK");
+                _MyAttack = TRAPSTRATS.XATTACK;
             }
-        }
     }
 
-    //Attack
-    //Enemy just follows the player for a certain amount of time
-    private void FollowPlayer()
+    //Find Trap
+    //Boss will find and go towards a trap
+    //Than he will cast QuadFire, there is room to do a deciding attack for random attacks
+    private void findTrap()
     {
-        _enemyAgent.SetDestination(_playerRef.transform.position);
-
-        _currAttackTime = (Time.time - _startAttackTime) / _realFollowDuration;
-
-        //Debug.Log("following");
-
-        if (_currAttackTime >= 1)
+        
+        if (_enemyAgent.hasPath == false)
         {
-            _enemyAgent.SetDestination(transform.position);
-
-            _MyAttack = SPINSTRATS.DOWNTIME;
-            _startAttackTime = Time.time;
-        }
-
-        for (int i = 0; i <= _numOfCasts; i++)
-        {
-            float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
-            float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
-
-            Vector3 RayDir = (transform.forward * Zpos) + (transform.right * Xpos);
-
-            if (_debug)
+            Debug.Log("findTrap");
+            fcurrentTrap = Random.Range(0, _listOfTraps.Count);
+            GameObject newTrap = _listOfTraps[fcurrentTrap];
+            if (newTrap == currentTrap)
             {
-                Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (RayDir * _bossCollisionDetectDistance), Color.red);
-            }
-
-            _calcAngle += _detectionAngle / _numOfCasts;
-
-            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
-            {
-                if (hit.collider.GetComponent<PlayerController>())
-                {
-                    hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
-                }
-            }
-        }
-
-        _calcAngle = _startAngle;
-    }
-
-    //Attack
-    //Boss will spin in place
-    //Boss will spawn and shoot ghosts out in random directions
-    private void SpinInPlace()
-    {
-        _currAttackTime = (Time.time - _startAttackTime) / _realSpinAttackDuration;
-        _currSpawnTime = (Time.time - _startSpawnTime) / _realSpawnDelayDuration;
-
-        for (int i = 0; i <= _numOfCasts; i++)
-        {
-            float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
-            float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
-
-            Vector3 RayDir = (transform.forward * Zpos) + (transform.right * Xpos);
-
-            if (_debug)
-            {
-                Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (RayDir * _bossCollisionDetectDistance), Color.red);
-            }
-
-            _calcAngle += _detectionAngle / _numOfCasts;
-
-            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
-            {
-                if (hit.collider.GetComponent<PlayerController>())
-                {
-                    hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
-                }
-            }
-        }
-
-        _calcAngle = _startAngle;
-
-        transform.Rotate(Vector3.up, _realSpinningSpeed);
-        //Debug.Log("spinning");
-
-        if (_currAttackTime >= 1)
-        {
-            //Debug.Log("spinning Done");
-            _invincible = false;
-            _enemyAgent.enabled = true;
-            _MyAttack = SPINSTRATS.STUNNED;
-            _startAttackTime = Time.time;
-        }
-
-        if (_currSpawnTime >= 1)
-        {
-            _currSpawnTime = 1;
-            GameObject _newEnemy = Instantiate<GameObject>(_enemyToSpawn, transform.position, transform.rotation);
-            _newEnemy.GetComponent<BaseEnemy>().Init(_myRoom, Mechanic.BOSS);
-            _startSpawnTime = Time.time;
-        }
-    }
-
-    //Attack
-    //Boss will spin
-    //Boss will shoot out towards the player and richochet off of walls for a duration
-    private void PlaySomePinball()
-    {
-        if (_tellPinballing)
-        {
-            _currAttackTime = (Time.time - _startAttackTime) / _realPinballTellDuration;
-
-            if (_currAttackTime >= 1)
-            {
-                _currAttackTime = 1;
-                _tellPinballing = false;
-                _moveDir = (_playerRef.transform.position - transform.position).normalized;
-                _moveDir.y = 0;
-                _startAttackTime = Time.time;
-            }
-
-            _currSpinningSpeed = _realSpinningSpeed * _currAttackTime;
-
-            transform.Rotate(Vector3.up, _currSpinningSpeed);
-        }
-        else
-        {
-            _currAttackTime = (Time.time - _startAttackTime) / _realPinballAttackDuration;
-
-            //Debug.Log("pinballing");
-
-            for (int i = 0; i <= _pinballNumOfCasts; i++)
-            {
-                float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
-                float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
-
-                Vector3 RayDir = (transform.forward * Zpos) + (transform.right * Xpos);
-
-                if (_debug)
-                {
-                    Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (RayDir * _bossCollisionDetectDistance), Color.red);
-                }
-
-                _calcAngle += _pinballDetectionAngle / _pinballNumOfCasts;
-
-                if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
-                {
-                    if (hit.collider.GetComponent<PlayerController>())
-                    {
-                        hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
-                    }
-                }
-            }
-
-            if (_debug)
-            {
-                Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (_moveDir * _bossCollisionDetectDistance), Color.blue);
-            }
-
-            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), _moveDir, out hit, _bossCollisionDetectDistance + 1f))
-            {
-                Vector3 checkDir = _moveDir;
-                GameObject thingHit = hit.collider.gameObject;
-
-                //Debug.Log("reflected");
-                if (!thingHit.GetComponent<BaseEnemy>() && !thingHit.GetComponent<BossEnemy>() && !thingHit.GetComponent<PlayerController>())
-                {
-                    _moveDir = Vector3.Reflect(checkDir, hit.normal);
-                }
-            }
-
-            _calcAngle = 0;
-
-            transform.Rotate(Vector3.up, _realSpinningSpeed);
-            transform.position += _moveDir * _realSpeedWhilePinballing * Time.deltaTime;
-
-            if (_currAttackTime >= 1)
-            {
-                _invincible = false;
-                _enemyAgent.enabled = true;
-                checkIfOffMap();
-                _MyAttack = SPINSTRATS.STUNNED;
-                _startAttackTime = Time.time;
                 return;
             }
+            else
+            {
+                currentTrap = newTrap;
+                _enemyAgent.SetDestination(currentTrap.transform.position);
+            }
+            
         }
+        //Debug.DrawRay(transform.position + Vector3.up, this.transform.forward);
 
-
+        WhatDoNext();
+        
     }
 
-    //once the boss is done with their attack
-    //will do nothing for an amount of time
-    private void Stunned()
+    //Attack
+    //Boss possesses trap by disabling his own mesh and collider. (Room for animation)
+    //When the trap finishes its attack he will be reinabled and find a new trap
+    private void possessTrap()
     {
-        _currAttackTime = (Time.time - _startAttackTime) / _realStunnedDuration;
-
-        //Debug.Log("stunned");
-
-        if (_currAttackTime >= 1)
+        gameObject.GetComponent<MeshRenderer>().enabled = false;
+        gameObject.GetComponent<CapsuleCollider>().enabled = false;
+        if (trapComplete)
         {
-            _MyAttack = SPINSTRATS.DOWNTIME;
-            _startAttackTime = Time.time;
+            _xAttack = false;
+            gameObject.GetComponent<MeshRenderer>().enabled = true;
+            gameObject.GetComponent<CapsuleCollider>().enabled = true;
+            _MyAttack = TRAPSTRATS.FINDTRAP;
+        }
+    }
+
+
+    //Detects when he gets to the targeted tower and starts the quad fire attack on the pillar.
+    private void QuadFireBeams()
+    {
+        for (int i = 0; i <= _numOfCasts; i++)
+        {
+            float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
+            float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
+
+            Vector3 RayDir = (transform.forward * Zpos) + (transform.right * Xpos);
+
+            if (_debug)
+            {
+                Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (RayDir * _bossCollisionDetectDistance), Color.red);
+            }
+
+            _calcAngle += _detectionAngle / _numOfCasts;
+
+            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
+            {
+                if (hit.collider.GetComponent<PlayerController>())
+                {
+                    hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
+                }
+            }
         }
 
+        _calcAngle = _startAngle;
+
+        if (Physics.Raycast(transform.position + Vector3.up, this.transform.forward, out hitObj, _detectDistance))
+        {
+
+            GameObject hitObject = hitObj.collider.gameObject;
+
+            if (hitObject == currentTrap)
+            {
+                //Moves all the variables from the boss to each fire trap gameobject
+                for (int z = 0; z < 4; z++)
+                {
+
+                    BossFireStatueTrap possessedTrap = hitObject.GetComponent<Transform>().GetChild(z).GetComponent<BossFireStatueTrap>();
+
+                    if (_xAttack)
+                    {
+                        possessedTrap.transform.eulerAngles += new Vector3(0, 45f, 0);
+                        possessedTrap._XAttack = true;
+                    }
+
+
+                    possessedTrap.bossEntity = this.gameObject;
+                    possessedTrap._fireDelay = _realQuadFireStartDelay;
+                    possessedTrap._fireDistance = _realQuadShootDist;
+                    possessedTrap._maxDetectDistance = _realQuadDetectDist;
+                    possessedTrap._startDelay = _quadStartDelay;
+                    possessedTrap._burningDuration = _realQuadBurnDuration;
+                    possessedTrap._fireDamage = _realQuadTrapDamage;
+                    possessedTrap.StartingDelay();
+                    trapComplete = false;
+                }
+
+                    _MyAttack = TRAPSTRATS.INSIDETRAP;
+            }
+        }
     }
 
     //called when boss gets hit and takes damage
@@ -754,20 +619,22 @@ public class SpinBossGlhost : BossEnemy
             //Debug.Log("Boss Reset");
             transform.position = _startPos;
             transform.rotation = _startRot;
+            /*
             _enemiesToCrush.SetActive(true);
             for (int i = 0; i < _GlhostsUnderMe.Count; i++)
             {
                 _GlhostsUnderMe[i].ResetCutscene();
             }
+            */
             _currBossHealth = _actualMaxHealth;
             _laggedBossHealthBar.fillAmount = 1;
             _actualBossHealthBar.fillAmount = 1;
 
             _bossBar.SetActive(false);
             _cameraInPosition = false;
-            _fallFinished = false;
-            _turnToPlayerFinished = false;
-            _glhostsCrushed = false;
+            //_fallFinished = false;
+            //_turnToPlayerFinished = false;
+            //_glhostsCrushed = false;
 
             _endingPlaying = false;
             _laggingHealth = false;
@@ -777,19 +644,8 @@ public class SpinBossGlhost : BossEnemy
             _invincible = false;
 
             _myAI = BossAI.NONE;
-            _MyAttack = SPINSTRATS.FOLLOW;
+            _MyAttack = TRAPSTRATS.FINDTRAP;
             _init = false;
-        }
-    }
-
-    private void checkIfOffMap()
-    {
-        if (Vector3.Distance(_startPos, transform.position) >= _maxDistanceOut)
-        {
-            transform.position = _startPos;
-            
-            _myAI = BossAI.INTRO;
-            _fallFinished = false;
         }
     }
 }
