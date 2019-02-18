@@ -97,12 +97,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _projectileDamage: 0.5
-  _damageRange: 0
-  _projectileSpeed: 0
-  _deathTimer: 0
+  _damageRange: 1
+  _projectileSpeed: 1
+  _deathTimer: 1
   _debugProjectile: 0
-  _cheatingDistance: 0
-  _cheatingSensitivity: 0
+  _cheatingDistance: 2
+  _cheatingSensitivity: 0.1
 --- !u!135 &135434989597854726
 SphereCollider:
   m_ObjectHideFlags: 1

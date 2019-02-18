@@ -460,18 +460,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _glhostDamage: 0.5
-  _damageRange: 0
-  _deathTimer: 0
-  _collisionCheckDist: 0
-  _spookDistance: 0
-  _spookyOffset: 0
+  _damageRange: 0.7
+  _deathTimer: 6
+  _collisionCheckDist: 1
+  _spookDistance: 10
+  _spookyOffset: 7.5
   _cheatingDistance: 0
   _cheatingSensitivity: 0
   _myMechanic: 0
-  _projectilePF: {fileID: 0}
-  _projectileSpawnOffset: 0
-  _projectileSpawnWaitTime: 0
-  _myProjectiles: []
+  _projectilePF: {fileID: 1342206675723872, guid: aa852c8edf3081746a2434ed8284ebde,
+    type: 2}
+  _projectileSpawnOffset: 1
+  _projectileSpawnWaitTime: 1
 --- !u!136 &136091093296632570
 CapsuleCollider:
   m_ObjectHideFlags: 1
