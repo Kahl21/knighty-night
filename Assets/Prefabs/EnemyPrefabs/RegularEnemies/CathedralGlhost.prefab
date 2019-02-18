@@ -456,7 +456,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1572586773812476}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5241634985b283b4ab0ceec53a86a547, type: 3}
+  m_Script: {fileID: 11500000, guid: 961eff98a193ad94286005fedbc4fc88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _glhostDamage: 0.5
@@ -468,11 +468,10 @@ MonoBehaviour:
   _cheatingDistance: 0
   _cheatingSensitivity: 0
   _myMechanic: 0
-  _projectilePF: {fileID: 1342206675723872, guid: db246d4d911f4e14cb12398b3b85dd77,
+  _projectilePF: {fileID: 1342206675723872, guid: aa852c8edf3081746a2434ed8284ebde,
     type: 2}
   _projectileSpawnOffset: 1
   _projectileSpawnWaitTime: 1
-  _myProjectiles: []
 --- !u!136 &136091093296632570
 CapsuleCollider:
   m_ObjectHideFlags: 1

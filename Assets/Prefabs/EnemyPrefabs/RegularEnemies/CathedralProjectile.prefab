@@ -93,16 +93,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1342206675723872}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3e1192d7c5c66344189749773debacb4, type: 3}
+  m_Script: {fileID: 11500000, guid: 65bf7dd9172fca342983c443b2d91975, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _projectileDamage: 0.5
-  _damageRange: 0.7
+  _damageRange: 1
   _projectileSpeed: 1
   _deathTimer: 1
   _debugProjectile: 0
-  _cheatingDistance: 0
-  _cheatingSensitivity: 0
+  _cheatingDistance: 2
+  _cheatingSensitivity: 0.1
 --- !u!135 &135434989597854726
 SphereCollider:
   m_ObjectHideFlags: 1

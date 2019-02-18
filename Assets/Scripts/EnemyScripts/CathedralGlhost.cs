@@ -14,7 +14,6 @@ public class CathedralGlhost : BasicGlhost {
     float _currProjSpawn;
     float _startProjSpawn;
     Vector3 _hoverPos;
-    [SerializeField]
     List<CathedralProjectile> _myProjectiles;
 
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
