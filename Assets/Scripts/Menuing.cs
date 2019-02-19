@@ -74,6 +74,16 @@ public class Menuing : MonoBehaviour {
     float _startTime;
     bool _creditsRolling;
 
+    //loadscreen variables
+    public Image _loadScreen;
+    public Image _fadeScreen;
+    private bool isLoading = false;
+    private Color blackColor = new Color(0, 0, 0, 1);
+    private Color transparentColor = new Color(0, 0, 0, 0);
+    private Color fullColor = new Color(1, 1, 1, 1);
+    private float fadeTime = 1f;
+    private float fadeUpdateTime = .01f;
+
     PlayerController _playerRef;
     GameManager _managerRef;
 
@@ -316,6 +326,56 @@ public class Menuing : MonoBehaviour {
         }
     }
 
+    public void Fading()
+    {
+        if (!isLoading && _fadeScreen.color != transparentColor)
+        {
+            StartCoroutine(FadeIn());
+        }
+
+
+    }
+
+    IEnumerator LoadNewScene()
+    {
+        _fadeScreen.color = transparentColor;
+        float time = 0;
+        Color wantedColor = _fadeScreen.color;
+        isLoading = true;
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex + 1);
+        asyncLoad.allowSceneActivation = false;
+
+        //yield return new WaitForSeconds(3f);
+        while (time < fadeTime)
+        {
+            yield return new WaitForSeconds(fadeUpdateTime);
+
+            wantedColor = Color.Lerp(transparentColor, blackColor, time);
+            _fadeScreen.color = wantedColor;
+            time += fadeUpdateTime;
+        }
+        _loadScreen.color = fullColor;
+        yield return new WaitForSeconds(2f);
+        _loadScreen.color = transparentColor;
+        asyncLoad.allowSceneActivation = true;
+        isLoading = false;
+    }
+
+    IEnumerator FadeIn()
+    {
+        float time = 0;
+        Color wantedColor = _fadeScreen.color;
+
+        while (time < fadeTime)
+        {
+            yield return new WaitForSeconds(fadeUpdateTime);
+
+            wantedColor = Color.Lerp(blackColor, transparentColor, time);
+            _fadeScreen.color = wantedColor;
+            time += fadeUpdateTime;
+        }
+    }
+
     public void StartCredits()
     {
         _credits.SetActive(true);
@@ -358,3 +418,5 @@ public class Menuing : MonoBehaviour {
     public bool GameIsPaused { get { return _paused; } } 
     public bool AreCreditsRolling { get { return _creditsRolling; } }
 }
+
+

@@ -2,31 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FireStatueTrap : BaseTrap {
+public class BossFireStatueTrap : BaseTrap {
 
     private enum FireState
     {
         NONE,
         BEGINBURNING,
         FLAMEDELAY,
-        SMOKEON,
         FLAMEON,
         BURNING,
         FLAMEOFF,
+        FLAMEBURNOUT,
         ROOMDONE
     }
 
-    [Header("Flame Statue Variables")]
-    [SerializeField]
+    [Header("Fire Statue Variables")]
+    public float _fireDamage;
+    [HideInInspector]
     float _beginningDelay;
     [SerializeField]
-    float _fireDelay;
+    public float _fireDelay;
     [SerializeField]
     float _fireIncDuration;
     [SerializeField]
-    float _burningDuration;
+    public float _burningDuration;
     [SerializeField]
-    float _startDelay;
+    public float _fireDistance;
+    public float _startDelay;
     float _currDelay;
 
     [Header("Detection Variables")]
@@ -34,12 +36,13 @@ public class FireStatueTrap : BaseTrap {
     bool _debugDamageArea;
     [SerializeField]
     float _spaceBetweenRays;
-    [SerializeField]
-    float _maxDetectDistance;
+    [HideInInspector]
+    public float _maxDetectDistance;
     float _currDetectDistance;
     RaycastHit hit;
     ParticleSystem _myFire;
-    public ParticleSystem _mySmoke;
+    public GameObject bossEntity;
+    public bool _XAttack = false;
 
     FireState _mystate = FireState.NONE;
 
@@ -47,10 +50,9 @@ public class FireStatueTrap : BaseTrap {
     protected override void Start()
     {
         _myFire = transform.GetChild(0).transform.GetComponent<ParticleSystem>();
-        _mySmoke = transform.GetChild(1).transform.GetComponent<ParticleSystem>();
-        _mySmoke.Stop();
+        var main = _myFire.main;
+        main.startLifetime = _fireDistance;
         _myFire.Stop();
-        base.Start();
     }
 
     //Initilizes trap
@@ -58,8 +60,7 @@ public class FireStatueTrap : BaseTrap {
     {
         base.Init();
         _currDetectDistance = 0;
-        _startDelay = Time.time;
-        _mystate = FireState.BEGINBURNING;
+        _mystate = FireState.NONE;
     }
 
     private void Update()
@@ -68,12 +69,8 @@ public class FireStatueTrap : BaseTrap {
         {
             case FireState.NONE:
                 break;
- 
             case FireState.BEGINBURNING:
                 StartingDelay();
-                break;
-            case FireState.SMOKEON:
-                StartSmoke();
                 break;
             case FireState.FLAMEDELAY:
                 StartFire();
@@ -87,36 +84,30 @@ public class FireStatueTrap : BaseTrap {
             case FireState.FLAMEOFF:
                 StopFire();
                 break;
+            case FireState.FLAMEBURNOUT:
+                Burnout();
+                break;
             case FireState.ROOMDONE:
                 break;
             default:
                 break;
         }
-
-            
     }
 
     //starts delay to spit out fire
-    void StartingDelay()
+    public void StartingDelay()
     {
-        _currDelay = (Time.time - _startDelay) / _beginningDelay;
-        if (_currDelay >= 1)
-        {
-            _currDelay = 1;
-            _startDelay = Time.time;
-            _mystate = FireState.SMOKEON;
-        }
-    }
+        var main = _myFire.main;
+        main.startLifetime = _fireDistance;
 
-    //plays fire animation after a delay
-    void StartSmoke()
-    {
-        _currDelay = (Time.time - _startDelay) / _fireDelay;
-        
+        _trapDamage = _fireDamage;
+
+        _currDelay = (Time.time - _startDelay) / _beginningDelay;
+
         if (_currDelay >= 1)
         {
             _currDelay = 1;
-            _mySmoke.Play();
+
             _startDelay = Time.time;
             _mystate = FireState.FLAMEDELAY;
         }
@@ -126,17 +117,17 @@ public class FireStatueTrap : BaseTrap {
     void StartFire()
     {
         _currDelay = (Time.time - _startDelay) / _fireDelay;
-        if (_currDelay >= 1)
+
+        if(_currDelay >= 1)
         {
             _currDelay = 1;
-            _mySmoke.Stop();
+
             _myFire.Play();
             _startDelay = Time.time;
+            Debug.Log("Shoot Fire");
             _mystate = FireState.FLAMEON;
         }
     }
-
-
 
     //shoots out three raycasts along with the fire animation
     //player will take damage if he walks through the fire
@@ -147,7 +138,7 @@ public class FireStatueTrap : BaseTrap {
         _currDetectDistance = _maxDetectDistance * _currDelay;
 
         LookForPlayer();
-        
+
         if (_currDelay >= 1)
         {
             _currDelay = 1;
@@ -165,7 +156,7 @@ public class FireStatueTrap : BaseTrap {
         _currDelay = (Time.time - _startDelay) / _burningDuration;
         
         LookForPlayer();
-
+        Debug.Log("burn Player");
         if (_currDelay >= 1)
         {
             _currDelay = 1;
@@ -185,8 +176,9 @@ public class FireStatueTrap : BaseTrap {
         _currDelay = (Time.time - _startDelay) / _fireIncDuration;
 
         _currDetectDistance = _maxDetectDistance * (1 - _currDelay);
-        
+
         LookForPlayer();
+
         if (_currDelay >= 1)
         {
             _currDelay = 1;
@@ -194,7 +186,26 @@ public class FireStatueTrap : BaseTrap {
             _currDetectDistance = 0;
             
             _startDelay = Time.time;
-            _mystate = FireState.SMOKEON;
+
+            bossEntity.GetComponent<TrapBossGlhost>().trapComplete = true;
+
+            _mystate = FireState.FLAMEBURNOUT;
+        }
+    }
+
+    void Burnout()
+    {
+        ParticleSystem.Particle[] particleArray = new ParticleSystem.Particle[_myFire.main.maxParticles];
+        int liveParticles = _myFire.GetParticles(particleArray);
+        //print(liveParticles + " Particles Alive");
+        if (liveParticles <= 0)
+        {
+            if (_XAttack)
+            {
+                transform.eulerAngles += new Vector3(0, 45f, 0);
+                _XAttack = false;
+            }
+            _mystate = FireState.NONE;
         }
     }
 
@@ -204,10 +215,10 @@ public class FireStatueTrap : BaseTrap {
         for (int i = -1; i < 2; i++)
         {
             Vector3 _RayPos;
-            
+
             if (_mystate != FireState.FLAMEOFF)
             {
-                _RayPos = transform.position + Vector3.up + (transform.right * _spaceBetweenRays * i);
+                _RayPos = transform.position + Vector3.down + (transform.right * _spaceBetweenRays * i);
                 if (_debugDamageArea)
                 {
                     Debug.DrawRay(_RayPos, transform.forward * _currDetectDistance);
@@ -223,7 +234,7 @@ public class FireStatueTrap : BaseTrap {
             }
             else
             {
-                _RayPos = transform.position + Vector3.up + (transform.right * _spaceBetweenRays * i) + (transform.forward * _maxDetectDistance);
+                _RayPos = transform.position + Vector3.down + (transform.right * _spaceBetweenRays * i) + (transform.forward * _maxDetectDistance);
                 if (_debugDamageArea)
                 {
                     Debug.DrawRay(_RayPos, -transform.forward * _currDetectDistance);

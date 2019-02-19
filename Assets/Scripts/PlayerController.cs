@@ -145,6 +145,11 @@ public class PlayerController : MonoBehaviour {
     Interactions _whatImDoing = Interactions.NONE;
     MenuOrient _menuOrient = MenuOrient.VERT;
 
+
+    //Johns Checkpoint Variables
+    bool reachCheckpoint;
+    Vector3 checkpointPos;
+
     // Use this for initialization
     void Awake()
     {
@@ -169,6 +174,8 @@ public class PlayerController : MonoBehaviour {
         
         _myRenderer = transform.GetChild(0).gameObject;
         _myAnimations = GetComponent<Animator>();
+
+        reachCheckpoint = false;
     }
 
     //Secondary Initialization
@@ -207,8 +214,11 @@ public class PlayerController : MonoBehaviour {
         _movingSpecial = false;
         _bossCutsceneInit = false;
         _myRenderer.SetActive(true);
-        
-        transform.position = _playerStartPos;
+
+        if (reachCheckpoint == true)                        //if the player has reached a checkpoint
+            transform.position = checkpointPos;             //spawn player at checkpoint
+        else
+            transform.position = _playerStartPos;           //else spawn player at players start position
         _whatImDoing = Interactions.NONE;
         _myAnimations.Play("StandingIdle", 0);
     }
@@ -216,92 +226,92 @@ public class PlayerController : MonoBehaviour {
     // Update is called once per frame
     void Update () {
 
-        if(_inMenu)
+        if(_inMenu)                                         //if the player is in the menu
         {
-            if(!_menuRef.AreCreditsRolling)
+            if(!_menuRef.AreCreditsRolling)                 //if the credits arent rolling in the menuing script
             {
-                MoveMenu();
-                MenuInput();
+                MoveMenu();                                 //move menu function
+                MenuInput();                                //menu input 
             }
             else
             {
-                if (Input.GetButtonDown("MenuSelect"))
+                if (Input.GetButtonDown("MenuSelect"))      //if the player presses down menu select
                 {
-                    _menuRef.StopCredits();
+                    _menuRef.StopCredits();                 //stop credits function in the menuing script
                 }
             }
 
         }
-        else if(_inCutscene)
+        else if(_inCutscene)                                //if the player is in a cutscene
         {
-            _startHealthTime = Time.time;
-            _startSpecialTime = Time.time;
-            if(_isIntroPlaying)
+            _startHealthTime = Time.time;                   //player heathtime equals current time
+            _startSpecialTime = Time.time;                  //players special time is current time
+            if(_isIntroPlaying)                             //if the intro is playing
             {
-                MoveIntoPosition();
+                MoveIntoPosition();                         //move player into position function
             }
         }
         else
         {
-            CheckForPause();
-            if (_movingHealth)
+            CheckForPause();                                //check for pause function
+            if (_movingHealth)                              //if moving health is true
             {
-                LerpHealthBar();
+                LerpHealthBar();                            //lerp health bar function
             }
 
-            if(_movingSpecial)
+            if(_movingSpecial)                              //if moving special
             {
-                LerpSpecialBar();
+                LerpSpecialBar();                           //lerp special bar function
             }
-            CheckForMovement();
+            CheckForMovement();                             //check for movement function
 
-            if (!_doingSomething)
+            if (!_doingSomething)                           //if not doing something
             {
-                LookAround();
-                CheckForActionInput();
+                LookAround();                               //look around function
+                CheckForActionInput();                      //check for action input
             }
             else
             {
-                WhatAmIEvenDoing();
+                WhatAmIEvenDoing();                         //else what are you doing with your life. theres so much meaning to this universe and instead you are reading this extrordinarily long comment which really doesnt have a point much like, i assume, this function that probably just checks to see what else the player can do/ why it isnt doing what its supposed to
             }
         }
 	}
 
     //Called every frame to see if the input to bring up the pause menu is pressed
-    private void CheckForPause()
+    private void CheckForPause()                            //check for pause function
     {
-        if(Input.GetButtonDown("Pause"))
+        if(Input.GetButtonDown("Pause"))                    //if the player presses the pause button
         {
-            _menuRef.Pause();
+            _menuRef.Pause();                               //start pause function from the menuing script
         }
     }
 
     //Checks to see what orientation the menu is in (Vert/Horiz)
     //looks for input on control stick to see if the player moved in correct direction
-    private void MoveMenu()
+    private void MoveMenu()                                 //move menu script
     {
-        if(_menuOrient == MenuOrient.VERT)
+        if(_menuOrient == MenuOrient.VERT)                  //if menu orient is equal to menu orient vert
         {
-            float _updown = Input.GetAxis("VertMove"); 
-            if(_updown > 0.5f)
+            float _updown = Input.GetAxis("VertMove");      //updown is equal to vertical movement
+            if(_updown > 0.5f)                              //if there is some vert movement greater than 0.5
             {
-                _menuRef.MenuUpOrDown(true);
+                _menuRef.MenuUpOrDown(true);                //MenuUpOrDown from the Menuing Script is true
             }
-            else if(_updown < -0.5f)
+            else if(_updown < -0.5f)                        //else if its less than -0.05f
             {
-                _menuRef.MenuUpOrDown(false);
+                _menuRef.MenuUpOrDown(false);               //MenuUpOrDown from the Menuing Script is false
             }
         }
-        else
+        else                                                //else 
         {
-            float _leftright = Input.GetAxis("HorizMove");
-            if(_leftright > 0.5f)
+            float _leftright = Input.GetAxis("HorizMove");  //_leftright equals horizontal movement
+            if(_leftright > 0.5f)                           //if leftright is greater than or equal to 0.5f
             {
-                _menuRef.MenuUpOrDown(true);
+                _menuRef.MenuUpOrDown(true);                //the MenuUpOrDown from menuing script is true
             }
-            else if (_leftright < -0.5f)
+            else if (_leftright < -0.5f)                    //else if leftright is left than 0.5f
             {
-                _menuRef.MenuUpOrDown(false);
+                _menuRef.MenuUpOrDown(false);               //MenuUpOrDown from the Menuing Script is false
             }
         }
     }
@@ -310,150 +320,150 @@ public class PlayerController : MonoBehaviour {
     //OnClicks the button that is selected
     private void MenuInput()
     {
-        if(Input.GetButtonDown("MenuSelect"))
+        if(Input.GetButtonDown("MenuSelect"))           //if the player presses the menu select button
         {
-            _menuRef.SelectButton();
+            _menuRef.SelectButton();                    //start the selectButton Function from the Menuing Script
         }
     }
 
     //increments Health bar if the player is damaged or healing
     private void IncHealthMeter(float _amount, bool PositiveIncrementQuestionMark)
     {
-        h0 = _playerHealth;
+        h0 = _playerHealth;                                         //h0 equals playerHealth
 
-        if (PositiveIncrementQuestionMark)
+        if (PositiveIncrementQuestionMark)                          //if the positiveIncrementQuestionMArk is true
         {
-            _playerHealth += _amount;
-            if (_playerHealth > _maxHealthValue)
+            _playerHealth += _amount;                               //playerhealth += the amount given
+            if (_playerHealth > _maxHealthValue)                    //if player health ever ends up above maximum health
             {
-                _playerHealth = _maxHealthValue;
+                _playerHealth = _maxHealthValue;                    //player health is equal to the max possible health
             }
         }
         else
         {
-            _playerHealth -= _amount;
+            _playerHealth -= _amount;                               //otherwise, take the amount given away from the current player health
             if (_playerHealth < 0)
             {
-                _playerHealth = 0;
+                _playerHealth = 0;                                  //if the players health ends up below zero, make the player health zero
             }
         }
 
-        h1 = _playerHealth;
-        _startHealthTime = Time.time;
-        _movingHealth = true;
+        h1 = _playerHealth;                                         //h1 equals player health
+        _startHealthTime = Time.time;                               //start health time is equal to current time
+        _movingHealth = true;                                       //moving health is true
 
     }
 
     //lerps the onscreen health bar to give a smooth transistion of hearts
-    private void LerpHealthBar()
+    private void LerpHealthBar()                    
     {
-        _currLerpHealth = (Time.time - _startHealthTime) / _healthBarLerpDuration;
+        _currLerpHealth = (Time.time - _startHealthTime) / _healthBarLerpDuration;          //current lerp health is equal to current time minus start health time then divided by lerp health duration
 
-        float h01;
+        float h01;                                                                          //float h01
 
-        h01 = (1 - _currLerpHealth) * h0 + _currLerpHealth * h1;
+        h01 = (1 - _currLerpHealth) * h0 + _currLerpHealth * h1;                            //h01 equals 1 minus current lerp health times 0 plus current lerp health times h1
 
-        if (_currLerpHealth >= 1)
+        if (_currLerpHealth >= 1)                                                           //if current lerp health is greater than one
         {
-            _currLerpHealth = 1;
+            _currLerpHealth = 1;                                                            //current lurp health is equal to one
 
-            _movingHealth = false;
-            _healing = false;
+            _movingHealth = false;                                                          //moving health equals false 
+            _healing = false;                                                               //healing is false
         }
 
-        _healthBar.GetComponent<Image>().fillAmount = h01 / _maxHealthValue;
+        _healthBar.GetComponent<Image>().fillAmount = h01 / _maxHealthValue;                //the healthbar image is filled h01 divided by max health value
     }
 
     //increments Special bar if the player is hits and enemy or uses special
     private void IncSpecialMeter(float _amount, bool PositiveIncrementQuestionMark)
     {
-        s0 = _currSpecialAmount;
+        s0 = _currSpecialAmount;                                                            //s0 is the current special amount
 
-        if (PositiveIncrementQuestionMark)
+        if (PositiveIncrementQuestionMark)                                                  //if its a positive increment
         {
-            _currSpecialAmount += _amount;
-            if (_currSpecialAmount > _MaxSpecialAmount)
+            _currSpecialAmount += _amount;                                                  //add the amount given to the current special amount
+            if (_currSpecialAmount > _MaxSpecialAmount)                                     //if the current special amount is greater than the max
             {
-                _currSpecialAmount = _MaxSpecialAmount;
+                _currSpecialAmount = _MaxSpecialAmount;                                       //make the current the max
             }
         }
-        else
+        else                                                                                //if its a negative increment
         {
-            _currSpecialAmount -= _amount;
-            if (_currSpecialAmount < 0)
+            _currSpecialAmount -= _amount;                                                  //take away the amount given to the current special amount
+            if (_currSpecialAmount < 0)                                                     //if the current is less than 0
             {
-                _currSpecialAmount = 0;
+                _currSpecialAmount = 0;                                                     //make it zero
             }
         }
 
-        s1 = _currSpecialAmount;
-        _startSpecialTime = Time.time;
-        _movingSpecial = true;
+        s1 = _currSpecialAmount;                                                            //s1 is the current special amount
+        _startSpecialTime = Time.time;                                                      //strat special time is equal to current time
+        _movingSpecial = true;                                                              //moving special is true
     }
 
     //lerps the onscreen special bar to give a smooth transistion of buildup
     private void LerpSpecialBar()
     {
-        _currSpecial = (Time.time - _startSpecialTime) / _specialBarLerpDuration;
+        _currSpecial = (Time.time - _startSpecialTime) / _specialBarLerpDuration;           //current special is equal to the current time minus the start special time divided by the special bar lerp duration
     
-        float s01;
+        float s01;                                                                          
 
-        s01 = (1 - _currSpecial) * s0 + _currSpecial * s1;
+        s01 = (1 - _currSpecial) * s0 + _currSpecial * s1;                                  //s01 is equal to 1 minus current special times s0 plus current special times s1
 
-        if (_currSpecial >= 1)
+        if (_currSpecial >= 1)                                                              //if current special is greate rthan or equal to 1
         {
-            _currSpecial = 1;
+            _currSpecial = 1;                                                               //make the current special 1
 
-            _movingSpecial = false;
+            _movingSpecial = false;                                                         //moving special is false
         }
 
-        _specialBar.GetComponent<Image>().fillAmount = s01 / _MaxSpecialAmount;
+        _specialBar.GetComponent<Image>().fillAmount = s01 / _MaxSpecialAmount;             //special bar image gets filled s01 divided by the maximum special amount
     }
 
     //call when the player is about to go into a boss fight
     public void GoingToIntroCutscene(BossEnemy thingToInit)
     {
         
-        _bossImFighting = thingToInit;
-        cs0 = transform.position;
-        cs1 = _bossImFighting.GetIntroPos;
-        cs1.x = transform.position.x;
-        cs1.y = transform.position.y;
-        _startCutsceneTime = Time.time;
-        _myAnimations.Play("StandingIdle", 0);
-        _isIntroPlaying = true;
-        _inCutscene = true;
+        _bossImFighting = thingToInit;                                                      //the boss im fighting from the boss enemy script equals thing to initialize
+        cs0 = transform.position;                                                           //cs0 (Vector3) is equal to the transform position
+        cs1 = _bossImFighting.GetIntroPos;                                                  //cs1 is equal to the bosses intro position
+        cs1.x = transform.position.x;                                                       //cs1's x positon is equal to the players current x
+        cs1.y = transform.position.y;                                                       //cs1's y position is equal to the players current y
+        _startCutsceneTime = Time.time;                                                     //start cutscene is equal to the current time
+        _myAnimations.Play("StandingIdle", 0);                                              //play animation standing idle 
+        _isIntroPlaying = true;                                                             //the intro is playing
+        _inCutscene = true;                                                                 //the player is in a cutscene
     }
 
     //call when player has defeated a boss
     public void GoingToOutroCutscene()
     {
-        _isIntroPlaying = false;
-        _inCutscene = true;
+        _isIntroPlaying = false;                                                            //the intro is not playing
+        _inCutscene = true;                                                                 //the player is in a cutscene
     }
 
     //Once in a cutscene
-    private void MoveIntoPosition()
+    private void MoveIntoPosition()                                                         //move into position
     {
-        _currCutsceneTime = (Time.time - _startCutsceneTime) / _playerCutsceneMovementDuration;
+        _currCutsceneTime = (Time.time - _startCutsceneTime) / _playerCutsceneMovementDuration;         //current cutscene time is equal to the current time minus the start cutscene time divided by the player cutscene movement duration
 
-        if(_currCutsceneTime >= 1)
+        if(_currCutsceneTime >= 1)                                                          //if the current cutscene time is greater than 1
         {
-            _currCutsceneTime = 1;
+            _currCutsceneTime = 1;                                                          //then the current cutscene time is 1
             if(!_bossCutsceneInit)
             {
-                _bossImFighting.Init();
-                _bossCutsceneInit = true;
+                _bossImFighting.Init();                                                     //initialize the boss im bout to fight
+                _bossCutsceneInit = true;                                                   //boss cutscene starts
             }
            
         }
 
         Vector3 cs01;
 
-        cs01 = (1 - _currCutsceneTime) * cs0 + _currCutsceneTime * cs1;
+        cs01 = (1 - _currCutsceneTime) * cs0 + _currCutsceneTime * cs1;                         
 
-        transform.position = cs01;
-        transform.LookAt(transform.position + Vector3.forward);
+        transform.position = cs01;                                                              //the players current position is equal to cs01
+        transform.LookAt(transform.position + Vector3.forward);                                 //make the player look at its current position plus forward
     }
 
     //checks for input from the stick and moves the player in that direction
@@ -461,99 +471,108 @@ public class PlayerController : MonoBehaviour {
     //casts raycast to look below for various things as well
     private void CheckForMovement()
     {
-        _move = new Vector3(Input.GetAxis("HorizMove"), 0, -Input.GetAxis("VertMove"));
+        _move = new Vector3(Input.GetAxis("HorizMove"), 0, -Input.GetAxis("VertMove"));         //move is euqal to the new vecto3 which only allows forward, backward, left, and right
         
 
-        if (_move.magnitude <= 0) 
+        if (_move.magnitude <= 0)                                                               //if the moves magnitude is less than or equal to zero
         {
-            if(!_doingSomething)
+            if(!_doingSomething)                                                                //if not doing anything
             {
-                _myAnimations.Play("StandingIdle", 0);
+                _myAnimations.Play("StandingIdle", 0);                                          //play the idle animation
             }
-            _move = Vector3.zero;
+            _move = Vector3.zero;                                                               //there is no movement
         }
-        else
+        else                                                                                    //if the move magnitude is greater than zero
         {
-            if (!_doingSomething)
+            if (!_doingSomething)                                                               //if  not doing something
             {
-                _myAnimations.Play("Moving", 0);
+                _myAnimations.Play("Moving", 0);                                                //play the moving animation
             }
         }
 
-        if (Physics.Raycast(transform.position + Vector3.up, _move, out hit, _collisionDetectDist))
+        if (Physics.Raycast(transform.position + Vector3.up, _move, out hit, _collisionDetectDist))     //create a raycast going forward
         {
-            GameObject thingHit = hit.collider.gameObject;
-            if (thingHit.GetComponent<WinScript>())
+            GameObject thingHit = hit.collider.gameObject;                                              //thingHit is whatever the raycast hit
+            if (thingHit.GetComponent<WinScript>())                                                     //if the thing hit is a win script
             {
-                _move = Vector3.zero;
-                if (thingHit.GetComponent<WinScript>().IsLastLevel())
+                _move = Vector3.zero;                                                                   //there is no movement
+                if (thingHit.GetComponent<WinScript>().IsLastLevel())                                   //if the win script is attached to the last level
                 {
-                    EndLevel(true);
+                    EndLevel(true);                                                                     //end level is equal to true
                 }
                 else
                 {
-                    _menuRef.NextLevel();
+                    _menuRef.NextLevel();                                                               //otherwise go to the next level
                 }
             }
-            else if (thingHit.GetComponent<DungeonMechanic>())
+            else if (thingHit.GetComponent<DungeonMechanic>())                                          //else if the player hit a dungeon mechanic
             {
-                thingHit.GetComponent<DungeonMechanic>().Init();
+                thingHit.GetComponent<DungeonMechanic>().Init();                                        //initialize the mechanic
             }
-            else if (thingHit.GetComponent<BaseEnemy>())
+            else if (thingHit.GetComponent<BaseEnemy>())                                                //else if the player hit a base enemy
             {
-                TakeDamage(thingHit.GetComponent<BaseEnemy>().GetDamage);
+                TakeDamage(thingHit.GetComponent<BaseEnemy>().GetDamage);                               //have the player take damage
             }
-            else if (thingHit.GetComponent<BossEnemy>())
+            else if (thingHit.GetComponent<BossEnemy>())                                                //else if the player hit a boss
             {
-                TakeDamage(thingHit.GetComponent<BossEnemy>().GetDamage);
+                TakeDamage(thingHit.GetComponent<BossEnemy>().GetDamage);                               //have the player take damage
             }
             else if(thingHit.GetComponent<CathedralProjectile>())
             {
                 TakeDamage(thingHit.GetComponent<CathedralProjectile>().GetDamage);
             }
-            else if(!thingHit.GetComponent<HealingGrace>() || !thingHit.GetComponent<SpikeTrap>())
+            else if(!thingHit.GetComponent<HealingGrace>() || !thingHit.GetComponent<SpikeTrap>())      //else if the player did not hit any of the above and it isnt a spike trap or healing spot
             {
-                _move = Vector3.zero;
+                _move = Vector3.zero;                                                                   //you should probably stop cause i got not clue what you hit homeboy
             }
         }
 
-        if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out hit, _collisionDetectDist))
+        if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out hit, _collisionDetectDist))      //creates a raycast infront of the player
         {
-            GameObject thingHit = hit.collider.gameObject;
+            GameObject thingHit = hit.collider.gameObject;                                                      //thing his is whatever the player hit
 
-            if (thingHit.GetComponent<HealingGrace>())
+            if (thingHit.GetComponent<HealingGrace>())                                                          //if the player hit a healing spot
             {
-                if (!_healing && _playerHealth < _maxHealthValue)
+                if (thingHit.GetComponent<HealingGrace>().isCheckpoint)                                          //if this healing grace is a checkpoint
+                {
+                    reachCheckpoint = true;                                                                     //the player has reached a checkpoint
+                    checkpointPos.x = thingHit.GetComponent<HealingGrace>().transform.position.x;               //the checkpoint's x position is whatever the healing graces is
+                    checkpointPos.z = thingHit.GetComponent<HealingGrace>().transform.position.z;               //the checkpoint's y position is whatever the healing graces is
+                }
+
+                if (!_healing && _playerHealth < _maxHealthValue)                                               //if the player is not healing and current health is less than max health
                 {
                     Debug.Log("am hurt");
-                    if (thingHit.GetComponent<HealingGrace>().GetHealingAmount > 0)
+                    if (thingHit.GetComponent<HealingGrace>().GetHealingAmount > 0)                             //if healing graces healing amount is greater than 0
                     {
-                        _healing = true;
-                        float _amountHeal = _playerHealth + thingHit.GetComponent<HealingGrace>().GetHealingAmount;
-                        if (_amountHeal > _maxHealthValue)
+                        _healing = true;                                                                        //healing is true
+                        float _amountHeal = _playerHealth + thingHit.GetComponent<HealingGrace>().GetHealingAmount;     //amountHeal is the playerhealth plus whatever the healing amount is
+                        if (_amountHeal > _maxHealthValue)                                                      //if the healing amount is greater than the maximum health value
                         {
-                            float leftoverHealth = _amountHeal - _maxHealthValue;
-                            _amountHeal -= leftoverHealth;
+                            float leftoverHealth = _amountHeal - _maxHealthValue;                               //leftover health is equal to amount heal minus the max health value
+                            _amountHeal -= leftoverHealth;                                                      //amount heal is subrtacts by the leftoverhealth
 
-                            thingHit.GetComponent<HealingGrace>().GetHealingAmount = leftoverHealth;
-                            thingHit.GetComponent<HealingGrace>().StartFade();
+                            thingHit.GetComponent<HealingGrace>().GetHealingAmount = leftoverHealth;            //the healing spots healing amount is now equal to the leftover health
+                            thingHit.GetComponent<HealingGrace>().StartFade();                                  //start the healing grace's fade
                         }
-                        else
-                        {
-                            thingHit.GetComponent<HealingGrace>().GetHealingAmount = 0;
-                            thingHit.GetComponent<HealingGrace>().StartFade();
+                        else                                                                                    //if the amount heal is less than or equal to max possible health
+                        { 
+                            thingHit.GetComponent<HealingGrace>().GetHealingAmount = 0;                         //healing graces healing amount is zero
+                            thingHit.GetComponent<HealingGrace>().StartFade();                                  //start healing grace's fade
                         }
-                        _amountHeal -= _playerHealth;
+                        _amountHeal -= _playerHealth;                                                           //the amount heal is minus whatever the player health is
 
 
-                        IncHealthMeter(_amountHeal, true);
+                        IncHealthMeter(_amountHeal, true);                                                      //increment the health bar whatever amount heal is
 
                     }
                 }
+
+
             }
-            else if(thingHit.GetComponent<SpikeTrap>())
+            else if(thingHit.GetComponent<SpikeTrap>())                                                         //if the playe hit a spike trap
             {
-                thingHit.GetComponent<SpikeTrap>().StartTell();
+                thingHit.GetComponent<SpikeTrap>().StartTell();                                                 
             }
             else if(thingHit.GetComponent<HazardFloor>())
             {
@@ -682,7 +701,7 @@ public class PlayerController : MonoBehaviour {
                         {
                             if (!thingHit.GetComponent<BossEnemy>().AmHit && !thingHit.GetComponent<BossEnemy>().AmInvincible)
                             {
-                                if(thingHit.GetComponent<ColorBossGlhost>())
+                                if(thingHit.GetComponent<ColorBossGlhost>() || thingHit.GetComponent<MiniBossColor>())
                                 {
                                     thingHit.GetComponent<BossEnemy>().GotHit(_playerDamage/_playerDamageDivideOffsetForSpecialBosses);
 

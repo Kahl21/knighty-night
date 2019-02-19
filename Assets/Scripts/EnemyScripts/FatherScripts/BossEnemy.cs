@@ -270,6 +270,6 @@ public class BossEnemy : MonoBehaviour {
     public virtual bool AmHit { get { return _amHit; } }
     public virtual bool AmInvincible { get { return _invincible; } }
     public virtual Vector3 GetIntroPos { get { return _playerIntroPos.transform.position; } }
-    public virtual DungeonMechanic SetMyRoom { set { _myRoom = value; } }
+    public virtual DungeonMechanic SetMyRoom { get { return _myRoom; } set { _myRoom = value; } }
     public virtual float GetDamage { get { return _bossDamage; } }
 }
