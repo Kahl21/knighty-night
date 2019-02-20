@@ -73,6 +73,9 @@ public class DungeonMechanic : MonoBehaviour {
     GameManager _managerRef;
     BoxCollider _myCollider;
 
+    [Header("Number Of The Next Checkpoint")]
+    public float nextCheckpoint;
+
     private void Awake()
     {
         _managerRef = GameManager.Instance;
@@ -395,6 +398,12 @@ public class DungeonMechanic : MonoBehaviour {
             default:
                 break;
         }
+    }
+
+    public void DisableRoom()
+    {
+        _myCollider.enabled = false;
+        EndAll();
     }
     
     public BossEnemy GetBigBoy { get { return _BigBad; } }

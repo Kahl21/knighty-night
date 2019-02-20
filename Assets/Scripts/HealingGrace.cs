@@ -26,6 +26,9 @@ public class HealingGrace : MonoBehaviour {
     //Check If Checkpoint
     [SerializeField]
     public bool isCheckpoint;
+    [Header("Which Checkpoint Is This?")]
+    public float checkpointNumber;
+
 
     private void Awake()
     {
@@ -35,6 +38,9 @@ public class HealingGrace : MonoBehaviour {
         _currentColor = _baseColor;
         _usedHealingAmount = _healingAmount;
         _currHealingAmount = _healingAmount;
+
+
+     
     }
 
     private void Update()
@@ -91,6 +97,7 @@ public class HealingGrace : MonoBehaviour {
         _currHealingAmount = _healingAmount;
         _currentColor = _baseColor;
     }
+
 
     public float GetHealingAmount { get { return _currHealingAmount; } set { _currHealingAmount = value; } }
 }

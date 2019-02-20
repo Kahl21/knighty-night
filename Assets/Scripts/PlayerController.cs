@@ -149,6 +149,9 @@ public class PlayerController : MonoBehaviour {
     //Johns Checkpoint Variables
     bool reachCheckpoint;
     Vector3 checkpointPos;
+    float currentCheckpoint;
+
+    public List<GameObject> baseRoomList;
 
     // Use this for initialization
     void Awake()
@@ -190,6 +193,7 @@ public class PlayerController : MonoBehaviour {
         _healthBar = _gameMenus[2].transform.GetChild(0).gameObject;
         _specialBar = _gameMenus[2].transform.GetChild(1).gameObject;
         _specialBar.GetComponent<Image>().fillAmount = 0;
+        currentCheckpoint = 0;
     }
 
     //Called to reset the Player Stats
@@ -201,8 +205,8 @@ public class PlayerController : MonoBehaviour {
         _currSpecialAmount = 0;
         _specialBar.GetComponent<Image>().fillAmount = _currSpecialAmount / _MaxSpecialAmount;
 
-        
 
+        disableRooms();
         _currPlayerSpeed = _playerSpeed;
         StopAllCoroutines();
         _doingSomething = false;
@@ -496,9 +500,11 @@ public class PlayerController : MonoBehaviour {
             if (thingHit.GetComponent<WinScript>())                                                     //if the thing hit is a win script
             {
                 _move = Vector3.zero;                                                                   //there is no movement
+                baseRoomList.Clear();
                 if (thingHit.GetComponent<WinScript>().IsLastLevel())                                   //if the win script is attached to the last level
                 {
                     EndLevel(true);                                                                     //end level is equal to true
+                    
                 }
                 else
                 {
@@ -508,6 +514,7 @@ public class PlayerController : MonoBehaviour {
             else if (thingHit.GetComponent<DungeonMechanic>())                                          //else if the player hit a dungeon mechanic
             {
                 thingHit.GetComponent<DungeonMechanic>().Init();                                        //initialize the mechanic
+                addRoom(thingHit);
             }
             else if (thingHit.GetComponent<BaseEnemy>())                                                //else if the player hit a base enemy
             {
@@ -533,8 +540,10 @@ public class PlayerController : MonoBehaviour {
                 if (thingHit.GetComponent<HealingGrace>().isCheckpoint)                                          //if this healing grace is a checkpoint
                 {
                     reachCheckpoint = true;                                                                     //the player has reached a checkpoint
+                    currentCheckpoint = thingHit.GetComponent<HealingGrace>().checkpointNumber;
                     checkpointPos.x = thingHit.GetComponent<HealingGrace>().transform.position.x;               //the checkpoint's x position is whatever the healing graces is
                     checkpointPos.z = thingHit.GetComponent<HealingGrace>().transform.position.z;               //the checkpoint's y position is whatever the healing graces is
+
                 }
 
                 if (!_healing && _playerHealth < _maxHealthValue)                                               //if the player is not healing and current health is less than max health
@@ -809,6 +818,24 @@ public class PlayerController : MonoBehaviour {
             _loseImage.SetActive(true);
         }
         _inMenu = true;
+    }
+
+    private void addRoom(GameObject room)
+    {
+        if(!baseRoomList.Contains(room))
+            baseRoomList.Add(room);
+    }
+
+    private void disableRooms()
+    {
+        for(int i=0; i< baseRoomList.Count; i++)
+        {
+            DungeonMechanic basicRoom = baseRoomList[i].GetComponent<DungeonMechanic>();
+            if (basicRoom.nextCheckpoint <= currentCheckpoint)
+            {
+                baseRoomList[i].SetActive(false);
+            }
+        }
     }
 
     //various getters and setters
