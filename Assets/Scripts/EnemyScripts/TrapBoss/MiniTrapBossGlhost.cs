@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
 
-public class TrapBossGlhost : BossEnemy
+public class MiniTrapBossGlhost : BossEnemy
 {
     //Strategy Enum for the Spin Boss
     protected enum TRAPSTRATS
@@ -12,8 +12,6 @@ public class TrapBossGlhost : BossEnemy
         DOWNTIME,
         FINDTRAP,
         INSIDETRAP,
-        SPIKETRAP,
-        DARTTRAP,
         FIREBEAM,
         XATTACK,
         QUADFIRE
@@ -336,17 +334,12 @@ public class TrapBossGlhost : BossEnemy
                     switch (_MyAttack)
                     {
                         case TRAPSTRATS.FINDTRAP:
-                            FindTrap();
+                            findTrap();
                             break;
                         case TRAPSTRATS.INSIDETRAP:
-                            PossessTrap();
+                            possessTrap();
                             break;
-                        case TRAPSTRATS.SPIKETRAP:
-                            SpikeFollow();
-                            break;
-                        case TRAPSTRATS.DARTTRAP:
-                            DartMachineGun();
-                            break;
+                            
                         case TRAPSTRATS.XATTACK:
                             QuadFireBeams();
                             _xAttack = true;
@@ -354,6 +347,7 @@ public class TrapBossGlhost : BossEnemy
                         case TRAPSTRATS.QUADFIRE:
                             QuadFireBeams();
                             break;
+                            
                         default:
                             //Debug.Log("No Attack Set");
                             break;
@@ -371,19 +365,8 @@ public class TrapBossGlhost : BossEnemy
     //decides what the attack the boss will do next (Currently Out of Use but setup fordifferent attacks.
     private void WhatDoNext()
     {
-        float _nextAttack = Random.Range(0, _totalPercentageFireTrap);
-        Debug.Log("Next attack: " + _nextAttack);
-
-        if(currentTrap.GetComponent<SpikeTrap>())
-        {
-            _MyAttack = TRAPSTRATS.SPIKETRAP;
-        }
-        else if(currentTrap.GetComponent<DartTrap>())
-        {
-            _MyAttack = TRAPSTRATS.DARTTRAP;
-        }
-        else if(currentTrap.GetComponent<FireStatueTrap>())
-        {
+            float _nextAttack = Random.Range(0, _totalPercentageFireTrap);
+            Debug.Log("Next attack: " + _nextAttack);
             if (_nextAttack > 0 && _nextAttack <= _realQuadFirePercentage)
             {
                 Debug.Log("Quad Fire");
@@ -394,14 +377,14 @@ public class TrapBossGlhost : BossEnemy
                 Debug.Log("XATTACK");
                 _MyAttack = TRAPSTRATS.XATTACK;
             }
-        }
     }
 
     //Find Trap
     //Boss will find and go towards a trap
     //Than he will cast QuadFire, there is room to do a deciding attack for random attacks
-    private void FindTrap()
+    private void findTrap()
     {
+        
         if (_enemyAgent.hasPath == false)
         {
             Debug.Log("findTrap");
@@ -427,7 +410,7 @@ public class TrapBossGlhost : BossEnemy
     //Attack
     //Boss possesses trap by disabling his own mesh and collider. (Room for animation)
     //When the trap finishes its attack he will be reinabled and find a new trap
-    private void PossessTrap()
+    private void possessTrap()
     {
         gameObject.GetComponent<MeshRenderer>().enabled = false;
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
@@ -440,15 +423,6 @@ public class TrapBossGlhost : BossEnemy
         }
     }
 
-    private void SpikeFollow()
-    {
-
-    }
-
-    private void DartMachineGun()
-    {
-
-    }
 
     //Detects when he gets to the targeted tower and starts the quad fire attack on the pillar.
     private void QuadFireBeams()
@@ -509,7 +483,7 @@ public class TrapBossGlhost : BossEnemy
                     trapComplete = false;
                 }
 
-                _MyAttack = TRAPSTRATS.INSIDETRAP;
+                    _MyAttack = TRAPSTRATS.INSIDETRAP;
             }
         }
     }
