@@ -16,7 +16,8 @@ public enum WhichUIMenu
     OPTIONS,
     PLAYER,
     PAUSE,
-    WIN
+    WIN,
+    LOAD
 }
 
 
@@ -250,7 +251,7 @@ public class Menuing : MonoBehaviour {
         _playerRef.GetPlayerAnimator.Play("Nothing", 0);
 
         _BossBar.SetActive(false);
-        SetMenu(0);
+        SetMenu(WhichUIMenu.MAINMENU);
     }
 
     public void ToOptions()
