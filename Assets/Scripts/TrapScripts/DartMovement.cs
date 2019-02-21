@@ -19,13 +19,15 @@ public class DartMovement : MonoBehaviour {
     float _distBetweenRays;
     RaycastHit hit;
 
+    DartTrap _trapThatFiredMe;
     bool _init = false;
 
 	// Use this for initialization
-	public void Init (float _damage)
+	public void Init (float _damage, DartTrap trapThatFiredMe)
     {
         _movement = transform.forward * _dartSpeed * Time.deltaTime;
         _dartDamage = _damage;
+        _trapThatFiredMe = trapThatFiredMe;
 
         _init = true;
 	}
@@ -66,6 +68,7 @@ public class DartMovement : MonoBehaviour {
                 }
                 else if (!_thingHit.GetComponent<BaseEnemy>() && !_thingHit.GetComponent<BossEnemy>() && !_thingHit.GetComponent<DungeonMechanic>())
                 {
+                    _trapThatFiredMe.GetCurrDart = null;
                     Destroy(gameObject);
                 }
             }

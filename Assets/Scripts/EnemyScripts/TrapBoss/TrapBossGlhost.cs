@@ -16,7 +16,8 @@ public class TrapBossGlhost : BossEnemy
         DARTTRAP,
         FIREBEAM,
         XATTACK,
-        QUADFIRE
+        QUADFIRE,
+        WAITING
     }
     
 
@@ -37,7 +38,7 @@ public class TrapBossGlhost : BossEnemy
     bool _debug;
     [SerializeField]
     float _detectDistance;
-    public bool trapComplete = false;
+    bool trapComplete = false;
     int _numOfCasts = 4;
     RaycastHit hitObj = new RaycastHit();
 
@@ -83,7 +84,23 @@ public class TrapBossGlhost : BossEnemy
     float _realQuadBurnDuration;
     bool _xAttack = false;
 
-    [Header("Fire Trap Variables")]
+    [Header("Dart Possess Variables")]
+    [SerializeField]
+    float _dartShooterMoveSpeed;
+    float _realDartShooterMoveSpeed;
+    [SerializeField]
+    float _dartPossessTime;
+    float _realDartPossessTime;
+    [SerializeField]
+    float _realDartFireDelay;
+    float _dartFireDelay;
+    [SerializeField]
+    float _dartSpawnDelay;
+    float _realDartSpawnDelay;
+    float _DartXMax;
+    float _DartXMin;
+    float _DartZMax;
+    float _DartZMin;
 
     float _startAttackTime;
     float _currAttackTime;
@@ -119,6 +136,16 @@ public class TrapBossGlhost : BossEnemy
     [Header("Hard Follow Player Varibales")]
     [SerializeField]
     float _hardFollowDuration;
+
+    [Header("Hard Dart Possess Variables")]
+    [SerializeField]
+    float _hardDartShooterMoveSpeed;
+    [SerializeField]
+    float _hardDartPossessTime;
+    [SerializeField]
+    float _hardDartFireDelay;
+    [SerializeField]
+    float _hardDartSpawnDelay;
 
     Vector3 _ogCamPos;
     bool _cameraInPosition;
@@ -266,6 +293,11 @@ public class TrapBossGlhost : BossEnemy
                 _realQuadTrapDamage = _quadTrapDamage;
                 _realFollowDuration = _followDuration;
                 _realXAttackPercentage = _xAttackPercentage;
+                _realDartFireDelay = _dartFireDelay;
+                _realDartPossessTime = _dartPossessTime;
+                _realDartShooterMoveSpeed = _dartShooterMoveSpeed;
+                _realDartSpawnDelay = _dartSpawnDelay;
+
             }
             else
             {
@@ -279,8 +311,17 @@ public class TrapBossGlhost : BossEnemy
                 _realQuadTrapDamage = _hardQuadTrapDamage;
                 _realFollowDuration = _hardFollowDuration;
                 _realXAttackPercentage = _hardXAttackPercentage;
+                _realDartFireDelay = _hardDartFireDelay;
+                _realDartPossessTime = _hardDartPossessTime;
+                _realDartShooterMoveSpeed = _hardDartShooterMoveSpeed;
+                _realDartSpawnDelay = _hardDartSpawnDelay;
             }
         }
+
+        _DartXMin = (_myRoom.transform.position.x - (_myRoom.transform.localScale.x * 4.5f));
+        _DartZMin = (_myRoom.transform.position.z - (_myRoom.transform.localScale.z * 4.5f));
+        _DartXMax = (_myRoom.transform.position.x + (_myRoom.transform.localScale.x * 4.5f));
+        _DartZMax = (_myRoom.transform.position.z + (_myRoom.transform.localScale.z * 4.5f));
 
         //_ogCamPos = _cameraRef.transform.position;
         cam0 = _cameraRef.transform.position;
@@ -342,16 +383,20 @@ public class TrapBossGlhost : BossEnemy
                             PossessTrap();
                             break;
                         case TRAPSTRATS.SPIKETRAP:
+                            FrontalDetect();
                             SpikeFollow();
                             break;
                         case TRAPSTRATS.DARTTRAP:
+                            FrontalDetect();
                             DartMachineGun();
                             break;
                         case TRAPSTRATS.XATTACK:
+                            FrontalDetect();
                             QuadFireBeams();
                             _xAttack = true;
                             break;
                         case TRAPSTRATS.QUADFIRE:
+                            FrontalDetect();
                             QuadFireBeams();
                             break;
                         default:
@@ -382,7 +427,7 @@ public class TrapBossGlhost : BossEnemy
         {
             _MyAttack = TRAPSTRATS.DARTTRAP;
         }
-        else if(currentTrap.GetComponent<FireStatueTrap>())
+        else if(currentTrap.GetComponent<BossFireStatueTrap>())
         {
             if (_nextAttack > 0 && _nextAttack <= _realQuadFirePercentage)
             {
@@ -399,14 +444,14 @@ public class TrapBossGlhost : BossEnemy
 
     //Find Trap
     //Boss will find and go towards a trap
-    //Than he will cast QuadFire, there is room to do a deciding attack for random attacks
+    //Then he will cast QuadFire, there is room to do a deciding attack for random attacks
     private void FindTrap()
     {
         if (_enemyAgent.hasPath == false)
         {
             Debug.Log("findTrap");
-            fcurrentTrap = Random.Range(0, _listOfTraps.Count);
-            GameObject newTrap = _listOfTraps[fcurrentTrap];
+            fcurrentTrap = Random.Range(0, _myRoom.GetCurrTrapList.Count);
+            GameObject newTrap = _myRoom.GetCurrTrapList[fcurrentTrap].gameObject;
             if (newTrap == currentTrap)
             {
                 return;
@@ -440,14 +485,100 @@ public class TrapBossGlhost : BossEnemy
         }
     }
 
+    void FrontalDetect()
+    {
+        for (int i = 0; i <= _numOfCasts; i++)
+        {
+            float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
+            float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
+
+            Vector3 RayDir = (transform.forward * Zpos) + (transform.right * Xpos);
+
+            if (_debug)
+            {
+                Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (RayDir * _bossCollisionDetectDistance), Color.red);
+            }
+
+            _calcAngle += _detectionAngle / _numOfCasts;
+
+            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
+            {
+                if (hit.collider.GetComponent<PlayerController>())
+                {
+                    hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
+                }
+            }
+        }
+
+        _calcAngle = _startAngle;
+    }
+
     private void SpikeFollow()
     {
+        
 
+        if (Physics.Raycast(transform.position + Vector3.up, this.transform.forward, out hitObj, _detectDistance))
+        {
+
+            GameObject hitObject = hitObj.collider.gameObject;
+
+            if (hitObject == currentTrap)
+            {
+
+                SpikeTrap possessedTrap = hitObject.GetComponent<SpikeTrap>();
+
+
+                trapComplete = false;
+
+                _MyAttack = TRAPSTRATS.INSIDETRAP;
+            }
+        }
     }
 
     private void DartMachineGun()
     {
+        for (int i = 0; i <= _numOfCasts; i++)
+        {
+            float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
+            float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
 
+            Vector3 RayDir = (transform.forward * Zpos) + (transform.right * Xpos);
+
+            if (_debug)
+            {
+                Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (RayDir * _bossCollisionDetectDistance), Color.red);
+            }
+
+            _calcAngle += _detectionAngle / _numOfCasts;
+
+            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
+            {
+                if (hit.collider.GetComponent<PlayerController>())
+                {
+                    hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
+                }
+            }
+        }
+
+        _calcAngle = _startAngle;
+
+        if (Physics.Raycast(transform.position + Vector3.up, this.transform.forward, out hitObj, _detectDistance))
+        {
+
+            GameObject hitObject = hitObj.collider.gameObject;
+
+            if (hitObject == currentTrap)
+            {
+                
+                DartTrap possessedTrap = hitObject.GetComponent<DartTrap>();
+                    
+                possessedTrap.BecomePossessed(this, _realDartPossessTime, _realDartFireDelay, _realDartSpawnDelay, _realDartShooterMoveSpeed, _DartXMin, _DartXMax, _DartZMin, _DartZMax);
+
+                trapComplete = false;
+
+                _MyAttack = TRAPSTRATS.INSIDETRAP;
+            }
+        }
     }
 
     //Detects when he gets to the targeted tower and starts the quad fire attack on the pillar.
@@ -494,17 +625,17 @@ public class TrapBossGlhost : BossEnemy
                     if (_xAttack)
                     {
                         possessedTrap.transform.eulerAngles += new Vector3(0, 45f, 0);
-                        possessedTrap._XAttack = true;
+                        possessedTrap.GetXAttack = true;
                     }
 
 
-                    possessedTrap.bossEntity = this.gameObject;
-                    possessedTrap._fireDelay = _realQuadFireStartDelay;
-                    possessedTrap._fireDistance = _realQuadShootDist;
-                    possessedTrap._maxDetectDistance = _realQuadDetectDist;
-                    possessedTrap._startDelay = _quadStartDelay;
-                    possessedTrap._burningDuration = _realQuadBurnDuration;
-                    possessedTrap._fireDamage = _realQuadTrapDamage;
+                    possessedTrap.GetBossEntity = this.gameObject;
+                    possessedTrap.GetFireDelay = _realQuadFireStartDelay;
+                    possessedTrap.GetFireDistance = _realQuadShootDist;
+                    possessedTrap.GetMaxDetectDistance = _realQuadDetectDist;
+                    possessedTrap.GetStartDelay = _quadStartDelay;
+                    possessedTrap.GetBurningDuration = _realQuadBurnDuration;
+                    possessedTrap.GetFireDamage = _realQuadTrapDamage;
                     possessedTrap.StartingDelay();
                     trapComplete = false;
                 }
@@ -674,4 +805,6 @@ public class TrapBossGlhost : BossEnemy
             _init = false;
         }
     }
+
+    public bool IsPossessing { get { return trapComplete; } set { trapComplete = value; } }
 }

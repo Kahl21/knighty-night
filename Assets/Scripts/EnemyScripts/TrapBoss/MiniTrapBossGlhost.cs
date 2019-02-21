@@ -35,13 +35,11 @@ public class MiniTrapBossGlhost : BossEnemy
     bool _debug;
     [SerializeField]
     float _detectDistance;
-    public bool trapComplete = false;
+    bool trapComplete = false;
     int _numOfCasts = 4;
     RaycastHit hitObj = new RaycastHit();
-
-    [Header("Traps in Room")]
-    [SerializeField]
-    List<GameObject> _listOfTraps;
+    
+    //traps in room
     int fcurrentTrap;
     GameObject currentTrap;
 
@@ -388,8 +386,8 @@ public class MiniTrapBossGlhost : BossEnemy
         if (_enemyAgent.hasPath == false)
         {
             Debug.Log("findTrap");
-            fcurrentTrap = Random.Range(0, _listOfTraps.Count);
-            GameObject newTrap = _listOfTraps[fcurrentTrap];
+            fcurrentTrap = Random.Range(0, _myRoom.GetCurrTrapList.Count);
+            GameObject newTrap = _myRoom.GetCurrTrapList[fcurrentTrap].gameObject;
             if (newTrap == currentTrap)
             {
                 return;
@@ -468,17 +466,17 @@ public class MiniTrapBossGlhost : BossEnemy
                     if (_xAttack)
                     {
                         possessedTrap.transform.eulerAngles += new Vector3(0, 45f, 0);
-                        possessedTrap._XAttack = true;
+                        possessedTrap.GetXAttack = true;
                     }
 
 
-                    possessedTrap.bossEntity = this.gameObject;
-                    possessedTrap._fireDelay = _realQuadFireStartDelay;
-                    possessedTrap._fireDistance = _realQuadShootDist;
-                    possessedTrap._maxDetectDistance = _realQuadDetectDist;
-                    possessedTrap._startDelay = _quadStartDelay;
-                    possessedTrap._burningDuration = _realQuadBurnDuration;
-                    possessedTrap._fireDamage = _realQuadTrapDamage;
+                    possessedTrap.GetBossEntity = this.gameObject;
+                    possessedTrap.GetFireDelay = _realQuadFireStartDelay;
+                    possessedTrap.GetFireDistance = _realQuadShootDist;
+                    possessedTrap.GetMaxDetectDistance = _realQuadDetectDist;
+                    possessedTrap.GetStartDelay = _quadStartDelay;
+                    possessedTrap.GetBurningDuration = _realQuadBurnDuration;
+                    possessedTrap.GetFireDamage = _realQuadTrapDamage;
                     possessedTrap.StartingDelay();
                     trapComplete = false;
                 }
@@ -648,4 +646,6 @@ public class MiniTrapBossGlhost : BossEnemy
             _init = false;
         }
     }
+
+    public bool IsPossessing { get { return trapComplete; } set { trapComplete = value; } }
 }
