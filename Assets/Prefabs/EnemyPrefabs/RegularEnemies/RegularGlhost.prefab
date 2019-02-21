@@ -464,8 +464,10 @@ MonoBehaviour:
   _deathTimer: 6
   _collisionCheckDist: 1
   _spookDistance: 10
-  _cheatingDistance: 2
-  _cheatingSensitivity: 2
+  _spookyOffset: 7.5
+  _cheatingDistance: 3
+  _cheatingSensitivity: 0.1
+  _myMechanic: 0
 --- !u!136 &136317569419810160
 CapsuleCollider:
   m_ObjectHideFlags: 1

@@ -10,6 +10,17 @@ public enum MenuOrient
     HORIZ
 }
 
+public enum WhichUIMenu
+{
+    MAINMENU,
+    OPTIONS,
+    PLAYER,
+    PAUSE,
+    WIN,
+    LOAD
+}
+
+
 public class Menuing : MonoBehaviour {
 
     private static Menuing _instance;
@@ -64,6 +75,16 @@ public class Menuing : MonoBehaviour {
     float _startTime;
     bool _creditsRolling;
 
+    //loadscreen variables
+    public Image _loadScreen;
+    public Image _fadeScreen;
+    private bool isLoading = false;
+    private Color blackColor = new Color(0, 0, 0, 1);
+    private Color transparentColor = new Color(0, 0, 0, 0);
+    private Color fullColor = new Color(1, 1, 1, 1);
+    private float fadeTime = 1f;
+    private float fadeUpdateTime = .01f;
+
     PlayerController _playerRef;
     GameManager _managerRef;
 
@@ -97,12 +118,12 @@ public class Menuing : MonoBehaviour {
         _playerRef = PlayerController.Instance;
         _playerRef.SetMenus = _menus;
 
-        SetMenu(4);
+        SetMenu(WhichUIMenu.WIN);
 
-        _playerRef.SetWinImage = _menus[4].transform.GetChild(1).gameObject;
-        _playerRef.SetLoseImage = _menus[4].transform.GetChild(2).gameObject;
+        _playerRef.SetWinImage = _menus[(int)WhichUIMenu.WIN].transform.GetChild(1).gameObject;
+        _playerRef.SetLoseImage = _menus[(int)WhichUIMenu.WIN].transform.GetChild(2).gameObject;
 
-        SetMenu(0);
+        SetMenu(WhichUIMenu.MAINMENU);
     }
 
     private void Update()
@@ -118,17 +139,17 @@ public class Menuing : MonoBehaviour {
         }
     }
 
-    public void SetMenu(int _whichMenu)
+    public void SetMenu(WhichUIMenu _whichMenu)
     {
         for (int i = 0; i < transform.childCount; i++)
         {
             _menus[i].SetActive(false);
         }
-        _menus[_whichMenu].SetActive(true);
+        _menus[(int)_whichMenu].SetActive(true);
 
-        if (_whichMenu != 2)
+        if (_whichMenu != WhichUIMenu.PLAYER)
         {
-            SetButtons(_whichMenu);
+            SetButtons((int)_whichMenu);
             currSelectableButtons[currSelected].Select();
         }
     }
@@ -158,14 +179,14 @@ public class Menuing : MonoBehaviour {
     {
         if(_paused)
         {
-            SetMenu(2);
+            SetMenu(WhichUIMenu.PLAYER);
             Time.timeScale = 1;
             _playerRef.InMenu = false;
             _paused = false;
         }
         else
         {
-            SetMenu(3);
+            SetMenu(WhichUIMenu.PAUSE);
             Time.timeScale = 0;
             _playerRef.InMenu = true;
             _paused = true;
@@ -180,7 +201,7 @@ public class Menuing : MonoBehaviour {
 
         _playerRef.InMenu = false;
         _playerRef.ResetPlayer();
-        SetMenu(2);
+        SetMenu(WhichUIMenu.PLAYER);
     }
 
     public void NextLevel()
@@ -191,12 +212,12 @@ public class Menuing : MonoBehaviour {
         _playerRef.InMenu = false;
         Time.timeScale = 1;
         _paused = false;
-        SetMenu(2);
+        SetMenu(WhichUIMenu.PLAYER);
     }
 
     public void RetryLevel()
     {
-        SetMenu(2);
+        SetMenu(WhichUIMenu.PLAYER);
         _playerRef.InMenu = false;
         Time.timeScale = 1;
         _paused = false;
@@ -206,7 +227,7 @@ public class Menuing : MonoBehaviour {
     public void RestartGame()
     {
         SceneManager.LoadScene(1);
-        SetMenu(2);
+        SetMenu(WhichUIMenu.PLAYER);
         _playerRef.InMenu = false;
         Time.timeScale = 1;
         _paused = false;
@@ -230,17 +251,17 @@ public class Menuing : MonoBehaviour {
         _playerRef.GetPlayerAnimator.Play("Nothing", 0);
 
         _BossBar.SetActive(false);
-        SetMenu(0);
+        SetMenu(WhichUIMenu.MAINMENU);
     }
 
     public void ToOptions()
     {
-        SetMenu(1);
+        SetMenu(WhichUIMenu.OPTIONS);
     }
 
     public void MenuBack()
     {
-        SetMenu(0);
+        SetMenu(WhichUIMenu.MAINMENU);
     }
 
     public void EndGame()
@@ -306,6 +327,56 @@ public class Menuing : MonoBehaviour {
         }
     }
 
+    public void Fading()
+    {
+        if (!isLoading && _fadeScreen.color != transparentColor)
+        {
+            StartCoroutine(FadeIn());
+        }
+
+
+    }
+
+    IEnumerator LoadNewScene()
+    {
+        _fadeScreen.color = transparentColor;
+        float time = 0;
+        Color wantedColor = _fadeScreen.color;
+        isLoading = true;
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex + 1);
+        asyncLoad.allowSceneActivation = false;
+
+        //yield return new WaitForSeconds(3f);
+        while (time < fadeTime)
+        {
+            yield return new WaitForSeconds(fadeUpdateTime);
+
+            wantedColor = Color.Lerp(transparentColor, blackColor, time);
+            _fadeScreen.color = wantedColor;
+            time += fadeUpdateTime;
+        }
+        _loadScreen.color = fullColor;
+        yield return new WaitForSeconds(2f);
+        _loadScreen.color = transparentColor;
+        asyncLoad.allowSceneActivation = true;
+        isLoading = false;
+    }
+
+    IEnumerator FadeIn()
+    {
+        float time = 0;
+        Color wantedColor = _fadeScreen.color;
+
+        while (time < fadeTime)
+        {
+            yield return new WaitForSeconds(fadeUpdateTime);
+
+            wantedColor = Color.Lerp(blackColor, transparentColor, time);
+            _fadeScreen.color = wantedColor;
+            time += fadeUpdateTime;
+        }
+    }
+
     public void StartCredits()
     {
         _credits.SetActive(true);
@@ -348,3 +419,5 @@ public class Menuing : MonoBehaviour {
     public bool GameIsPaused { get { return _paused; } } 
     public bool AreCreditsRolling { get { return _creditsRolling; } }
 }
+
+
