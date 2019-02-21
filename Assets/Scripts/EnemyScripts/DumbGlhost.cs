@@ -7,9 +7,14 @@ public class DumbGlhost : BaseEnemy
 {
     [SerializeField]
     float moveSpeed;
+    [SerializeField]
+    float _DamageToBoss;
+    [SerializeField]
+    float _DamageToPlayer;
 
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
+        _myAgent.enabled = false;
         _mySpawner = _spawner;
         _myMechanic = _incomingMech;
         _target = PlayerController.Instance;
@@ -44,6 +49,7 @@ public class DumbGlhost : BaseEnemy
         }
         else
         {
+            CheckForHit();
             Die();
         }       
 	}
@@ -65,7 +71,7 @@ public class DumbGlhost : BaseEnemy
             GameObject thingHit = hit.collider.gameObject;
             if(thingHit.GetComponent<PlayerController>())
             {
-                thingHit.GetComponent<PlayerController>().TakeDamage(_glhostDamage);
+                thingHit.GetComponent<PlayerController>().TakeDamage(_DamageToPlayer);
             }
             else
             {
@@ -108,7 +114,12 @@ public class DumbGlhost : BaseEnemy
         
         if (Physics.Raycast(transform.position + Vector3.up, _deathDirection, out hit, _collisionCheckDist))
         {
-            if(!hit.collider.GetComponent<BaseEnemy>() && !hit.collider.GetComponent<PlayerController>())
+            if (hit.collider.GetComponent<ShootingMiniBoss>())
+            {
+                hit.collider.GetComponent<ShootingMiniBoss>().HitByGhlost(this.gameObject, _DamageToPlayer);
+                Destroy(gameObject);
+            }
+            else if (!hit.collider.GetComponent<BaseEnemy>() && !hit.collider.GetComponent<PlayerController>())
             {
                 Destroy(gameObject);
             }
@@ -121,14 +132,15 @@ public class DumbGlhost : BaseEnemy
     public override void Stop()
     {
         _canMove = false;
-        if(!_dead && _myAgent.enabled)
+        if(!_dead)
         {
             _myAgent.SetDestination(transform.position);
         }
         _mySpawner.RemoveMe(this);
-
         Destroy(gameObject);
     }
 
     public float GetSpeed { get { return moveSpeed; } set { moveSpeed = value; } }
+    public float SetDamageToBoss { set { _DamageToBoss = value; } }
+    public float SetDamageToPlayer { set { _DamageToPlayer = value; } }
 }

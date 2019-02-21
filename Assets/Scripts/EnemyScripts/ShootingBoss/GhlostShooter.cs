@@ -22,6 +22,8 @@ public class GhlostShooter : MonoBehaviour
     public bool newAttack = false;
     [HideInInspector]
     public bool attackInProgress = false;
+    [SerializeField]
+    float _SpawnedDistAway;
 
     [Header("Pulse Attack variables")]
     [SerializeField]
@@ -34,15 +36,15 @@ public class GhlostShooter : MonoBehaviour
     [SerializeField]
     int _amountPerRing;
 
-    [Header("Varied Pulse Attack variables")]
-    [SerializeField]
+    //[Header("Varied Pulse Attack variables")]
+    //[SerializeField]
     int _variedHowManyPulses;
     int _variedCurrentPulse = 0;
-    [SerializeField]
+    //[SerializeField]
     float _variedPulseDelay;
-    [SerializeField]
+    //[SerializeField]
     float _variedGhlostTravelSpeed;
-    [SerializeField]
+    //[SerializeField]
     int _variedAmountPerRing;
 
     [Header("Line Attack Variables")]
@@ -128,7 +130,6 @@ public class GhlostShooter : MonoBehaviour
     private void FindAttack()
     {
         Debug.Log("New Attack");
-        startTime = Time.time;
         GhlostsCast = 0;
         _totalAttackPercentages = _pulseAttackPercentage + _spiralAttackPercentage + _lineAttackPercentage;
         float _nextAttack = Random.Range(0, _totalAttackPercentages);
@@ -137,6 +138,7 @@ public class GhlostShooter : MonoBehaviour
         {
             Debug.Log("Pulse Attack");
             _attackState = ATTACKSTATE.PULSEATK;
+            _currentPulse = 0;
         }
         else if (_nextAttack > _pulseAttackPercentage && _nextAttack <= (_pulseAttackPercentage + _lineAttackPercentage))
         {
@@ -149,6 +151,7 @@ public class GhlostShooter : MonoBehaviour
             Debug.Log("Spiral Attack");
             _attackState = ATTACKSTATE.SPIRALATK;
         }
+        startTime = Time.time;
     }
 
     private void spiralAttack()
@@ -164,8 +167,7 @@ public class GhlostShooter : MonoBehaviour
             {
                 //Debug.Log(timeTaken + " VS. " + _spiralSpawnRate * GhlostsCast);
                 GhlostsCast += 1;
-                ghlostObj = Instantiate(_ghlostPrefab, transform.position + (transform.forward * 4), transform.rotation);
-                ghlostObj.transform.parent = null;
+                ghlostObj = SpawnGhlost();
                 ghlostObj.GetComponent<DumbGlhost>().GetSpeed = _spiralGhlostTravelSpeed;
             }
         }
@@ -185,15 +187,15 @@ public class GhlostShooter : MonoBehaviour
         {
             //Rotates back and forth through the cone angle / 2 * -1 and 1
             float angle = Mathf.Sin(Time.time * _lineRotateSpeed) * ((_degreeOfCastCone / 2));
-            transform.rotation = Quaternion.AngleAxis(angle + _startingAngle.y, Vector3.up);
+            gameObject.transform.LookAt(GetComponent<ShootingMiniBoss>().GetPlayerRef.gameObject.transform);
+            transform.rotation = Quaternion.AngleAxis(angle + transform.eulerAngles.y, Vector3.up);
 
             //Spawns a new glhost based on the spawnrate
             if (timeTaken >= _lineSpawnRate * GhlostsCast)
             {
                 //Debug.Log(timeTaken + " VS. " + _lineSpawnRate * GhlostsCast);
                 GhlostsCast+= 1;
-                ghlostObj = Instantiate(_ghlostPrefab, transform.position + (transform.forward * 4), transform.rotation);
-                ghlostObj.transform.parent = null;
+                ghlostObj = SpawnGhlost();
                 ghlostObj.GetComponent<DumbGlhost>().GetSpeed = _lineGhlostTravelSpeed;
             }
         }
@@ -215,8 +217,7 @@ public class GhlostShooter : MonoBehaviour
             for (int i = 0; i < _amountPerRing; i++)
             {
                 transform.eulerAngles += new Vector3(0, spacingAngle, 0);
-                ghlostObj = Instantiate(_ghlostPrefab, transform.position + (transform.forward * 4), transform.rotation);
-                ghlostObj.transform.parent = null;
+                ghlostObj = SpawnGhlost();
                 ghlostObj.GetComponent<DumbGlhost>().GetSpeed = _pulseGhlostTravelSpeed;
             }
             _currentPulse++;
@@ -239,9 +240,8 @@ public class GhlostShooter : MonoBehaviour
             {
                 transform.eulerAngles += new Vector3(0, spacingAngle + (spacingAngle / 2 * (_variedCurrentPulse % 2)), 0);
                 //print(transform.rotation.ToString());
-                ghlostObj = Instantiate(_ghlostPrefab, transform.position + (transform.forward * 4), transform.rotation);
-                ghlostObj.transform.parent = null;
-                ghlostObj.GetComponent<BaseEnemy>().Init(gameObject.GetComponent<ShootingMiniBoss>().SetMyRoom, Mechanic.BOSS);
+                ghlostObj = SpawnGhlost();
+                //ghlostObj.GetComponent<BaseEnemy>().Init(gameObject.GetComponent<ShootingMiniBoss>().SetMyRoom, Mechanic.BOSS);
                 ghlostObj.GetComponent<DumbGlhost>().GetSpeed = _variedGhlostTravelSpeed;
             }
             _variedCurrentPulse++;
@@ -251,5 +251,15 @@ public class GhlostShooter : MonoBehaviour
             _attackState = ATTACKSTATE.WAITFORATK;
             Debug.Log("stop pulsing");
         }
+    }
+
+    private GameObject SpawnGhlost()
+    {
+        GameObject newGhlost;
+        newGhlost = Instantiate(_ghlostPrefab, transform.position + (transform.forward * _SpawnedDistAway), transform.rotation);
+        newGhlost.GetComponent<DumbGlhost>().SetDamageToBoss = gameObject.GetComponent<ShootingMiniBoss>().GetDamageToBoss;
+        newGhlost.GetComponent<DumbGlhost>().SetDamageToPlayer = gameObject.GetComponent<ShootingMiniBoss>().GetDamageToPlayer;
+        newGhlost.transform.parent = null;
+        return newGhlost;
     }
 }
