@@ -48,29 +48,29 @@ MonoBehaviour:
   m_GameObject: {fileID: 1725651748450942}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72f3d16cdfc21044b81443bf47e6ade0, type: 3}
+  m_Script: {fileID: 11500000, guid: 565f741fa8b81e9489822558ec1e7ee0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _ghlostPrefab: {fileID: 0}
   newAttack: 0
   attackInProgress: 0
-  _howManyPulses: 10
-  _pulseDelay: 0.4
-  _pulseGhlostTravelSpeed: 5
-  _amountPerRing: 19
+  _howManyPulses: 0
+  _pulseDelay: 0
+  _pulseGhlostTravelSpeed: 0
+  _amountPerRing: 0
   _variedHowManyPulses: 0
   _variedPulseDelay: 0
   _variedGhlostTravelSpeed: 0
   _variedAmountPerRing: 0
-  _lineCastTime: 10
-  _degreeOfCastCone: 90
-  _lineSpawnRate: 0.1
-  _lineRotateSpeed: 5
-  _lineGhlostTravelSpeed: 5
-  _spiralCastTime: 10
-  _spiralSpawnRate: 0.1
-  _spiralRotateSpeed: 200
-  _spiralGhlostTravelSpeed: 5
+  _lineCastTime: 0
+  _degreeOfCastCone: 0
+  _lineSpawnRate: 0
+  _lineRotateSpeed: 0
+  _lineGhlostTravelSpeed: 0
+  _spiralCastTime: 0
+  _spiralSpawnRate: 0
+  _spiralRotateSpeed: 0
+  _spiralGhlostTravelSpeed: 0
   _pulseAttackPercentage: 0
   _lineAttackPercentage: 0
-  _spiralAttackPercentage: 100
+  _spiralAttackPercentage: 0

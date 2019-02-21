@@ -459,9 +459,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0a81c6fb9b965d489b90bf97ff6cafa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _glhostDamage: 0.5
   _damageRange: 0.7
+  _deathTimer: 0
   _collisionCheckDist: 1
   _spookDistance: 10
+  _spookyOffset: 7.5
+  _cheatingDistance: 0
+  _cheatingSensitivity: 0
 --- !u!136 &136693654624570092
 CapsuleCollider:
   m_ObjectHideFlags: 1

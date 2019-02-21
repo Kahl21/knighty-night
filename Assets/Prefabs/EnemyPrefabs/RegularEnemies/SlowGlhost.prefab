@@ -171,7 +171,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4425021250217544}
   - component: {fileID: 95330335125271608}
-  - component: {fileID: 136170171236243426}
+  - component: {fileID: 136317569419810160}
   - component: {fileID: 195116454740646582}
   - component: {fileID: 114210736455924386}
   m_Layer: 0
@@ -464,9 +464,11 @@ MonoBehaviour:
   _deathTimer: 6
   _collisionCheckDist: 1
   _spookDistance: 10
+  _spookyOffset: 7.5
   _cheatingDistance: 3
   _cheatingSensitivity: 0.1
---- !u!136 &136170171236243426
+  _myMechanic: 0
+--- !u!136 &136317569419810160
 CapsuleCollider:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
