@@ -82,6 +82,8 @@ public class GhlostShooter : MonoBehaviour
     float _spiralAttackPercentage;
     float _totalAttackPercentages;
 
+    List<GameObject> _ghlostsInScene = new List<GameObject>();
+
     ATTACKSTATE _attackState = ATTACKSTATE.WAITFORATK;
     float startTime;
 	
@@ -260,6 +262,33 @@ public class GhlostShooter : MonoBehaviour
         newGhlost.GetComponent<DumbGlhost>().SetDamageToBoss = gameObject.GetComponent<ShootingMiniBoss>().GetDamageToBoss;
         newGhlost.GetComponent<DumbGlhost>().SetDamageToPlayer = gameObject.GetComponent<ShootingMiniBoss>().GetDamageToPlayer;
         newGhlost.transform.parent = null;
+        _ghlostsInScene.Add(newGhlost);
+
+        newGhlost.GetComponent<DumbGlhost>().SetShooterRef = gameObject.GetComponent<GhlostShooter>();
         return newGhlost;
+    }
+
+    public void removeGhlostFromScene(GameObject ghlostsToRemove)
+    {
+        for (int i = 0; i < _ghlostsInScene.Count; i++)
+        {
+            if (_ghlostsInScene[i] == ghlostsToRemove)
+            {
+                _ghlostsInScene.Remove(ghlostsToRemove);
+                return;
+            }
+        }
+        Debug.Log("Not In Scene");
+    }
+
+    public void MyReset()
+    {
+        _attackState = ATTACKSTATE.WAITFORATK;
+        for (int index = 0; index < _ghlostsInScene.Count; index++)
+        {
+            GameObject ghlostRef;
+            ghlostRef = _ghlostsInScene[index];
+            _ghlostsInScene.Remove(ghlostRef);
+        }
     }
 }

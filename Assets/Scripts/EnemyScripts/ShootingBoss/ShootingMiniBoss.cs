@@ -403,6 +403,7 @@ public class ShootingMiniBoss : BossEnemy
     {
         if (_init)
         {
+            _attachedShooter.MyReset();
             gameObject.SetActive(true);
             _myRenderer.enabled = true;
             _myColor.a = 1;

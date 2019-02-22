@@ -456,19 +456,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 1099749849767518}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6243a08be36ce54fbee16c95286b197, type: 3}
+  m_Script: {fileID: 11500000, guid: 6baefa82ac75c29478431ace764ca346, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _glhostDamage: 0.5
   _damageRange: 0.7
   _deathTimer: 6
-  _collisionCheckDist: 1
+  _collisionCheckDist: 1.2
   _spookDistance: 10
-  _cheatingDistance: 2
-  _cheatingSensitivity: 2
+  _spookyOffset: 7.5
+  _cheatingDistance: 3
+  _cheatingSensitivity: 0.1
+  _myMechanic: 0
   moveSpeed: 0
   _DamageToBoss: 0
   _DamageToPlayer: 0
+  _shooterRef: {fileID: 0}
 --- !u!136 &136802746617796052
 CapsuleCollider:
   m_ObjectHideFlags: 1

@@ -11,6 +11,8 @@ public class DumbGlhost : BaseEnemy
     float _DamageToBoss;
     [SerializeField]
     float _DamageToPlayer;
+    [SerializeField]
+    GhlostShooter _shooterRef;
 
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
@@ -75,6 +77,7 @@ public class DumbGlhost : BaseEnemy
             }
             else
             {
+                _shooterRef.removeGhlostFromScene(gameObject);
                 Destroy(gameObject);
             }
         }
@@ -117,10 +120,12 @@ public class DumbGlhost : BaseEnemy
             if (hit.collider.GetComponent<ShootingMiniBoss>())
             {
                 hit.collider.GetComponent<ShootingMiniBoss>().HitByGhlost(this.gameObject, _DamageToPlayer);
+                _shooterRef.removeGhlostFromScene(gameObject);
                 Destroy(gameObject);
             }
             else if (!hit.collider.GetComponent<BaseEnemy>() && !hit.collider.GetComponent<PlayerController>())
             {
+                _shooterRef.removeGhlostFromScene(gameObject);
                 Destroy(gameObject);
             }
         }
@@ -137,10 +142,12 @@ public class DumbGlhost : BaseEnemy
             _myAgent.SetDestination(transform.position);
         }
         _mySpawner.RemoveMe(this);
+        _shooterRef.removeGhlostFromScene(gameObject);
         Destroy(gameObject);
     }
 
     public float GetSpeed { get { return moveSpeed; } set { moveSpeed = value; } }
     public float SetDamageToBoss { set { _DamageToBoss = value; } }
     public float SetDamageToPlayer { set { _DamageToPlayer = value; } }
+    public GhlostShooter SetShooterRef { set { _shooterRef = value; } }
 }
