@@ -55,38 +55,48 @@ public class DartTrap : BaseTrap {
         base.Init();
         _startPos = transform.position;
 
+        _realFireDelay = _fireDelay;
+        _realSpawnDelay = _spawnDelay;
+
+        _init = true;
         _startDelay = Time.time;
         _myState = DartState.SPAWNING;
     }
 
     // Update is called once per frame
     void Update () {
-        switch (_myState)
+        if(_init)
         {
-            case DartState.NONE:
-                break;
-            case DartState.SPAWNING:
-                SpawnDart();
-                break;
-            case DartState.FIRING:
-                FireDart();
-                break;
-            case DartState.ROOMDONE:
-                break;
-            default:
-                break;
-        }
+            if (!_menuRef.GameIsPaused)
+            {
+                switch (_myState)
+                {
+                    case DartState.NONE:
+                        break;
+                    case DartState.SPAWNING:
+                        SpawnDart();
+                        break;
+                    case DartState.FIRING:
+                        FireDart();
+                        break;
+                    case DartState.ROOMDONE:
+                        break;
+                    default:
+                        break;
+                }
 
-        if (_possessed)
-        {
-            PossessionMoving();
+                if (_possessed)
+                {
+                    PossessionMoving();
+                }
+            }
         }
     }
 
     //creates a dart behind whatever wall the plate in on
     private void SpawnDart()
     {
-        _currDelay = (Time.time - _startDelay) / _spawnDelay;
+        _currDelay = (Time.time - _startDelay) / _realSpawnDelay;
 
         Vector3 _spawnPos = transform.position;
         Quaternion _spawnRot = transform.rotation;
@@ -104,14 +114,13 @@ public class DartTrap : BaseTrap {
 
     private void FireDart()
     {
-        _currDelay = (Time.time - _startDelay) / _spawnDelay;
+        _currDelay = (Time.time - _startDelay) / _realFireDelay;
 
         if (_currDelay >= 1)
         {
             _currDelay = 1;
 
-            _currDart.transform.parent = null;
-            _currDart.GetComponent<DartMovement>().Init(_trapDamage, this);
+            _currDart.GetComponent<DartMovement>().Init(_trapDamage);
 
             _startDelay = Time.time;
             _myState = DartState.SPAWNING;
@@ -131,7 +140,7 @@ public class DartTrap : BaseTrap {
             case BossOrientation.VERTICAL:
                 _ZMax = zmax;
                 _ZMin = zmin;
-                _moveVector = Vector3.up;
+                _moveVector = Vector3.forward;
                 break;
             case BossOrientation.HORIZONTAL:
                 _XMax = xmax;
@@ -154,7 +163,9 @@ public class DartTrap : BaseTrap {
             _currPossessTime = 1;
             _possessed = false;
             _moveVector = Vector3.zero;
-            _bossRef.IsPossessing = false;
+            _realFireDelay = _fireDelay;
+            _realSpawnDelay = _spawnDelay;
+            _bossRef.IsPossessing = true;
         }
 
         switch (_myOrientationInBossRoom)
@@ -162,11 +173,11 @@ public class DartTrap : BaseTrap {
             case BossOrientation.VERTICAL:
                 if(transform.position.z > _ZMax)
                 {
-                    _moveVector = Vector3.down;
+                    _moveVector = Vector3.back;
                 }
                 else if(transform.position.z < _ZMin)
                 {
-                    _moveVector = Vector3.up;
+                    _moveVector = Vector3.forward;
                 }
                 break;
             case BossOrientation.HORIZONTAL:

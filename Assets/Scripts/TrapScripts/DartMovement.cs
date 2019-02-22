@@ -22,12 +22,16 @@ public class DartMovement : MonoBehaviour {
     DartTrap _trapThatFiredMe;
     bool _init = false;
 
+    Menuing _menuRef;
+
 	// Use this for initialization
-	public void Init (float _damage, DartTrap trapThatFiredMe)
+	public void Init (float _damage)
     {
         _movement = transform.forward * _dartSpeed * Time.deltaTime;
         _dartDamage = _damage;
-        _trapThatFiredMe = trapThatFiredMe;
+
+        transform.parent = null;
+        _menuRef = Menuing.Instance;
 
         _init = true;
 	}
@@ -37,8 +41,11 @@ public class DartMovement : MonoBehaviour {
     {
         if(_init)
         {
-            DartDetect();
-            MoveDart();
+            if(!_menuRef.GameIsPaused)
+            {
+                DartDetect();
+                MoveDart();
+            }
         }
 	}
 
@@ -68,7 +75,6 @@ public class DartMovement : MonoBehaviour {
                 }
                 else if (!_thingHit.GetComponent<BaseEnemy>() && !_thingHit.GetComponent<BossEnemy>() && !_thingHit.GetComponent<DungeonMechanic>())
                 {
-                    _trapThatFiredMe.GetCurrDart = null;
                     Destroy(gameObject);
                 }
             }

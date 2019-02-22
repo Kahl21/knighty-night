@@ -42,9 +42,6 @@ public class TrapBossGlhost : BossEnemy
     int _numOfCasts = 4;
     RaycastHit hitObj = new RaycastHit();
 
-    [Header("Traps in Room")]
-    [SerializeField]
-    List<GameObject> _listOfTraps;
     int fcurrentTrap;
     GameObject currentTrap;
 
@@ -92,11 +89,11 @@ public class TrapBossGlhost : BossEnemy
     float _dartPossessTime;
     float _realDartPossessTime;
     [SerializeField]
-    float _realDartFireDelay;
-    float _dartFireDelay;
-    [SerializeField]
     float _dartSpawnDelay;
     float _realDartSpawnDelay;
+    [SerializeField]
+    float _dartFireDelay;
+    float _realDartFireDelay;
     float _DartXMax;
     float _DartXMin;
     float _DartZMax;
@@ -368,40 +365,43 @@ public class TrapBossGlhost : BossEnemy
             case BossAI.FIGHTING:
                 if (_init)
                 {
-                    if (_amHit)
+                    if (!_menuRef.GameIsPaused)
                     {
-                        ResetAmHit();
-                    }
+                        if (_amHit)
+                        {
+                            ResetAmHit();
+                        }
 
-                    base.Update();
-                    switch (_MyAttack)
-                    {
-                        case TRAPSTRATS.FINDTRAP:
-                            FindTrap();
-                            break;
-                        case TRAPSTRATS.INSIDETRAP:
-                            PossessTrap();
-                            break;
-                        case TRAPSTRATS.SPIKETRAP:
-                            FrontalDetect();
-                            SpikeFollow();
-                            break;
-                        case TRAPSTRATS.DARTTRAP:
-                            FrontalDetect();
-                            DartMachineGun();
-                            break;
-                        case TRAPSTRATS.XATTACK:
-                            FrontalDetect();
-                            QuadFireBeams();
-                            _xAttack = true;
-                            break;
-                        case TRAPSTRATS.QUADFIRE:
-                            FrontalDetect();
-                            QuadFireBeams();
-                            break;
-                        default:
-                            //Debug.Log("No Attack Set");
-                            break;
+                        base.Update();
+                        switch (_MyAttack)
+                        {
+                            case TRAPSTRATS.FINDTRAP:
+                                FindTrap();
+                                break;
+                            case TRAPSTRATS.INSIDETRAP:
+                                PossessTrap();
+                                break;
+                            case TRAPSTRATS.SPIKETRAP:
+                                FrontalDetect();
+                                SpikeFollow();
+                                break;
+                            case TRAPSTRATS.DARTTRAP:
+                                FrontalDetect();
+                                DartMachineGun();
+                                break;
+                            case TRAPSTRATS.XATTACK:
+                                FrontalDetect();
+                                QuadFireBeams();
+                                _xAttack = true;
+                                break;
+                            case TRAPSTRATS.QUADFIRE:
+                                FrontalDetect();
+                                QuadFireBeams();
+                                break;
+                            default:
+                                //Debug.Log("No Attack Set");
+                                break;
+                        }
                     }
                 }
                 break;
@@ -476,11 +476,17 @@ public class TrapBossGlhost : BossEnemy
     {
         gameObject.GetComponent<MeshRenderer>().enabled = false;
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
+
+        Vector3 possessPosition = currentTrap.transform.localPosition;
+        possessPosition.y = transform.position.y;
+        transform.position = possessPosition;
+
         if (trapComplete)
         {
             _xAttack = false;
             gameObject.GetComponent<MeshRenderer>().enabled = true;
             gameObject.GetComponent<CapsuleCollider>().enabled = true;
+            _enemyAgent.SetDestination(transform.position);
             _MyAttack = TRAPSTRATS.FINDTRAP;
         }
     }
@@ -515,24 +521,36 @@ public class TrapBossGlhost : BossEnemy
 
     private void SpikeFollow()
     {
-        
-
-        if (Physics.Raycast(transform.position + Vector3.up, this.transform.forward, out hitObj, _detectDistance))
+        for (int i = 0; i <= _numOfCasts; i++)
         {
+            float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
+            float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
 
-            GameObject hitObject = hitObj.collider.gameObject;
+            Vector3 RayDir = (transform.forward * Zpos) + (transform.right * Xpos);
 
-            if (hitObject == currentTrap)
+            if (_debug)
+            {
+                Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (RayDir * _bossCollisionDetectDistance), Color.red);
+            }
+
+            if (Physics.Raycast(transform.position + Vector3.up, this.transform.forward, out hitObj, _detectDistance))
             {
 
-                SpikeTrap possessedTrap = hitObject.GetComponent<SpikeTrap>();
+                GameObject hitObject = hitObj.collider.gameObject;
+
+                if (hitObject == currentTrap)
+                {
+
+                    SpikeTrap possessedTrap = hitObject.GetComponent<SpikeTrap>();
 
 
-                trapComplete = false;
+                    trapComplete = false;
 
-                _MyAttack = TRAPSTRATS.INSIDETRAP;
+                    _MyAttack = TRAPSTRATS.INSIDETRAP;
+                }
             }
         }
+        _calcAngle = _startAngle;
     }
 
     private void DartMachineGun()
@@ -549,41 +567,31 @@ public class TrapBossGlhost : BossEnemy
                 Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (RayDir * _bossCollisionDetectDistance), Color.red);
             }
 
-            _calcAngle += _detectionAngle / _numOfCasts;
-
-            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
+            if (Physics.Raycast(transform.position + Vector3.up, this.transform.forward, out hitObj, _detectDistance))
             {
-                if (hit.collider.GetComponent<PlayerController>())
+
+                GameObject hitObject = hitObj.collider.gameObject;
+
+                if (hitObject == currentTrap)
                 {
-                    hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
+
+                    DartTrap possessedTrap = hitObject.GetComponent<DartTrap>();
+
+                    possessedTrap.BecomePossessed(this, _realDartPossessTime, _realDartFireDelay, _realDartSpawnDelay, _realDartShooterMoveSpeed, _DartXMin, _DartXMax, _DartZMin, _DartZMax);
+
+                    trapComplete = false;
+
+                    _MyAttack = TRAPSTRATS.INSIDETRAP;
                 }
             }
         }
-
         _calcAngle = _startAngle;
-
-        if (Physics.Raycast(transform.position + Vector3.up, this.transform.forward, out hitObj, _detectDistance))
-        {
-
-            GameObject hitObject = hitObj.collider.gameObject;
-
-            if (hitObject == currentTrap)
-            {
-                
-                DartTrap possessedTrap = hitObject.GetComponent<DartTrap>();
-                    
-                possessedTrap.BecomePossessed(this, _realDartPossessTime, _realDartFireDelay, _realDartSpawnDelay, _realDartShooterMoveSpeed, _DartXMin, _DartXMax, _DartZMin, _DartZMax);
-
-                trapComplete = false;
-
-                _MyAttack = TRAPSTRATS.INSIDETRAP;
-            }
-        }
     }
 
     //Detects when he gets to the targeted tower and starts the quad fire attack on the pillar.
     private void QuadFireBeams()
     {
+
         for (int i = 0; i <= _numOfCasts; i++)
         {
             float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
@@ -596,53 +604,43 @@ public class TrapBossGlhost : BossEnemy
                 Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (RayDir * _bossCollisionDetectDistance), Color.red);
             }
 
-            _calcAngle += _detectionAngle / _numOfCasts;
 
-            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
+            if (Physics.Raycast(transform.position + Vector3.up, this.transform.forward, out hitObj, _detectDistance))
             {
-                if (hit.collider.GetComponent<PlayerController>())
+
+                GameObject hitObject = hitObj.collider.gameObject;
+
+                if (hitObject == currentTrap)
                 {
-                    hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
-                }
-            }
-        }
-
-        _calcAngle = _startAngle;
-
-        if (Physics.Raycast(transform.position + Vector3.up, this.transform.forward, out hitObj, _detectDistance))
-        {
-
-            GameObject hitObject = hitObj.collider.gameObject;
-
-            if (hitObject == currentTrap)
-            {
-                //Moves all the variables from the boss to each fire trap gameobject
-                for (int z = 0; z < 4; z++)
-                {
-
-                    BossFireStatueTrap possessedTrap = hitObject.GetComponent<Transform>().GetChild(z).GetComponent<BossFireStatueTrap>();
-
-                    if (_xAttack)
+                    //Moves all the variables from the boss to each fire trap gameobject
+                    for (int z = 0; z < 4; z++)
                     {
-                        possessedTrap.transform.eulerAngles += new Vector3(0, 45f, 0);
-                        possessedTrap.GetXAttack = true;
+
+                        BossFireStatueTrap possessedTrap = hitObject.GetComponent<Transform>().GetChild(z).GetComponent<BossFireStatueTrap>();
+
+                        if (_xAttack)
+                        {
+                            possessedTrap.transform.eulerAngles += new Vector3(0, 45f, 0);
+                            possessedTrap.GetXAttack = true;
+                        }
+
+
+                        possessedTrap.GetBossEntity = this.gameObject;
+                        possessedTrap.GetFireDelay = _realQuadFireStartDelay;
+                        possessedTrap.GetFireDistance = _realQuadShootDist;
+                        possessedTrap.GetMaxDetectDistance = _realQuadDetectDist;
+                        possessedTrap.GetStartDelay = _quadStartDelay;
+                        possessedTrap.GetBurningDuration = _realQuadBurnDuration;
+                        possessedTrap.GetFireDamage = _realQuadTrapDamage;
+                        possessedTrap.StartingDelay();
+                        trapComplete = false;
                     }
 
-
-                    possessedTrap.GetBossEntity = this.gameObject;
-                    possessedTrap.GetFireDelay = _realQuadFireStartDelay;
-                    possessedTrap.GetFireDistance = _realQuadShootDist;
-                    possessedTrap.GetMaxDetectDistance = _realQuadDetectDist;
-                    possessedTrap.GetStartDelay = _quadStartDelay;
-                    possessedTrap.GetBurningDuration = _realQuadBurnDuration;
-                    possessedTrap.GetFireDamage = _realQuadTrapDamage;
-                    possessedTrap.StartingDelay();
-                    trapComplete = false;
+                    _MyAttack = TRAPSTRATS.INSIDETRAP;
                 }
-
-                _MyAttack = TRAPSTRATS.INSIDETRAP;
             }
         }
+        _calcAngle = _startAngle;
     }
 
     //called when boss gets hit and takes damage
