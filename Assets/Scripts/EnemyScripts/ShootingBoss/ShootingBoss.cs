@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
 
-public class ShootingMiniBoss : BossEnemy
+public class ShootingBoss : BossEnemy
 {
     //Strategy Enum for the Spin Boss
     protected enum SHOOTERSTATES
@@ -54,16 +54,24 @@ public class ShootingMiniBoss : BossEnemy
     [SerializeField]
     float _hardTimeBetweenAttacks;
 
+    [Header("Color Attack Variables")]
+    
+
+    [Header("Special Attack Variables")]
+    [SerializeField]
+    float _absorbAttackPercentage;
+    [SerializeField]
+    float _normalAtttackPercentage;
+
     Vector3 _ogCamPos;
     bool _cameraInPosition;
     float _startTimer;
     float _currentTime;
     GhlostShooter _attachedShooter;
     [HideInInspector]
+    public bool _attackInProgress = false;
     float _startAttackTime;
     float _currAttackTime;
-
-    
 
     SHOOTERSTATES _MyState = SHOOTERSTATES.FOLLOWING;
 
@@ -448,4 +456,5 @@ public class ShootingMiniBoss : BossEnemy
     public float GetDamageToBoss { get { return _damageToBoss; } }
     public float GetDamageToPlayer { get { return _damageToPlayer; } }
     public PlayerController GetPlayerRef { get { return _playerRef; } }
+    //public bool GetIfSpecialGhlosts { get { return _specialGhlosts; } }
 }
