@@ -51,14 +51,14 @@ public class MiniTrapBossGlhost : BossEnemy
     float _quadFirePercentage;
     float _realQuadFirePercentage;
     //[SerializeField]
-    float _fireSpinPercentage;
-    float _realFireSpinPercentage;
+    //float _fireSpinPercentage;
+    //float _realFireSpinPercentage;
     float _totalPercentageFireTrap;
 
-    [Header("Follow Player Varibales")]
-    [SerializeField]
-    float _followDuration;
-    float _realFollowDuration;
+    //[Header("Follow Player Varibales")]
+    //[SerializeField]
+    //float _followDuration;
+    //float _realFollowDuration;
 
     [Header("Quad Fire Variables")]
     [SerializeField]
@@ -85,8 +85,8 @@ public class MiniTrapBossGlhost : BossEnemy
     float _currAttackTime;
 
     [Header("Trap Boss Hard Variables")]
-    [SerializeField]
-    float _hardTimeBetweenAttacks;
+    //[SerializeField]
+    //float _hardTimeBetweenAttacks;
     [SerializeField]
     float _hardStunnedDuration;
 
@@ -97,7 +97,7 @@ public class MiniTrapBossGlhost : BossEnemy
     [SerializeField]
     float _hardQuadFirePercentage;
     //[SerializeField]
-    float _hardFireSpinPercentage;
+    //float _hardFireSpinPercentage;
 
     [Header("Hard Quad Fire Variables")]
     [SerializeField]
@@ -108,7 +108,6 @@ public class MiniTrapBossGlhost : BossEnemy
     float _hardQuadDetectDist;
     [SerializeField]
     float _hardQuadFireStartDelay;
-    float _hardQuadStartDelay = 1;
     [SerializeField]
     float _hardQuadBurnDuration;
 
@@ -253,27 +252,27 @@ public class MiniTrapBossGlhost : BossEnemy
             if (!_managerRef.HardModeOn)
             {
                 _realQuadFirePercentage = _quadFirePercentage;
-                _realFireSpinPercentage = _fireSpinPercentage;
-                _realTimeBetweenAttacks = _timeBetweenAttacks;
+                //_realFireSpinPercentage = _fireSpinPercentage;
+                //_realTimeBetweenAttacks = _timeBetweenAttacks;
                 _realQuadBurnDuration = _quadBurnDuration;
                 _realQuadDetectDist = _quadDetectDist;
                 _realQuadFireStartDelay = _quadFireStartDelay;
                 _realQuadShootDist = _quadShootDist;
                 _realQuadTrapDamage = _quadTrapDamage;
-                _realFollowDuration = _followDuration;
+                //_realFollowDuration = _followDuration;
                 _realXAttackPercentage = _xAttackPercentage;
             }
             else
             {
                 _realQuadFirePercentage = _hardQuadFirePercentage;
-                _realFireSpinPercentage = _hardFireSpinPercentage;
-                _realTimeBetweenAttacks = _hardTimeBetweenAttacks;
+                //_realFireSpinPercentage = _hardFireSpinPercentage;
+                //_realTimeBetweenAttacks = _hardTimeBetweenAttacks;
                 _realQuadBurnDuration = _hardQuadBurnDuration;
                 _realQuadDetectDist = _hardQuadDetectDist;
                 _realQuadFireStartDelay = _hardQuadFireStartDelay;
                 _realQuadShootDist = _hardQuadShootDist;
                 _realQuadTrapDamage = _hardQuadTrapDamage;
-                _realFollowDuration = _hardFollowDuration;
+                //_realFollowDuration = _hardFollowDuration;
                 _realXAttackPercentage = _hardXAttackPercentage;
             }
         }

@@ -165,7 +165,7 @@ public class DartTrap : BaseTrap {
             _moveVector = Vector3.zero;
             _realFireDelay = _fireDelay;
             _realSpawnDelay = _spawnDelay;
-            _bossRef.IsPossessing = true;
+            _bossRef.IsNotPossessing = true;
         }
 
         switch (_myOrientationInBossRoom)

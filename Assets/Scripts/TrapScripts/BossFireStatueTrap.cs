@@ -189,7 +189,7 @@ public class BossFireStatueTrap : BaseTrap {
 
             if(bossEntity.GetComponent<TrapBossGlhost>())
             {
-                bossEntity.GetComponent<TrapBossGlhost>().IsPossessing = true;
+                bossEntity.GetComponent<TrapBossGlhost>().IsNotPossessing = true;
             }
             else if(bossEntity.GetComponent<MiniTrapBossGlhost>())
             {

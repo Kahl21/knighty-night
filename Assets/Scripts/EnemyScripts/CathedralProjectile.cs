@@ -19,7 +19,7 @@ public class CathedralProjectile : MonoBehaviour {
     float _startTime;
     bool _dead = false;
     bool _hit = false;
-    bool _canMove = true;
+    //bool _canMove = true;
      Vector3 _deathDirection;
     [SerializeField]
     bool _debugProjectile;
@@ -160,8 +160,15 @@ public class CathedralProjectile : MonoBehaviour {
 
         if (_currTime >= 1)
         {
-            _myPillar.GetComponent<CathedralGlhost>().RemoveProj(this);
-            Destroy(gameObject);
+            try
+            {
+                _myPillar.GetComponent<CathedralGlhost>().RemoveProj(this);
+                Destroy(gameObject);
+            }
+            catch
+            {
+                Destroy(gameObject);
+            }
         }
     }
 
