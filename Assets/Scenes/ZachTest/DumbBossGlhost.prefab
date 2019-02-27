@@ -37,9 +37,9 @@ GameObject:
   - component: {fileID: 95878461187630384}
   - component: {fileID: 136802746617796052}
   - component: {fileID: 195112797558125458}
-  - component: {fileID: 114220077671389376}
+  - component: {fileID: 114601594927493162}
   m_Layer: 0
-  m_Name: DumbGlhost
+  m_Name: DumbBossGlhost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -448,7 +448,7 @@ Light:
   m_UseColorTemperature: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
---- !u!114 &114220077671389376
+--- !u!114 &114601594927493162
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -456,19 +456,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 1099749849767518}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6baefa82ac75c29478431ace764ca346, type: 3}
+  m_Script: {fileID: 11500000, guid: ca10773e99b499749b015961737a7aba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _glhostDamage: 0.5
-  _damageRange: 0
-  _deathTimer: 0
-  _collisionCheckDist: 0
-  _spookDistance: 0
-  _spookyOffset: 0
-  _cheatingDistance: 0
-  _cheatingSensitivity: 0
+  _damageRange: 0.7
+  _deathTimer: 6
+  _collisionCheckDist: 1.2
+  _spookDistance: 10
+  _spookyOffset: 7.5
+  _cheatingDistance: 3
+  _cheatingSensitivity: 0.1
   _myMechanic: 0
   moveSpeed: 0
+  _DamageToBoss: 0
+  _DamageToPlayer: 0
+  _maxTravelTime: 0
+  _shooterRef: {fileID: 0}
 --- !u!136 &136802746617796052
 CapsuleCollider:
   m_ObjectHideFlags: 1
@@ -476,7 +480,7 @@ CapsuleCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1099749849767518}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 55.141808
   m_Height: 153.47302

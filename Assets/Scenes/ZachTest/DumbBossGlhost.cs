@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class DumbGlhost : BaseEnemy
+public class DumbBossGlhost : BaseEnemy
 {
     [Header("Dumb Ghlost Variables")]
     [SerializeField]
@@ -15,11 +15,13 @@ public class DumbGlhost : BaseEnemy
     [SerializeField]
     float _maxTravelTime;
     [SerializeField]
-    GhlostShooter _shooterRef;
+    GhlostBossShooter _shooterRef;
 
 
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
+        _canMove = true;
+        _myAgent = gameObject.GetComponent<NavMeshAgent>();
         _myAgent.enabled = false;
         _mySpawner = _spawner;
         _myMechanic = _incomingMech;
@@ -39,22 +41,35 @@ public class DumbGlhost : BaseEnemy
     }
 
     // Update is called once per frame
-    protected override void Update ()
+    protected override void Update()
     {
         if (!_dead)
         {
             if (_canMove)
             {
-                Move();
-                CheckForHit();
+                if (_myMechanic == Mechanic.NONE)
+                {
+                    Move();
+                    CheckForHit();
+                }
+                else if (_myMechanic == Mechanic.COLOR)
+                {
+                    ColorMove();
+                    CheckForHit();
+                }
+                else if (_myMechanic == Mechanic.CHASE)
+                {
+                    Move();
+                    CheckForHit();
+                }
             }
         }
         else
         {
             CheckForHit();
             Die();
-        }       
-	}
+        }
+    }
 
 
     protected override void Move()
@@ -62,23 +77,38 @@ public class DumbGlhost : BaseEnemy
         transform.position += transform.forward * moveSpeed * Time.deltaTime;
     }
 
+    protected void ColorMove()
+    {
+        _currTime = Time.time - _startTime;
+        if (_currTime <= _maxTravelTime)
+        {
+            transform.position += transform.forward * moveSpeed * Time.deltaTime;
+        }
+    }
+
     //shoots a raycast in front of the enemy
     //if the raycast hits the player
     //the player takes damage
     protected override void CheckForHit()
     {
-        if(Physics.Raycast(transform.position + Vector3.up, transform.forward, out hit, _damageRange))
+        if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out hit, _damageRange))
         {
             GameObject thingHit = hit.collider.gameObject;
             if (thingHit.GetComponent<PlayerController>())
             {
                 thingHit.GetComponent<PlayerController>().TakeDamage(_DamageToPlayer);
             }
-            else
+            else if(!thingHit.GetComponent<PlayerController>() && !thingHit.GetComponent<DumbBossGlhost>() && !thingHit.GetComponent<ShootingBoss>())
             {
-                _shooterRef.removeGhlostFromScene(gameObject);
-                Destroy(gameObject);
-
+                if (_myMechanic == Mechanic.NONE)
+                {
+                    _shooterRef.removeGhlostFromScene(gameObject);
+                    Destroy(gameObject);
+                }
+                else if(_myMechanic == Mechanic.CHASE || _myMechanic == Mechanic.COLOR)
+                {
+                    _canMove = false;
+                }
             }
         }
     }
@@ -86,7 +116,7 @@ public class DumbGlhost : BaseEnemy
     //changes how clear the ghost is depending on how close they are to the player
     protected override void ChangeSpookiness()
     {
-        _spookColor.a = (_spookDistance - Vector3.Distance(transform.position, _target.transform.position))/7.5f;
+        _spookColor.a = (_spookDistance - Vector3.Distance(transform.position, _target.transform.position)) / 7.5f;
         _mySpookiness.color = _spookColor;
         _myRenderer.materials[1] = _mySpookiness;
     }
@@ -96,10 +126,10 @@ public class DumbGlhost : BaseEnemy
     public override void GotHit(Vector3 _flyDir, float _knockBackForce)
     {
         Debug.Log("Glhost Got Hit");
-        if(!_hit && (_myMechanic == Mechanic.COLOR || _myMechanic == Mechanic.NONE))
+        if (!_hit && (_myMechanic == Mechanic.COLOR || _myMechanic == Mechanic.NONE))
         {
             _hit = true;
-            //_myAgent.enabled = false;
+            _myAgent.enabled = false;
             _knockBack = _knockBackForce;
             _deathDirection = _flyDir;
             _deathDirection.y = 0;
@@ -112,14 +142,14 @@ public class DumbGlhost : BaseEnemy
     //makes the ghost die in a certain way
     //depending on what kind of room the ghost is in
     protected override void Die()
-    { 
+    {
         //Debug.DrawLine(transform.position, transform.position + _deathDirection*_collisionCheckDist);
-        
+
         if (Physics.Raycast(transform.position + Vector3.up, _deathDirection, out hit, _collisionCheckDist))
         {
-            if (hit.collider.GetComponent<ShootingMiniBoss>())
+            if (hit.collider.GetComponent<ShootingBoss>())
             {
-                hit.collider.GetComponent<ShootingMiniBoss>().HitByGhlost(this.gameObject, _DamageToPlayer);
+                hit.collider.GetComponent<ShootingBoss>().HitByGhlost(this.gameObject, _DamageToPlayer);
                 _shooterRef.removeGhlostFromScene(gameObject);
                 Destroy(gameObject);
             }
@@ -137,7 +167,7 @@ public class DumbGlhost : BaseEnemy
     public override void Stop()
     {
         _canMove = false;
-        if(!_dead)
+        if (!_dead)
         {
             _myAgent.SetDestination(transform.position);
         }
@@ -150,6 +180,6 @@ public class DumbGlhost : BaseEnemy
     public float SetDamageToBoss { set { _DamageToBoss = value; } }
     public float SetDamageToPlayer { set { _DamageToPlayer = value; } }
     public float SetMaxTravelTime { set { _maxTravelTime = value; } }
-    public GhlostShooter SetShooterRef { set { _shooterRef = value; } }
+    public GhlostBossShooter SetShooterRef { set { _shooterRef = value; } }
     public Color SetMyColor { set { _mySpookiness.color = value; } }
 }

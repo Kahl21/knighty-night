@@ -67,7 +67,7 @@ public class ShootingBoss : BossEnemy
     bool _cameraInPosition;
     float _startTimer;
     float _currentTime;
-    GhlostShooter _attachedShooter;
+    GhlostBossShooter _attachedShooter;
     [HideInInspector]
     public bool _attackInProgress = false;
     float _startAttackTime;
@@ -110,7 +110,7 @@ public class ShootingBoss : BossEnemy
         if (!_hasInit)
         {
             base.Init();
-            _attachedShooter = gameObject.GetComponent<GhlostShooter>();
+            _attachedShooter = gameObject.GetComponent<GhlostBossShooter>();
 
             if (!_managerRef.HardModeOn)
             {

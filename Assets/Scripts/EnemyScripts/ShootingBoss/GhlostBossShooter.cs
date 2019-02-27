@@ -20,7 +20,7 @@ public class GhlostBossShooter : MonoBehaviour
     GameObject _normalGhlostPrefab;
     [SerializeField]
     GameObject _InvincibleGhlostPrefab;
-    [SerializeField]
+    //[SerializeField]
     GameObject _ColoredGhlostPrefab;
     //[HideInInspector]
     public bool newAttack = false;
@@ -100,9 +100,14 @@ public class GhlostBossShooter : MonoBehaviour
     [Header("Colored Ghlost Variables")]
     [SerializeField]
     List<Color> _colorsForMinions;
-    List<Color> _realColorsForMinions;
-    List<Color> _ColorsLeft;
-    List<Color> _currColors;
+    [SerializeField]
+    float _maxColorTravelDistance;
+
+    [Header("Invincible Ghlost Variables")]
+    [SerializeField]
+    protected Color _invincibleColor;
+    [SerializeField]
+    GameObject _immuneParticles;
 
     List<GameObject> _ghlostsInScene = new List<GameObject>();
 
@@ -163,6 +168,7 @@ public class GhlostBossShooter : MonoBehaviour
             Debug.Log("Pulse Attack");
             _attackState = ATTACKSTATE.PULSEHARDATK;
             _currentPulse = 0;
+            _variedCurrentPulse = 0;
         }
         else if (_nextAttack > _pulseAttackPercentage && _nextAttack <= (_pulseAttackPercentage + _lineAttackPercentage))
         {
@@ -192,7 +198,7 @@ public class GhlostBossShooter : MonoBehaviour
                 //Debug.Log(timeTaken + " VS. " + _spiralSpawnRate * GhlostsCast);
                 GhlostsCast += 1;
                 ghlostObj = SpawnGhlost();
-                ghlostObj.GetComponent<DumbGlhost>().GetSpeed = _spiralGhlostTravelSpeed;
+                ghlostObj.GetComponent<DumbBossGlhost>().GetSpeed = _spiralGhlostTravelSpeed;
             }
         }
         else
@@ -211,7 +217,7 @@ public class GhlostBossShooter : MonoBehaviour
         {
             //Rotates back and forth through the cone angle / 2 * -1 and 1
             float angle = Mathf.Sin(Time.time * _lineRotateSpeed) * ((_degreeOfCastCone / 2));
-            gameObject.transform.LookAt(GetComponent<ShootingMiniBoss>().GetPlayerRef.gameObject.transform);
+            gameObject.transform.LookAt(GetComponent<ShootingBoss>().GetPlayerRef.gameObject.transform);
             transform.rotation = Quaternion.AngleAxis(angle + transform.eulerAngles.y, Vector3.up);
 
             //Spawns a new glhost based on the spawnrate
@@ -220,7 +226,7 @@ public class GhlostBossShooter : MonoBehaviour
                 //Debug.Log(timeTaken + " VS. " + _lineSpawnRate * GhlostsCast);
                 GhlostsCast+= 1;
                 ghlostObj = SpawnGhlost();
-                ghlostObj.GetComponent<DumbGlhost>().GetSpeed = _lineGhlostTravelSpeed;
+                ghlostObj.GetComponent<DumbBossGlhost>().GetSpeed = _lineGhlostTravelSpeed;
             }
         }
         else
@@ -242,7 +248,7 @@ public class GhlostBossShooter : MonoBehaviour
             {
                 transform.eulerAngles += new Vector3(0, spacingAngle, 0);
                 ghlostObj = SpawnGhlost();
-                ghlostObj.GetComponent<DumbGlhost>().GetSpeed = _pulseGhlostTravelSpeed;
+                ghlostObj.GetComponent<DumbBossGlhost>().GetSpeed = _pulseGhlostTravelSpeed;
             }
             _currentPulse++;
         }
@@ -266,7 +272,7 @@ public class GhlostBossShooter : MonoBehaviour
                 //print(transform.rotation.ToString());
                 ghlostObj = SpawnGhlost();
                 //ghlostObj.GetComponent<BaseEnemy>().Init(gameObject.GetComponent<ShootingMiniBoss>().SetMyRoom, Mechanic.BOSS);
-                ghlostObj.GetComponent<DumbGlhost>().GetSpeed = _variedGhlostTravelSpeed;
+                ghlostObj.GetComponent<DumbBossGlhost>().GetSpeed = _variedGhlostTravelSpeed;
             }
             _variedCurrentPulse++;
         }
@@ -284,42 +290,53 @@ public class GhlostBossShooter : MonoBehaviour
         {
             _totalSpawnPercentage = _invincibleSpawnPercentage + _normalSpawnPercentage + _coloredSpawnPercentage;
             float _ghlostToSpawn = Random.Range(0, _totalSpawnPercentage);
-            Debug.Log("Next attack: " + _ghlostToSpawn);
             if (_ghlostToSpawn > 0 && _ghlostToSpawn <= _normalSpawnPercentage)
             {
-                return InstantiateGhlost(_normalGhlostPrefab);
+                GameObject newNormalGhlost = InstantiateGhlost(_normalGhlostPrefab, Mechanic.NONE);
+                _ghlostsInScene.Add(newNormalGhlost);
+                return newNormalGhlost;
             }
             else if (_ghlostToSpawn > _normalSpawnPercentage && _ghlostToSpawn <= (_normalSpawnPercentage + _invincibleSpawnPercentage))
             {
-                return InstantiateGhlost(_InvincibleGhlostPrefab);
+                GameObject newInvincibleGhlost = InstantiateGhlost(_normalGhlostPrefab, Mechanic.CHASE);
+                GameObject newImmunePS = Instantiate(_immuneParticles);
+                newImmunePS.transform.position = newInvincibleGhlost.transform.position;
+                for (int i = 0; i < 4; i++)
+                {
+                    newImmunePS.transform.GetChild(i).position = newInvincibleGhlost.transform.position;
+                }
+                newImmunePS.transform.SetParent(newInvincibleGhlost.transform);
+                newInvincibleGhlost.GetComponent<DumbBossGlhost>().SetMyColor = _invincibleColor;
+                _ghlostsInScene.Add(newInvincibleGhlost);
+                return newInvincibleGhlost;
             }
             else
             {
-                GameObject _newColorGlhost = InstantiateGhlost(_ColoredGhlostPrefab);
-                int _rando = Random.Range(0, _ColorsLeft.Count);
-
-               _newColorGlhost.GetComponent<ColorMinion>().SetColor = _colorsForMinions[_rando];
-                _newColorGlhost.GetComponent<ColorMinion>().Init(gameObject.GetComponent<ShootingBoss>().SetMyRoom, Mechanic.BOSS);
-
-                return _newColorGlhost;
+                GameObject newColorGlhost = InstantiateGhlost(_normalGhlostPrefab, Mechanic.COLOR);
+                int _rando = Random.Range(0, _colorsForMinions.Count);
+                newColorGlhost.GetComponent<DumbBossGlhost>().SetMyColor = _colorsForMinions[_rando];
+                newColorGlhost.GetComponent<DumbBossGlhost>().SetMaxTravelTime = _maxColorTravelDistance;
+                _ghlostsInScene.Add(newColorGlhost);
+                return newColorGlhost;
             }
         }
         else
         {
-            return InstantiateGhlost(_normalGhlostPrefab);
+            GameObject newNormalGhlost = InstantiateGhlost(_normalGhlostPrefab, Mechanic.NONE);
+            _ghlostsInScene.Add(newNormalGhlost);
+            return newNormalGhlost;
         }
     }
 
-    private GameObject InstantiateGhlost(GameObject ghlostPrefab)
+    private GameObject InstantiateGhlost(GameObject ghlostPrefab, Mechanic myMechanic)
     {
         GameObject newGhlost;
         newGhlost = Instantiate(ghlostPrefab, transform.position + (transform.forward * _SpawnedDistAway), transform.rotation);
-        newGhlost.GetComponent<DumbGlhost>().SetDamageToBoss = gameObject.GetComponent<ShootingMiniBoss>().GetDamageToBoss;
-        newGhlost.GetComponent<DumbGlhost>().SetDamageToPlayer = gameObject.GetComponent<ShootingMiniBoss>().GetDamageToPlayer;
+        newGhlost.GetComponent<DumbBossGlhost>().SetShooterRef = gameObject.GetComponent<GhlostBossShooter>();
+        newGhlost.GetComponent<DumbBossGlhost>().SetDamageToBoss = gameObject.GetComponent<ShootingBoss>().GetDamageToBoss;
+        newGhlost.GetComponent<DumbBossGlhost>().SetDamageToPlayer = gameObject.GetComponent<ShootingBoss>().GetDamageToPlayer;
+        newGhlost.GetComponent<DumbBossGlhost>().Init(gameObject.GetComponent<ShootingBoss>().SetMyRoom, myMechanic);
         newGhlost.transform.parent = null;
-        _ghlostsInScene.Add(newGhlost);
-
-        newGhlost.GetComponent<DumbGlhost>().SetShooterRef = gameObject.GetComponent<GhlostShooter>();
         return newGhlost;
     }
 
