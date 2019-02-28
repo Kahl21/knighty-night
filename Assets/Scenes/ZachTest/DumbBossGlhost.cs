@@ -5,6 +5,13 @@ using UnityEngine.AI;
 
 public class DumbBossGlhost : BaseEnemy
 {
+    //Strategy Enum for the DumbBossGhlosts
+    public enum DUMBSTATE
+    {
+        NONE,
+        ABSORB
+    }
+
     [Header("Dumb Ghlost Variables")]
     [SerializeField]
     float moveSpeed;
@@ -16,6 +23,8 @@ public class DumbBossGlhost : BaseEnemy
     float _maxTravelTime;
     [SerializeField]
     GhlostBossShooter _shooterRef;
+
+    DUMBSTATE _myDumbState = DUMBSTATE.NONE;
 
 
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
@@ -59,8 +68,15 @@ public class DumbBossGlhost : BaseEnemy
                 }
                 else if (_myMechanic == Mechanic.CHASE)
                 {
-                    Move();
-                    CheckForHit();
+                    if (_myDumbState == DUMBSTATE.ABSORB)
+                    {
+                        MoveToBoss();
+                    }
+                    else
+                    {
+                        Move();
+                        CheckForHit();
+                    }
                 }
             }
         }
@@ -74,7 +90,15 @@ public class DumbBossGlhost : BaseEnemy
 
     protected override void Move()
     {
+        _myAgent.enabled = false;
         transform.position += transform.forward * moveSpeed * Time.deltaTime;
+    }
+
+    public void setMove(Quaternion rotation)
+    {
+        _myAgent.enabled = false;
+        transform.rotation = rotation;
+        _myDumbState = DUMBSTATE.NONE;
     }
 
     protected void ColorMove()
@@ -84,6 +108,13 @@ public class DumbBossGlhost : BaseEnemy
         {
             transform.position += transform.forward * moveSpeed * Time.deltaTime;
         }
+    }
+
+    void MoveToBoss()
+    {
+        _myAgent.enabled = true;
+        _myAgent.speed = moveSpeed;
+        _myAgent.SetDestination(_shooterRef.gameObject.transform.position);
     }
 
     //shoots a raycast in front of the enemy
@@ -182,4 +213,6 @@ public class DumbBossGlhost : BaseEnemy
     public float SetMaxTravelTime { set { _maxTravelTime = value; } }
     public GhlostBossShooter SetShooterRef { set { _shooterRef = value; } }
     public Color SetMyColor { set { _mySpookiness.color = value; } }
+    public Mechanic GetMyMechanic { get { return _myMechanic; } }
+    public DUMBSTATE setMyState { set { _myDumbState = value; } }
 }

@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
+using System.Linq;
 
 public class ShootingBoss : BossEnemy
 {
-    //Strategy Enum for the Spin Boss
+    //Strategy Enum for the Shooting Boss
     protected enum SHOOTERSTATES
     {
         STUNNED,
         ATTACKING,
+        ABSORB,
+        SHOOT,
         FOLLOWING
     }
     
@@ -62,6 +65,23 @@ public class ShootingBoss : BossEnemy
     float _absorbAttackPercentage;
     [SerializeField]
     float _normalAtttackPercentage;
+
+    [Header("Absorb Attack Variables")]
+    [SerializeField]
+    float _absorbSpeed;
+    [SerializeField]
+    float _shootingFollowOffset;
+    [SerializeField]
+    float _shootRate;
+    [SerializeField]
+    float _rotationAngle = 0;
+    int _ghlostsShot = 0;
+    [SerializeField]
+    List<GameObject> _absorbingGhlosts;
+    [SerializeField]
+    List<GameObject> _absorbedGhlosts;
+    //[SerializeField]
+    //float _normalAtttackPercentage;
 
     Vector3 _ogCamPos;
     bool _cameraInPosition;
@@ -148,8 +168,8 @@ public class ShootingBoss : BossEnemy
             _enemyAgent.enabled = true;
             _cameraRef.AmFollowingPlayer = true;
             _calcAngle = _startAngle;
-
-            
+            _absorbingGhlosts = new List<GameObject>();
+            _absorbedGhlosts = new List<GameObject>();
         }
         _myAI = BossAI.FIGHTING;
         _init = true;
@@ -185,7 +205,15 @@ public class ShootingBoss : BossEnemy
                         case SHOOTERSTATES.STUNNED:
                             Stunned();
                             break;
-                            
+
+                        case SHOOTERSTATES.ABSORB:
+                            AbsorbAtk();
+                            break;
+
+                        case SHOOTERSTATES.SHOOT:
+                            ShootAtPlayer();
+                            break;
+
                         default:
                             //Debug.Log("No Attack Set");
                             break;
@@ -204,7 +232,7 @@ public class ShootingBoss : BossEnemy
     {
         if (_attachedShooter.attackInProgress != true)
         {
-            _MyState = SHOOTERSTATES.STUNNED;
+            _MyState = SHOOTERSTATES.ABSORB;
             _startTimer = Time.time;
         }
     }
@@ -217,6 +245,66 @@ public class ShootingBoss : BossEnemy
             _MyState = SHOOTERSTATES.FOLLOWING;
             _startTimer = Time.time;
         }
+    }
+
+    private void AbsorbAtk()
+    {
+
+        if (_rotationAngle <= 20)
+        {
+            _rotationAngle += _absorbSpeed * Time.deltaTime;
+            transform.eulerAngles += new Vector3(0, _rotationAngle, 0);
+            Debug.DrawRay(transform.position + (Vector3.up * 0.4f), (transform.forward * 40f), Color.green);
+            if (Physics.Raycast(transform.position + (Vector3.up * 0.4f), (transform.forward), out hit, 40f))
+            {
+                
+                //transform.eulerAngles += new Vector3(0, angle, 0);
+                if (hit.collider.GetComponent<DumbBossGlhost>())
+                {
+                    if (hit.collider.GetComponent<DumbBossGlhost>().GetMyMechanic == Mechanic.CHASE)
+                    {
+                        DumbBossGlhost ghlostRef = hit.collider.GetComponent<DumbBossGlhost>();
+                        _absorbingGhlosts.Add(ghlostRef.gameObject);
+                    }
+                }
+            }
+        }
+        else if(_absorbingGhlosts != _absorbedGhlosts)
+        {
+            _rotationAngle += _absorbSpeed * Time.deltaTime;
+            transform.eulerAngles += new Vector3(0, _rotationAngle, 0);
+            for (int index = 0; index < _absorbingGhlosts.Count; index++)
+            {
+                _absorbedGhlosts[index].GetComponent<DumbBossGlhost>().setMyState = DumbBossGlhost.DUMBSTATE.ABSORB;
+            }
+        }
+        else if (_absorbingGhlosts == _absorbedGhlosts)
+        {
+            _MyState = SHOOTERSTATES.SHOOT;
+        }
+    }
+
+    private void ShootAtPlayer()
+    {
+        if (_ghlostsShot < _absorbedGhlosts.Count)
+        {
+            float timeTaken = Time.time - _startTimer;
+            gameObject.transform.LookAt(_playerRef.transform.position + new Vector3(0, _shootingFollowOffset, 0));
+
+            //Spawns a new glhost based on the spawnrate
+            if (timeTaken >= _shootRate * _ghlostsShot)
+            {
+                DumbBossGlhost ghlostRef = _absorbedGhlosts[_ghlostsShot].GetComponent<DumbBossGlhost>();
+                ghlostRef.setMove(transform.rotation);
+                _ghlostsShot++;
+            }
+            Debug.Log("Absorbing Ghlosts");
+        }
+        else
+        {
+            _MyState = SHOOTERSTATES.STUNNED;
+        }
+        
     }
 
     private void FollowPlayer()
@@ -298,7 +386,12 @@ public class ShootingBoss : BossEnemy
 
     public void HitByGhlost(GameObject objectHitting, float _damageHit)
     {
-        if (objectHitting.GetComponent<DumbGlhost>())
+        if (objectHitting.GetComponent<DumbBossGlhost>() && _MyState == SHOOTERSTATES.ABSORB)
+        {
+            _absorbedGhlosts.Add(objectHitting);
+            objectHitting.SetActive(false);
+        }
+        else if (objectHitting.GetComponent<DumbBossGlhost>())
         {
             base.GotHit(_damageHit);
 
