@@ -77,6 +77,9 @@ public class Menuing : MonoBehaviour {
     private float fadeTime = 1f;
     private float fadeUpdateTime = .01f;
 
+    //Video Settings
+    public Dropdown resolutions;
+
 
     // Use this for initialization
     void Awake ()
@@ -114,7 +117,6 @@ public class Menuing : MonoBehaviour {
         _playerRef.SetLoseImage = _menus[4].transform.GetChild(2).gameObject;
 
         SetMenu(0);
-
     }
 
     private void Update()
@@ -260,6 +262,16 @@ public class Menuing : MonoBehaviour {
         SetMenu(1);
     }
 
+    public void ToVideo()
+    {
+        SetMenu(6);
+    }
+
+    public void ToAudio()
+    {
+        SetMenu(7);
+    }
+
     public void MenuBack()
     {
         SetMenu(0);
@@ -371,6 +383,60 @@ public class Menuing : MonoBehaviour {
 
 
     }
+
+
+    //video Settings
+    public void ChangeResolution(int width, int height, bool fullscreen)
+    {
+        Screen.SetResolution(width, height, fullscreen);
+        
+    }
+
+    
+
+
+
+
+    //audio Settings
+    public void MuteAll()
+    {
+        AudioManager.instance.MasterVolume(0);
+    }
+
+    public void MuteSFX()
+    {
+        AudioManager.instance.SFXVolume(0);
+    }
+
+    public void MuteMusic()
+    {
+        AudioManager.instance.MusicVolume(0);
+
+    }
+
+    public void ChangeMasterVolume(int vol)
+    {
+        AudioManager.instance.MasterVolume(vol);
+    }
+
+    public void ChangeSFXVolume(int vol)
+    {
+        AudioManager.instance.SFXVolume(vol);
+    }
+
+    public void ChangeMusicVolume(int vol)
+    {
+        AudioManager.instance.MusicVolume(vol);
+
+    }
+
+
+
+
+
+
+
+
 
     IEnumerator LoadNewScene()
     {

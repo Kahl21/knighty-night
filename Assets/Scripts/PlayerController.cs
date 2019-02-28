@@ -749,6 +749,7 @@ public class PlayerController : MonoBehaviour {
     {
         if (!_invincible)
         {
+            //AudioManager.instance.PlayerDamaged();
             _invincible = true;
             IncHealthMeter(_damageTaken, false);
 
