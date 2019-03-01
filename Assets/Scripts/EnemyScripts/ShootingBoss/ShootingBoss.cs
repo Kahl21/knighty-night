@@ -13,6 +13,7 @@ public class ShootingBoss : BossEnemy
         STUNNED,
         ATTACKING,
         ABSORB,
+        CHECKFORABSORB,
         SHOOT,
         FOLLOWING
     }
@@ -70,12 +71,15 @@ public class ShootingBoss : BossEnemy
     [SerializeField]
     float _absorbSpeed;
     [SerializeField]
+    float _rotateSpeed;
+    [SerializeField]
     float _shootingFollowOffset;
     [SerializeField]
     float _shootRate;
     [SerializeField]
     float _rotationAngle = 0;
     int _ghlostsShot = 0;
+    bool _invinciblesAddad = false;
     [SerializeField]
     List<GameObject> _absorbingGhlosts;
     [SerializeField]
@@ -210,6 +214,10 @@ public class ShootingBoss : BossEnemy
                             AbsorbAtk();
                             break;
 
+                        case SHOOTERSTATES.CHECKFORABSORB:
+                            CheckForCanAbsorb();
+                            break;
+
                         case SHOOTERSTATES.SHOOT:
                             ShootAtPlayer();
                             break;
@@ -232,7 +240,7 @@ public class ShootingBoss : BossEnemy
     {
         if (_attachedShooter.attackInProgress != true)
         {
-            _MyState = SHOOTERSTATES.ABSORB;
+            _MyState = SHOOTERSTATES.CHECKFORABSORB;
             _startTimer = Time.time;
         }
     }
@@ -247,15 +255,38 @@ public class ShootingBoss : BossEnemy
         }
     }
 
+    private void CheckForCanAbsorb()
+    {
+        for (int ghlost = 0; ghlost < _attachedShooter.GetGhlostsInScene.Count; ghlost++)
+        {
+            if (_attachedShooter.GetGhlostsInScene[ghlost].GetComponent<DumbBossGlhost>().GetSpeed != 0)
+            {
+                return;
+            }
+        }
+        _invinciblesAddad = false;
+        _MyState = SHOOTERSTATES.ABSORB;
+    }
+
     private void AbsorbAtk()
     {
-
-        if (_rotationAngle <= 20)
+        _rotationAngle += 1 * _rotateSpeed * Time.deltaTime;
+        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y+ _rotationAngle, 0);
+        if (_invinciblesAddad == false)
         {
-            _rotationAngle += _absorbSpeed * Time.deltaTime;
-            transform.eulerAngles += new Vector3(0, _rotationAngle, 0);
-            Debug.DrawRay(transform.position + (Vector3.up * 0.4f), (transform.forward * 40f), Color.green);
-            if (Physics.Raycast(transform.position + (Vector3.up * 0.4f), (transform.forward), out hit, 40f))
+            for (int index = 0; index < _attachedShooter.GetGhlostsInScene.Count; index++)
+            {
+                if (_attachedShooter.GetGhlostsInScene[index].GetComponent<DumbBossGlhost>().GetMyMechanic == Mechanic.CHASE)
+                {
+                    DumbBossGlhost ghlostRef = _attachedShooter.GetGhlostsInScene[index].GetComponent<DumbBossGlhost>();
+                    ghlostRef.GetSpeed = _absorbSpeed;
+                    ghlostRef.setMove(transform.eulerAngles);
+                    _absorbingGhlosts.Add(_attachedShooter.GetGhlostsInScene[index]);
+                }
+            }
+            /*
+            Debug.DrawRay(transform.position + (Vector3.up * 1f), (transform.forward * 100f), Color.green);
+            if (Physics.Raycast(transform.position + (Vector3.up * 1f), transform.forward, out hit, 100f))
             {
                 
                 //transform.eulerAngles += new Vector3(0, angle, 0);
@@ -263,24 +294,34 @@ public class ShootingBoss : BossEnemy
                 {
                     if (hit.collider.GetComponent<DumbBossGlhost>().GetMyMechanic == Mechanic.CHASE)
                     {
+                        for (int i = 0; i < _absorbingGhlo`sts.Count; i++)
+                        {
+                            if (hit.collider.gameObject == _absorbingGhlosts[i])
+                            {
+                                return;
+                            }
+                        }
                         DumbBossGlhost ghlostRef = hit.collider.GetComponent<DumbBossGlhost>();
+                        ghlostRef.GetSpeed = _absorbSpeed;
+                        ghlostRef.setMove(transform.eulerAngles);
                         _absorbingGhlosts.Add(ghlostRef.gameObject);
                     }
                 }
+
             }
+            */
+            _invinciblesAddad = true;
         }
-        else if(_absorbingGhlosts != _absorbedGhlosts)
+        else if(_absorbingGhlosts.Count != _absorbedGhlosts.Count)
         {
-            _rotationAngle += _absorbSpeed * Time.deltaTime;
-            transform.eulerAngles += new Vector3(0, _rotationAngle, 0);
-            for (int index = 0; index < _absorbingGhlosts.Count; index++)
-            {
-                _absorbedGhlosts[index].GetComponent<DumbBossGlhost>().setMyState = DumbBossGlhost.DUMBSTATE.ABSORB;
-            }
+            _rotationAngle += 1 + _rotateSpeed * Time.deltaTime;
+            transform.eulerAngles = new Vector3(0, _rotationAngle, 0);
         }
-        else if (_absorbingGhlosts == _absorbedGhlosts)
+        else if (_absorbingGhlosts.Count == _absorbedGhlosts.Count)
         {
+            _ghlostsShot = 0;
             _MyState = SHOOTERSTATES.SHOOT;
+            _startTimer = Time.time;
         }
     }
 
@@ -289,16 +330,17 @@ public class ShootingBoss : BossEnemy
         if (_ghlostsShot < _absorbedGhlosts.Count)
         {
             float timeTaken = Time.time - _startTimer;
-            gameObject.transform.LookAt(_playerRef.transform.position + new Vector3(0, _shootingFollowOffset, 0));
+            gameObject.transform.LookAt(_playerRef.transform);
 
             //Spawns a new glhost based on the spawnrate
             if (timeTaken >= _shootRate * _ghlostsShot)
             {
                 DumbBossGlhost ghlostRef = _absorbedGhlosts[_ghlostsShot].GetComponent<DumbBossGlhost>();
-                ghlostRef.setMove(transform.rotation);
+                ghlostRef.gameObject.SetActive(true);
+                ghlostRef.setMove(_playerRef.transform.position);
                 _ghlostsShot++;
             }
-            Debug.Log("Absorbing Ghlosts");
+            Debug.Log("Shooting Ghlosts");
         }
         else
         {
@@ -386,7 +428,7 @@ public class ShootingBoss : BossEnemy
 
     public void HitByGhlost(GameObject objectHitting, float _damageHit)
     {
-        if (objectHitting.GetComponent<DumbBossGlhost>() && _MyState == SHOOTERSTATES.ABSORB)
+        if (objectHitting.GetComponent<DumbBossGlhost>() && (_MyState == SHOOTERSTATES.ABSORB))
         {
             _absorbedGhlosts.Add(objectHitting);
             objectHitting.SetActive(false);

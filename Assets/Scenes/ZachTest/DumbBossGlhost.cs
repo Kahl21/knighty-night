@@ -9,7 +9,7 @@ public class DumbBossGlhost : BaseEnemy
     public enum DUMBSTATE
     {
         NONE,
-        ABSORB
+        ABSORBING
     }
 
     [Header("Dumb Ghlost Variables")]
@@ -56,27 +56,44 @@ public class DumbBossGlhost : BaseEnemy
         {
             if (_canMove)
             {
-                if (_myMechanic == Mechanic.NONE)
+                switch (_myMechanic)
                 {
-                    Move();
-                    CheckForHit();
-                }
-                else if (_myMechanic == Mechanic.COLOR)
-                {
-                    ColorMove();
-                    CheckForHit();
-                }
-                else if (_myMechanic == Mechanic.CHASE)
-                {
-                    if (_myDumbState == DUMBSTATE.ABSORB)
-                    {
-                        MoveToBoss();
-                    }
-                    else
-                    {
+                    case Mechanic.NONE:
                         Move();
                         CheckForHit();
-                    }
+                        break;
+
+                    case Mechanic.SWARM:
+                        break;
+
+                    case Mechanic.CHASE:
+                        switch (_myDumbState)
+                        {
+                            case DUMBSTATE.NONE:
+                                Move();
+                                CheckForHit();
+                                break;
+
+                            case DUMBSTATE.ABSORBING:
+                                Move();
+                                CheckForHit();
+                                break;
+                        }
+                        break;
+
+                    case Mechanic.COLOR:
+                        ColorMove();
+                        CheckForHit();
+                        break;
+
+                    case Mechanic.TRAP:
+                        break;
+
+                    case Mechanic.BOSS:
+                        break;
+
+                    case Mechanic.HEAL:
+                        break;
                 }
             }
         }
@@ -90,14 +107,27 @@ public class DumbBossGlhost : BaseEnemy
 
     protected override void Move()
     {
+        
         _myAgent.enabled = false;
         transform.position += transform.forward * moveSpeed * Time.deltaTime;
     }
 
-    public void setMove(Quaternion rotation)
+    public void ShootMe(Quaternion Shootingrotation)
     {
-        _myAgent.enabled = false;
-        transform.rotation = rotation;
+        _canMove = true;
+        transform.rotation = _shooterRef.transform.rotation;
+        _myDumbState = DUMBSTATE.NONE;
+    }
+
+    public void setMove(Vector3 rotation)
+    {
+        if (_myAgent.enabled == true)
+        {
+            _myAgent.SetDestination(transform.position);
+            _myAgent.enabled = false;
+        }
+        _canMove = true;
+        transform.LookAt(_shooterRef.transform);
         _myDumbState = DUMBSTATE.NONE;
     }
 
@@ -107,6 +137,10 @@ public class DumbBossGlhost : BaseEnemy
         if (_currTime <= _maxTravelTime)
         {
             transform.position += transform.forward * moveSpeed * Time.deltaTime;
+        }
+        else
+        {
+            moveSpeed = 0;
         }
     }
 
@@ -129,6 +163,10 @@ public class DumbBossGlhost : BaseEnemy
             {
                 thingHit.GetComponent<PlayerController>().TakeDamage(_DamageToPlayer);
             }
+            else if(thingHit.GetComponent<ShootingBoss>())
+            {
+                thingHit.GetComponent<ShootingBoss>().HitByGhlost(gameObject, 0f);
+            }
             else if(!thingHit.GetComponent<PlayerController>() && !thingHit.GetComponent<DumbBossGlhost>() && !thingHit.GetComponent<ShootingBoss>())
             {
                 if (_myMechanic == Mechanic.NONE)
@@ -139,6 +177,7 @@ public class DumbBossGlhost : BaseEnemy
                 else if(_myMechanic == Mechanic.CHASE || _myMechanic == Mechanic.COLOR)
                 {
                     _canMove = false;
+                    moveSpeed = 0;
                 }
             }
         }
@@ -180,7 +219,7 @@ public class DumbBossGlhost : BaseEnemy
         {
             if (hit.collider.GetComponent<ShootingBoss>())
             {
-                hit.collider.GetComponent<ShootingBoss>().HitByGhlost(this.gameObject, _DamageToPlayer);
+                hit.collider.GetComponent<ShootingBoss>().HitByGhlost(this.gameObject, _DamageToBoss);
                 _shooterRef.removeGhlostFromScene(gameObject);
                 Destroy(gameObject);
             }

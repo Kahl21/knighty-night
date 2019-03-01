@@ -363,4 +363,6 @@ public class GhlostBossShooter : MonoBehaviour
             _ghlostsInScene.Remove(ghlostRef);
         }
     }
+
+    public List<GameObject> GetGhlostsInScene { get { return _ghlostsInScene; } }
 }

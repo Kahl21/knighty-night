@@ -6413,8 +6413,12 @@ MonoBehaviour:
   _absorbAttackPercentage: 0
   _normalAtttackPercentage: 0
   _absorbSpeed: 10
+  _rotateSpeed: 50
   _shootingFollowOffset: 1
-  _shootRate: 0.1
+  _shootRate: 0.4
+  _rotationAngle: 0
+  _absorbingGhlosts: []
+  _absorbedGhlosts: []
   _attackInProgress: 0
 --- !u!195 &945691939
 NavMeshAgent:
