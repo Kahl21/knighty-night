@@ -15,11 +15,14 @@ public class BossSpikeTrap : SpikeTrap {
     float _realRetreatSpeed;
     float _moveSpeed;
 
+    Vector3 _startPos;
+
     TrapBossGlhost _bossRef;
 
     public override void Init()
     {
         base.Init();
+        _startPos = transform.position;
         _realAttackDelayDuration = _attackDelayDuration;
         _realAttackSpeed = _attackSpeed;
         _realRetreatSpeed = _retreatSpeed;
@@ -27,12 +30,12 @@ public class BossSpikeTrap : SpikeTrap {
 
     protected override void Update()
     {
-        base.Update();
-
-        if(_possessed)
+        if (_possessed)
         {
             StalkPlayer();
         }
+
+        base.Update();
     }
 
     public void BecomePossessed(TrapBossGlhost myboss, float possessDuration, float attackSpeed, float attackDelay, float retreatSpeed, float moveSpeed)
@@ -116,7 +119,7 @@ public class BossSpikeTrap : SpikeTrap {
         {
             _currTime = 1;
 
-            _currBound = _startPos;
+            _currBound = _spikeStartPos;
             myState = SpikeState.RETREAT;
         }
     }
@@ -130,7 +133,7 @@ public class BossSpikeTrap : SpikeTrap {
         }
         else
         {
-            _spikes.transform.localPosition = _startPos;
+            _spikes.transform.localPosition = _spikeStartPos;
 
             myState = SpikeState.NONE;
 
@@ -155,6 +158,19 @@ public class BossSpikeTrap : SpikeTrap {
             _bossRef.IsNotPossessing = true;
         }
 
-        transform.position = Vector3.MoveTowards(transform.position, _playerRef.transform.position, _moveSpeed * Time.deltaTime);
+        _scanStartPos = transform.position;
+
+        _topLeftCorner = _scanStartPos + ((Vector3.forward + Vector3.left) * BoxRadius);
+        _bottomRightCorner = _scanStartPos + ((Vector3.back + Vector3.right) * BoxRadius);
+
+        Vector3 _playerPos = _playerRef.transform.position;
+        _playerPos.y = transform.position.y;
+        transform.position = Vector3.MoveTowards(transform.position, _playerPos, _moveSpeed * Time.deltaTime);
+    }
+
+    public override void ResetTrap()
+    {
+        base.ResetTrap();
+        transform.position = _startPos;
     }
 }

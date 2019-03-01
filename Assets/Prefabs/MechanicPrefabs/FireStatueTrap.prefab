@@ -70,8 +70,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1875060388093014}
-  m_LocalRotation: {x: -0, y: 0.0000015497205, z: -0, w: 1}
-  m_LocalPosition: {x: 1.59, y: 0, z: 30.5}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -6.3223505, y: 2.1633005, z: 32.111908}
   m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_Children:
   - {fileID: 4729952641366704}
@@ -157,8 +157,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 124.33684, y: 274.468, z: 204.52266}
-  m_Center: {x: 1.2980138e-11, y: 137.234, z: -39.9999}
+  m_Size: {x: 124.33684, y: 274.468, z: 224.52283}
+  m_Center: {x: 1.944045e-11, y: 137.234, z: -49.99998}
 --- !u!114 &114126533685051228
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -176,10 +176,11 @@ MonoBehaviour:
   _fireDelay: 1
   _fireIncDuration: 0.5
   _burningDuration: 1.5
-  _fireDistance: 1
+  _startDelay: 0.1
   _debugDamageArea: 1
   _spaceBetweenRays: 0.5
   _maxDetectDistance: 4
+  _mySmoke: {fileID: 198608669152211440}
 --- !u!198 &198608669152211440
 ParticleSystem:
   m_ObjectHideFlags: 1

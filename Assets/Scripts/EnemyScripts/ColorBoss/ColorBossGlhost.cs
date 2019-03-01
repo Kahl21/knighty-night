@@ -856,7 +856,6 @@ public class ColorBossGlhost : BossEnemy {
                 _endingPlaying = false;
 
                 //Debug.Log("dead");
-                _myRoom.EndAll();
                 gameObject.SetActive(false);
             }
         }

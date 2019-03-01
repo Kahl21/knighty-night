@@ -17,8 +17,8 @@ public class BossFireStatueTrap : BaseTrap {
     }
 
     [Header("Fire Statue Variables")]
-    float _fireDamage;
-    [HideInInspector]
+    
+    [SerializeField]
     float _beginningDelay;
     [SerializeField]
     float _fireDelay;
@@ -30,6 +30,7 @@ public class BossFireStatueTrap : BaseTrap {
     float _fireDistance;
     float _startDelay;
     float _currDelay;
+    float _fireDamage;
 
     [Header("Detection Variables")]
     [SerializeField]
