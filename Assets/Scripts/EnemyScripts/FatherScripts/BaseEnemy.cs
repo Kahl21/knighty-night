@@ -45,8 +45,11 @@ public class BaseEnemy : MonoBehaviour {
     protected DungeonMechanic _mySpawner;
     protected Mechanic _myMechanic;
 
-	// Use this for initialization
-	public virtual void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
+    protected Collider _myCollider;
+    protected bool dead;
+
+    // Use this for initialization
+    public virtual void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
         _myAgent = GetComponent<NavMeshAgent>();
         _mySpawner = _spawner;
@@ -54,7 +57,7 @@ public class BaseEnemy : MonoBehaviour {
         _target = PlayerController.Instance;
         _menuRef = Menuing.Instance;
 
-        _myBody = transform.GetChild(2).gameObject;
+        _myBody = transform.GetChild(3).gameObject;
         _myRenderer = _myBody.GetComponent<SkinnedMeshRenderer>();
         _mySpookiness = _myRenderer.materials[1];
         if (_myMechanic == Mechanic.COLOR)
@@ -67,7 +70,7 @@ public class BaseEnemy : MonoBehaviour {
         _myRenderer.materials[1] = _mySpookiness;
 
         _myAnimations = GetComponent<Animator>();
-        _myAnimations.Play("Moving", 0);
+        //_myAnimations.Play("Moving");
     }
 
     // Update is called once per frame

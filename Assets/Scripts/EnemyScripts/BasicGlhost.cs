@@ -3,11 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class BasicGlhost : BaseEnemy { 
+public class BasicGlhost : BaseEnemy {
+
+    
+    private void Start()
+    {
+        _myCollider = GetComponent<Collider>();
+        if(_canMove)
+            _myAnimations.Play("Moving");
+    }
 
     // Update is called once per frame
     protected override void Update ()
     {
+        
         if(!_menuRef.GameIsPaused)
         {
             if (!_dead)
@@ -16,6 +25,10 @@ public class BasicGlhost : BaseEnemy {
                 {
                     Move();
                     CheckForHit();
+                }
+                else
+                {
+                    _myAnimations.Play("Nothing");
                 }
             }
             else
@@ -30,10 +43,15 @@ public class BasicGlhost : BaseEnemy {
     {
         if(Vector3.Distance(transform.position, _target.transform.position) <= _damageRange)
         {
+            //_myAnimations.Play("Moving");
+            //this is where you match the animation speed with the ghost speed
+            //_myAnimations.speed = 10;
             _myAgent.SetDestination(transform.position);
         }
         else
         {
+            //animation breaker
+            //_myAnimations.Play("Moving");
             _myAgent.SetDestination(_target.transform.position);
         }
 
@@ -72,6 +90,7 @@ public class BasicGlhost : BaseEnemy {
     {
         if(!_hit)
         {
+            _myAnimations.Play("Dazed");
             _hit = true;
             _myAgent.enabled = false;
             _knockBack = _knockBackForce;
@@ -86,87 +105,94 @@ public class BasicGlhost : BaseEnemy {
     //makes the ghost die in a certain way
     //depending on what kind of room the ghost is in
     protected override void Die()
-    { 
+    {
         //Debug.DrawLine(transform.position, transform.position + _deathDirection*_collisionCheckDist);
-
-        switch (_myMechanic)
+        if (dead == false)
         {
-            case Mechanic.NONE:
-                Debug.Log("No Mechanic");
-                break;
-            case Mechanic.SWARM:
-                base.Die();
-                if (Physics.Raycast(transform.position + Vector3.up, _deathDirection, out hit, _collisionCheckDist))
-                {
-                    if(!hit.collider.GetComponent<BaseEnemy>() && !hit.collider.GetComponent<PlayerController>())
+            switch (_myMechanic)
+            {
+                case Mechanic.NONE:
+                    Debug.Log("No Mechanic");
+                    break;
+                case Mechanic.SWARM:
+                    base.Die();
+                    if (Physics.Raycast(transform.position + Vector3.up, _deathDirection, out hit, _collisionCheckDist))
                     {
-                        _mySpawner.RemoveMe(this);
-                        _mySpawner.CheckForEnd();
-                        Destroy(gameObject);
-                    }
-                }
-                transform.position += _deathDirection * _knockBack * Time.deltaTime;
-                break;
-            case Mechanic.COLOR:
-
-                Vector3 _newDeathDirection = _deathDirection;
-                if(Vector3.Distance(transform.position, _myPillar.transform.position) <= _cheatingDistance)
-                {
-                    if(transform.position.z > _myPillar.transform.position.z)
-                    {
-                        _newDeathDirection.z -= _cheatingSensitivity;
-                    }
-                    else if (transform.position.z < _myPillar.transform.position.z)
-                    {
-                        _newDeathDirection.z += _cheatingSensitivity;
-                    }
-
-                    if (transform.position.x > _myPillar.transform.position.x)
-                    {
-                        _newDeathDirection.x -= _cheatingSensitivity;
-                    }
-                    else if (transform.position.x > _myPillar.transform.position.x)
-                    {
-                        _newDeathDirection.x += _cheatingSensitivity;
-                    }
-                }
-                if (Physics.Raycast(transform.position + Vector3.up, _newDeathDirection,  out hit, _collisionCheckDist))
-                {
-                   
-                    if (hit.collider.GetComponent<ColoredBlock>())
-                    {
-                        ColoredBlock other = hit.collider.GetComponent<ColoredBlock>();
-                        if (_myColor == other.GetColor)
+                        if (!hit.collider.GetComponent<BaseEnemy>() && !hit.collider.GetComponent<PlayerController>())
                         {
-                            other.CorrectMatch();
+                            _myCollider.enabled = false;
                             _mySpawner.RemoveMe(this);
-                            Destroy(gameObject);
+                            _mySpawner.CheckForEnd();
+
+                            Dead();
                         }
-                        else
+                    }
+                    transform.position += _deathDirection * _knockBack * Time.deltaTime;
+                    break;
+                case Mechanic.COLOR:
+
+                    Vector3 _newDeathDirection = _deathDirection;
+                    if (Vector3.Distance(transform.position, _myPillar.transform.position) <= _cheatingDistance)
+                    {
+                        if (transform.position.z > _myPillar.transform.position.z)
                         {
-                            _deathDirection = Vector3.zero;
+                            _newDeathDirection.z -= _cheatingSensitivity;
+                        }
+                        else if (transform.position.z < _myPillar.transform.position.z)
+                        {
+                            _newDeathDirection.z += _cheatingSensitivity;
+                        }
+
+                        if (transform.position.x > _myPillar.transform.position.x)
+                        {
+                            _newDeathDirection.x -= _cheatingSensitivity;
+                        }
+                        else if (transform.position.x > _myPillar.transform.position.x)
+                        {
+                            _newDeathDirection.x += _cheatingSensitivity;
+                        }
+                    }
+                    if (Physics.Raycast(transform.position + Vector3.up, _newDeathDirection, out hit, _collisionCheckDist))
+                    {
+
+                        if (hit.collider.GetComponent<ColoredBlock>())
+                        {
+                            ColoredBlock other = hit.collider.GetComponent<ColoredBlock>();
+                            if (_myColor == other.GetColor)
+                            {
+                                _myCollider.enabled = false;
+                                other.CorrectMatch();
+                                _mySpawner.RemoveMe(this);
+
+                                Dead();
+                            }
+                            else
+                            {
+                                _deathDirection = Vector3.zero;
+                                _myAgent.enabled = true;
+                                _hit = false;
+                                _dead = false;
+                            }
+                        }
+                        else if (!hit.collider.GetComponent<BaseEnemy>() && !hit.collider.GetComponent<PlayerController>())
+
+                        {
+                            _newDeathDirection = Vector3.zero;
                             _myAgent.enabled = true;
                             _hit = false;
                             _dead = false;
+                            _myAnimations.Play("Moving");
                         }
-                    }
-                    else if (!hit.collider.GetComponent<BaseEnemy>() && !hit.collider.GetComponent<PlayerController>())
-                    
-                    {
-                        _newDeathDirection = Vector3.zero;
-                        _myAgent.enabled = true;
-                        _hit = false;
-                        _dead = false;
-                    }
-                    
-                }
 
-                transform.position += _newDeathDirection * _knockBack * Time.deltaTime;
-                break;
-            case Mechanic.BOSS:
-                break;
-            default:
-                break;
+                    }
+
+                    transform.position += _newDeathDirection * _knockBack * Time.deltaTime;
+                    break;
+                case Mechanic.BOSS:
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
@@ -179,8 +205,17 @@ public class BasicGlhost : BaseEnemy {
         {
             _myAgent.SetDestination(transform.position);
         }
+        _myCollider.enabled = false;
         _mySpawner.RemoveMe(this);
 
-        Destroy(gameObject);
+        Dead();
+    }
+
+
+    void Dead()
+    {
+        dead = true;
+        _myAnimations.Play("Death");
+        Destroy(gameObject, 1f);
     }
 }
