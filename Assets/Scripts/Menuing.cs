@@ -78,7 +78,9 @@ public class Menuing : MonoBehaviour {
     private float fadeUpdateTime = .01f;
 
     //Video Settings
-    public Dropdown resolutions;
+    bool isFullscreen;
+    public Text currenResolution;
+    public Text currentWindow;
 
 
     // Use this for initialization
@@ -94,6 +96,8 @@ public class Menuing : MonoBehaviour {
 
             Destroy(gameObject);
         }
+
+
 
         _menus = new List<GameObject>();
         for (int i = 0; i < transform.childCount; i++)
@@ -116,7 +120,20 @@ public class Menuing : MonoBehaviour {
         _playerRef.SetWinImage = _menus[4].transform.GetChild(1).gameObject;
         _playerRef.SetLoseImage = _menus[4].transform.GetChild(2).gameObject;
 
+        if (Screen.fullScreen == true)
+        {
+            currentWindow.text = "Fullscreen";
+        }
+
+        if (Screen.fullScreen == false)
+        {
+            currentWindow.text = "Windowed";
+        }
+
+        currenResolution.text = Screen.width + " x " + Screen.height;
+
         SetMenu(0);
+
     }
 
     private void Update()
@@ -386,13 +403,99 @@ public class Menuing : MonoBehaviour {
 
 
     //video Settings
-    public void ChangeResolution(int width, int height, bool fullscreen)
+    private void ChangeResolution(int width, int height, bool fullscreen)
     {
         Screen.SetResolution(width, height, fullscreen);
         
     }
 
-    
+    public void ChangeWindow()
+    {
+        if(Screen.fullScreen == true)
+        {
+            Screen.fullScreen = false;
+            isFullscreen = false;
+            currentWindow.text = "Windowed";
+        }
+        else
+        {
+            Screen.fullScreen = true;
+            isFullscreen = true;
+            currentWindow.text = "FullScreen";
+
+        }
+    }
+
+    public void ChooseResolution()
+    {
+        SetMenu(8);
+
+    }
+
+    public void Resolution1920x1080 ()
+    {
+        ChangeResolution(1920, 1080, isFullscreen);
+        currenResolution.text = "1920 x 1080";
+        SetMenu(6);
+    }
+
+    public void Resolution1920x1200()
+    {
+        ChangeResolution(1920, 1200, isFullscreen);
+        currenResolution.text = "1920 x 1200";
+        SetMenu(6);
+    }
+
+    public void Resolution1600x900()
+    {
+        ChangeResolution(1600, 900, isFullscreen);
+        currenResolution.text = "1600 x 600";
+        SetMenu(6);
+    }
+
+    public void Resolution1440x900()
+    {
+        ChangeResolution(1440, 900, isFullscreen);
+        currenResolution.text = "1440 x 600";
+        SetMenu(6);
+    }
+
+    public void Resolution1366x768()
+    {
+        ChangeResolution(1366, 768, isFullscreen);
+        currenResolution.text = "1366 x 768";
+        SetMenu(6);
+    }
+
+    public void Resolution1280x1024()
+    {
+        ChangeResolution(1280, 1024, isFullscreen);
+        currenResolution.text = "1280 x 1024";
+        SetMenu(6);
+    }
+
+    public void Resolution1280x768()
+    {
+        ChangeResolution(1280, 768, isFullscreen);
+        currenResolution.text = "1280 x 768";
+        SetMenu(6);
+    }
+
+    public void Resolution1024x768()
+    {
+        ChangeResolution(1024, 768, isFullscreen);
+        currenResolution.text = "1024 x 768";
+        SetMenu(6);
+    }
+
+    public void Resolution800x600()
+    {
+        ChangeResolution(800, 600, isFullscreen);
+        currenResolution.text = "800 x 600";
+        SetMenu(6);
+    }
+
+
 
 
 

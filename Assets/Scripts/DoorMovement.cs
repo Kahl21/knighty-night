@@ -83,20 +83,21 @@ public class DoorMovement : MonoBehaviour {
     {
         if(isGate)
         {
-            if(leftDoor.transform.eulerAngles.y >= 0)
+            if(leftDoor.transform.eulerAngles.y < 180)
             {
                 leftDoor.transform.Rotate(Vector3.up * _doorSpeed);
+                rightDoor.transform.Rotate(Vector3.down * _doorSpeed);
             }
 
-            if (leftDoor.transform.eulerAngles.y >= 0)
+            /*if (leftDoor.transform.eulerAngles.y >= 0)
             {
-                rightDoor.transform.Rotate(Vector3.down * _doorSpeed);
+                
             }
 
             else
             {
                 rightDoor.transform.rotation = leftDoor.transform.rotation;
-            }
+            }*/
 
         }
 
