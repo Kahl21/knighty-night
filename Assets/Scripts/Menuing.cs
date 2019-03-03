@@ -83,6 +83,16 @@ public class Menuing : MonoBehaviour {
     public Text currentWindow;
 
 
+    //Audio Settings
+    GameObject _Audio;
+    AudioManager _audioManager;
+    public Text currentMaster;
+    public Text currentMusic;
+    public Text currentSFX;
+    public Text changedMaster;
+    public Text changedMusic;
+    public Text changedSFX;
+
     // Use this for initialization
     void Awake ()
     {
@@ -130,7 +140,10 @@ public class Menuing : MonoBehaviour {
             currentWindow.text = "Windowed";
         }
 
+        _Audio = GameObject.Find("AudioManager");
+        _audioManager = _Audio.GetComponent<AudioManager>();
         currenResolution.text = Screen.width + " x " + Screen.height;
+
 
         SetMenu(0);
 
@@ -148,6 +161,12 @@ public class Menuing : MonoBehaviour {
         {
             RollCredits();
         }
+        changedMaster.text = _audioManager.volMaster.ToString();
+        changedMusic.text = _audioManager.volMusic.ToString();
+        changedSFX.text = _audioManager.volSFX.ToString();
+        currentMaster.text = changedMaster.text;
+        currentMusic.text = changedMusic.text;
+        currentSFX.text = changedSFX.text;
     }
 
     public void SetMenu(int _whichMenu)
@@ -168,13 +187,13 @@ public class Menuing : MonoBehaviour {
 
     private void SetButtons(int _menuNum)
     {
-        if(_menuNum != 4)
+        if(_menuNum == 4 || _menuNum == 9 || _menuNum == 10 || _menuNum == 11)
         {
-            _playerRef.SetOrientation = MenuOrient.VERT;
+            _playerRef.SetOrientation = MenuOrient.HORIZ;
         }
         else
         {
-            _playerRef.SetOrientation = MenuOrient.HORIZ;
+            _playerRef.SetOrientation = MenuOrient.VERT;
         }
         currSelectableButtons = new List<Selectable>();
         for (int i = 0; i < _menus[_menuNum].transform.childCount; i++)
@@ -220,7 +239,6 @@ public class Menuing : MonoBehaviour {
     public void NextLevel()
     {
 
-        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
         if (isLoading == false)
         {
             _menus[5].SetActive(true);
@@ -246,7 +264,8 @@ public class Menuing : MonoBehaviour {
 
     public void RestartGame()
     {
-        SceneManager.LoadScene(1);
+        //SceneManager.LoadScene(1);
+        StartCoroutine(LoadSpecificScene(1));
         SetMenu(2);
         _playerRef.InMenu = false;
         Time.timeScale = 1;
@@ -257,7 +276,8 @@ public class Menuing : MonoBehaviour {
 
     public void BackToMainMenu()
     {
-        SceneManager.LoadScene(0);
+        //SceneManager.LoadScene(0);
+        StartCoroutine(LoadSpecificScene(0));
         Time.timeScale = 1;
         _paused = false;
 
@@ -288,6 +308,23 @@ public class Menuing : MonoBehaviour {
     {
         SetMenu(7);
     }
+
+    public void ToMaster()
+    {
+        SetMenu(9);
+    }
+
+    public void ToMusic()
+    {
+        SetMenu(10);
+    }
+
+    public void ToSFX()
+    {
+        SetMenu(11);
+    }
+
+
 
     public void MenuBack()
     {
@@ -503,34 +540,82 @@ public class Menuing : MonoBehaviour {
     //audio Settings
     public void MuteAll()
     {
-        AudioManager.instance.MasterVolume(0);
+        _audioManager.MasterVolume(0);
     }
 
     public void MuteSFX()
     {
-        AudioManager.instance.SFXVolume(0);
+        _audioManager.SFXVolume(0);
     }
 
     public void MuteMusic()
     {
-        AudioManager.instance.MusicVolume(0);
+        _audioManager.MusicVolume(0);
 
     }
 
-    public void ChangeMasterVolume(int vol)
+    private void ChangeMasterVolume(float vol)
     {
-        AudioManager.instance.MasterVolume(vol);
+        _audioManager.MasterVolume(vol);
     }
 
-    public void ChangeSFXVolume(int vol)
+    private void ChangeSFXVolume(float vol)
     {
-        AudioManager.instance.SFXVolume(vol);
+        _audioManager.SFXVolume(vol);
     }
 
-    public void ChangeMusicVolume(int vol)
+    private void ChangeMusicVolume(float vol)
     {
-        AudioManager.instance.MusicVolume(vol);
+        _audioManager.MusicVolume(vol);
 
+    }
+
+    public void MasterUp()
+    {
+        float currentVol = _audioManager.volMaster;
+        if (currentVol < 10)
+            ChangeMasterVolume(currentVol+1);
+        changedMaster.text = _audioManager.volMaster.ToString();
+    }
+
+    public void MasterDown()
+    {
+        float currentVol = _audioManager.volMaster;
+        if (currentVol > 0)
+            ChangeMasterVolume(currentVol-1);
+        changedMaster.text = _audioManager.volMaster.ToString();
+    }
+
+    public void MusicUp()
+    {
+        float currentVol = _audioManager.volMusic;
+        if (currentVol < 10)
+            ChangeMusicVolume(currentVol+1);
+        changedMusic.text = _audioManager.volMusic.ToString();
+    }
+
+    public void MusicDown()
+    {
+        float currentVol = _audioManager.volMusic;
+        if (currentVol > 0)
+            ChangeMusicVolume(currentVol-1);
+        changedMusic.text = _audioManager.volMusic.ToString();
+    }
+
+    public void SFXUp()
+    {
+        float currentVol = _audioManager.volSFX;
+        if (currentVol < 10)
+            ChangeSFXVolume(currentVol+1);
+        changedSFX.text = _audioManager.volSFX.ToString();
+    }
+
+    public void SFXDown()
+    {
+        float currentVol = _audioManager.volSFX;
+        if (currentVol > 0)
+            ChangeSFXVolume(currentVol-1);
+        changedSFX.text = _audioManager.volSFX.ToString();
     }
 
 
@@ -552,6 +637,31 @@ public class Menuing : MonoBehaviour {
 
         //yield return new WaitForSeconds(3f);
         while(time < fadeTime)
+        {
+            yield return new WaitForSeconds(fadeUpdateTime);
+
+            wantedColor = Color.Lerp(transparentColor, blackColor, time);
+            _fadeScreen.color = wantedColor;
+            time += fadeUpdateTime;
+        }
+        _loadScreen.color = fullColor;
+        yield return new WaitForSeconds(2f);
+        _loadScreen.color = transparentColor;
+        asyncLoad.allowSceneActivation = true;
+        isLoading = false;
+    }
+
+    IEnumerator LoadSpecificScene(int scene)
+    {
+        _fadeScreen.color = transparentColor;
+        float time = 0;
+        Color wantedColor = _fadeScreen.color;
+        isLoading = true;
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(scene);
+        asyncLoad.allowSceneActivation = false;
+
+        //yield return new WaitForSeconds(3f);
+        while (time < fadeTime)
         {
             yield return new WaitForSeconds(fadeUpdateTime);
 

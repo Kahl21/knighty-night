@@ -97,11 +97,11 @@ public class AudioManager : MonoBehaviour {
     AudioClip BGMCathedral;
 
     //master volume value
-    static float volMaster = 1;
+    public float volMaster = 10;
     //music volume value
-    static float volMusic = 1;
+    public float volMusic = 10;
     //sfx music volume
-    static float volSFX = 1;
+    public float volSFX = 10;
     //function that changes the music volume
     //function that changes the sfx volume
 
@@ -124,6 +124,18 @@ public class AudioManager : MonoBehaviour {
         }
 
         DontDestroyOnLoad(gameObject);
+    }
+
+    void Update()
+    {
+        if(volMaster<=volMusic)
+        {
+            volMusic = volMaster;
+        }
+        if(volMaster<=volSFX)
+        {
+            volSFX = volMaster;
+        }
     }
 
     //Volume Control
