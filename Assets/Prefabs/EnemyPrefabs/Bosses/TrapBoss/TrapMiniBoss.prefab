@@ -140,7 +140,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1357090406945198}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8, y: -0.4, z: 66.2}
+  m_LocalPosition: {x: -0.06540215, y: -2.3678578e-17, z: 28.199097}
   m_LocalScale: {x: 0.032052, y: 0.032052, z: 0.032052}
   m_Children:
   - {fileID: 4304972562732396}
@@ -325,45 +325,38 @@ MonoBehaviour:
   m_GameObject: {fileID: 1357090406945198}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a3d227135f795447a39da920ab26fe7, type: 3}
+  m_Script: {fileID: 11500000, guid: 9633a385e0367aa45b9b3533cc7fbeab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _bossName: 
   _bossSubTitle: 
-  _healthLagDuration: 1
-  _healthUpdateDuration: 1
-  _playerIntroPos: {fileID: 1122949136765908}
-  _cameraIntroDuration: 1
-  _deathDuration: 3
-  _maxBossHealth: 15
-  _bossDamage: 1
-  _bossDefaultSpeed: 2
-  _bossCollisionDetectDistance: 1
-  _InvincibleDuration: 1
-  _maxHardBossHealth: 20
-  _bossHardDefaultSpeed: 2.5
-  _timeBetweenAttacks: 1.5
-  _vertDetectOffset: 0.4
-  _startAngle: 45
-  _detectionAngle: 90
-  _maxDistanceOut: 2
-  _debug: 1
-  _detectDistance: 1.5
-  trapComplete: 0
-  _listOfTraps:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  _xAttackPercentage: 50
-  _quadFirePercentage: 50
-  _followDuration: 5
-  _quadTrapDamage: 0.5
-  _quadShootDist: 2
-  _quadDetectDist: 4
-  _quadFireStartDelay: 0.1
-  _quadBurnDuration: 1
+  _healthLagDuration: 0
+  _healthUpdateDuration: 0
+  _playerIntroPos: {fileID: 0}
+  _cameraIntroDuration: 0
+  _deathDuration: 0
+  _maxBossHealth: 0
+  _bossDamage: 0
+  _bossDefaultSpeed: 0
+  _bossCollisionDetectDistance: 0
+  _InvincibleDuration: 0
+  _maxHardBossHealth: 0
+  _bossHardDefaultSpeed: 0
+  _timeBetweenAttacks: 0
+  _vertDetectOffset: 0
+  _startAngle: 0
+  _detectionAngle: 0
+  _maxDistanceOut: 0
+  _debug: 0
+  _detectDistance: 0
+  _xAttackPercentage: 0
+  _quadFirePercentage: 0
+  _followDuration: 0
+  _quadTrapDamage: 0
+  _quadShootDist: 0
+  _quadDetectDist: 0
+  _quadFireStartDelay: 0
+  _quadBurnDuration: 0
   _hardTimeBetweenAttacks: 0
   _hardStunnedDuration: 0
   _hardXAttackPercentage: 0

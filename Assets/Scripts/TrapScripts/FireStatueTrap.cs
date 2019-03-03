@@ -25,7 +25,6 @@ public class FireStatueTrap : BaseTrap {
     float _fireIncDuration;
     [SerializeField]
     float _burningDuration;
-    [SerializeField]
     float _startDelay;
     float _currDelay;
 
@@ -68,7 +67,6 @@ public class FireStatueTrap : BaseTrap {
         {
             case FireState.NONE:
                 break;
- 
             case FireState.BEGINBURNING:
                 StartingDelay();
                 break;

@@ -733,7 +733,6 @@ public class SpinBossGlhost : BossEnemy
                 _endingPlaying = false;
 
                 //Debug.Log("dead");
-                _myRoom.EndAll();
                 gameObject.SetActive(false);
             }
         }
