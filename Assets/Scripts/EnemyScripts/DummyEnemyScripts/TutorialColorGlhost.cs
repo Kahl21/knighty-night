@@ -13,7 +13,7 @@ public class TutorialColorGlhost : BaseEnemy  {
         _mySpawner = _spawner;
         _spawnPoint = transform.position;
 
-        _myBody = transform.GetChild(2).gameObject;
+        _myBody = transform.GetChild(3).gameObject;
         _myRenderer = _myBody.GetComponent<SkinnedMeshRenderer>();
         _mySpookiness = _myRenderer.materials[1];
 

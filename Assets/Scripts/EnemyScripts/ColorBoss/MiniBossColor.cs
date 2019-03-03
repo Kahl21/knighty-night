@@ -909,4 +909,3 @@ public class MiniBossColor : BossEnemy
 
     public Color GetColor { get { return _myColor; } }
 }
-

@@ -39,7 +39,7 @@ public class ColorIntroGlhost : MonoBehaviour {
 
     public void Start()
     {
-        _myBody = transform.GetChild(2).gameObject;
+        _myBody = transform.GetChild(3).gameObject;
         _myRenderer = _myBody.GetComponent<SkinnedMeshRenderer>();
         _myMaterial = _myRenderer.materials[1];
         _myMaterial.color = _myColor;
