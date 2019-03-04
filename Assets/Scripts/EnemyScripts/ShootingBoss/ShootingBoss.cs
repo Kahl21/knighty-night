@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
+using System.Linq;
 
-public class ShootingMiniBoss : BossEnemy
+public class ShootingBoss : BossEnemy
 {
-    //Strategy Enum for the Spin Boss
+    //Strategy Enum for the Shooting Boss
     protected enum SHOOTERSTATES
     {
         STUNNED,
         ATTACKING,
+        ABSORB,
+        CHECKFORABSORB,
+        SHOOT,
         FOLLOWING
     }
     
@@ -37,6 +41,12 @@ public class ShootingMiniBoss : BossEnemy
     int _numOfCasts = 4;
     RaycastHit hitObj = new RaycastHit();
 
+    [Header("Base Spawned Enemies")]
+    [SerializeField]
+    float _damageToBoss;
+    [SerializeField]
+    float _damageToPlayer;
+
     [Header("Follow Player Varibales")]
     [SerializeField]
     float _followDuration;
@@ -48,16 +58,44 @@ public class ShootingMiniBoss : BossEnemy
     [SerializeField]
     float _hardTimeBetweenAttacks;
 
+    [Header("Color Attack Variables")]
+    
+
+    [Header("Special Attack Variables")]
+    [SerializeField]
+    float _absorbAttackPercentage;
+    [SerializeField]
+    float _normalAtttackPercentage;
+
+    [Header("Absorb Attack Variables")]
+    [SerializeField]
+    float _absorbSpeed;
+    [SerializeField]
+    float _rotateSpeed;
+    [SerializeField]
+    float _shootingFollowOffset;
+    [SerializeField]
+    float _shootRate;
+    [SerializeField]
+    float _rotationAngle = 0;
+    int _ghlostsShot = 0;
+    bool _invinciblesAddad = false;
+    [SerializeField]
+    List<GameObject> _absorbingGhlosts;
+    [SerializeField]
+    List<GameObject> _absorbedGhlosts;
+    //[SerializeField]
+    //float _normalAtttackPercentage;
+
     Vector3 _ogCamPos;
     bool _cameraInPosition;
     float _startTimer;
     float _currentTime;
-    GhlostShooter _attachedShooter;
+    GhlostBossShooter _attachedShooter;
     [HideInInspector]
+    public bool _attackInProgress = false;
     float _startAttackTime;
     float _currAttackTime;
-
-    
 
     SHOOTERSTATES _MyState = SHOOTERSTATES.FOLLOWING;
 
@@ -65,99 +103,6 @@ public class ShootingMiniBoss : BossEnemy
     
     protected override void PlayIntro()
     {
-        /*
-        if (!_cameraInPosition)
-        {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            if (_currAttackTime >= 1)
-            {
-                _currAttackTime = 1;
-                if (!_glhostsCrushed)
-                {
-                    for (int i = 0; i < _GlhostsUnderMe.Count; i++)
-                    {
-                        _GlhostsUnderMe[i].Init();
-                    }
-                    _glhostsCrushed = true;
-                }
-            }
-
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
-        }
-        else if (!_fallFinished)
-        {
-            _currAttackTime = (Time.time - _startAttackTime) / _introFallAndStopDuration;
-
-            if (_currAttackTime >= 1)
-            {
-                _currAttackTime = 1;
-
-                if (_enemiesToCrush.activeInHierarchy)
-                {
-                    for (int i = 0; i < _GlhostsUnderMe.Count; i++)
-                    {
-                        _GlhostsUnderMe[i].ParentYouself();
-                    }
-                    _enemiesToCrush.SetActive(false);
-                }
-
-                _startAttackTime = Time.time;
-                _fallFinished = true;
-            }
-
-            Vector3 fall = Vector3.down * Time.deltaTime * _introFallSpeed;
-            if (Physics.Raycast(transform.position, fall, _downCheckDistance))
-            {
-
-                fall = Vector3.zero;
-            }
-
-            transform.position += fall;
-        }
-        else if (!_turnToPlayerFinished)
-        {
-            _currAttackTime = (Time.time - _startAttackTime) / _introTurnAroundDuration;
-
-            transform.Rotate(Vector3.up, _introTurnAroundSpeed);
-
-            if (_currAttackTime >= 1)
-            {
-                _currAttackTime = 1;
-
-                cam0 = _cameraRef.transform.position;
-                cam1 = _ogCamPos;
-
-                _startAttackTime = Time.time;
-                transform.LookAt(_playerRef.transform.position);
-                _turnToPlayerFinished = true;
-            }
-
-
-        }
-        else
-        {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
-
-            if (_currAttackTime >= 1)
-            {
-                _currAttackTime = 1;
-                _startAttackTime = Time.time;
-                _playerRef.AmInCutscene = false;
-                StartFight();
-            }
-        }
-        */
         _playerRef.AmInCutscene = false;
         _cameraInPosition = true;
         StartFight();
@@ -189,7 +134,7 @@ public class ShootingMiniBoss : BossEnemy
         if (!_hasInit)
         {
             base.Init();
-            _attachedShooter = gameObject.GetComponent<GhlostShooter>();
+            _attachedShooter = gameObject.GetComponent<GhlostBossShooter>();
 
             if (!_managerRef.HardModeOn)
             {
@@ -227,8 +172,8 @@ public class ShootingMiniBoss : BossEnemy
             _enemyAgent.enabled = true;
             _cameraRef.AmFollowingPlayer = true;
             _calcAngle = _startAngle;
-
-            
+            _absorbingGhlosts = new List<GameObject>();
+            _absorbedGhlosts = new List<GameObject>();
         }
         _myAI = BossAI.FIGHTING;
         _init = true;
@@ -264,7 +209,19 @@ public class ShootingMiniBoss : BossEnemy
                         case SHOOTERSTATES.STUNNED:
                             Stunned();
                             break;
-                            
+
+                        case SHOOTERSTATES.ABSORB:
+                            AbsorbAtk();
+                            break;
+
+                        case SHOOTERSTATES.CHECKFORABSORB:
+                            CheckForCanAbsorb();
+                            break;
+
+                        case SHOOTERSTATES.SHOOT:
+                            ShootAtPlayer();
+                            break;
+
                         default:
                             //Debug.Log("No Attack Set");
                             break;
@@ -283,7 +240,7 @@ public class ShootingMiniBoss : BossEnemy
     {
         if (_attachedShooter.attackInProgress != true)
         {
-            _MyState = SHOOTERSTATES.STUNNED;
+            _MyState = SHOOTERSTATES.CHECKFORABSORB;
             _startTimer = Time.time;
         }
     }
@@ -298,6 +255,100 @@ public class ShootingMiniBoss : BossEnemy
         }
     }
 
+    private void CheckForCanAbsorb()
+    {
+        for (int ghlost = 0; ghlost < _attachedShooter.GetGhlostsInScene.Count; ghlost++)
+        {
+            if (_attachedShooter.GetGhlostsInScene[ghlost].GetComponent<DumbBossGlhost>().GetSpeed != 0)
+            {
+                return;
+            }
+        }
+        _invinciblesAddad = false;
+        _MyState = SHOOTERSTATES.ABSORB;
+    }
+
+    private void AbsorbAtk()
+    {
+        _rotationAngle += 1 * _rotateSpeed * Time.deltaTime;
+        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y+ _rotationAngle, 0);
+        if (_invinciblesAddad == false)
+        {
+            for (int index = 0; index < _attachedShooter.GetGhlostsInScene.Count; index++)
+            {
+                if (_attachedShooter.GetGhlostsInScene[index].GetComponent<DumbBossGlhost>().GetMyMechanic == Mechanic.CHASE)
+                {
+                    DumbBossGlhost ghlostRef = _attachedShooter.GetGhlostsInScene[index].GetComponent<DumbBossGlhost>();
+                    ghlostRef.GetSpeed = _absorbSpeed;
+                    ghlostRef.setMove(transform.eulerAngles);
+                    _absorbingGhlosts.Add(_attachedShooter.GetGhlostsInScene[index]);
+                }
+            }
+            /*
+            Debug.DrawRay(transform.position + (Vector3.up * 1f), (transform.forward * 100f), Color.green);
+            if (Physics.Raycast(transform.position + (Vector3.up * 1f), transform.forward, out hit, 100f))
+            {
+                
+                //transform.eulerAngles += new Vector3(0, angle, 0);
+                if (hit.collider.GetComponent<DumbBossGlhost>())
+                {
+                    if (hit.collider.GetComponent<DumbBossGlhost>().GetMyMechanic == Mechanic.CHASE)
+                    {
+                        for (int i = 0; i < _absorbingGhlo`sts.Count; i++)
+                        {
+                            if (hit.collider.gameObject == _absorbingGhlosts[i])
+                            {
+                                return;
+                            }
+                        }
+                        DumbBossGlhost ghlostRef = hit.collider.GetComponent<DumbBossGlhost>();
+                        ghlostRef.GetSpeed = _absorbSpeed;
+                        ghlostRef.setMove(transform.eulerAngles);
+                        _absorbingGhlosts.Add(ghlostRef.gameObject);
+                    }
+                }
+
+            }
+            */
+            _invinciblesAddad = true;
+        }
+        else if(_absorbingGhlosts.Count != _absorbedGhlosts.Count)
+        {
+            _rotationAngle += 1 + _rotateSpeed * Time.deltaTime;
+            transform.eulerAngles = new Vector3(0, _rotationAngle, 0);
+        }
+        else if (_absorbingGhlosts.Count == _absorbedGhlosts.Count)
+        {
+            _ghlostsShot = 0;
+            _MyState = SHOOTERSTATES.SHOOT;
+            _startTimer = Time.time;
+        }
+    }
+
+    private void ShootAtPlayer()
+    {
+        if (_ghlostsShot < _absorbedGhlosts.Count)
+        {
+            float timeTaken = Time.time - _startTimer;
+            gameObject.transform.LookAt(_playerRef.transform);
+
+            //Spawns a new glhost based on the spawnrate
+            if (timeTaken >= _shootRate * _ghlostsShot)
+            {
+                DumbBossGlhost ghlostRef = _absorbedGhlosts[_ghlostsShot].GetComponent<DumbBossGlhost>();
+                ghlostRef.gameObject.SetActive(true);
+                ghlostRef.setMove(_playerRef.transform.position);
+                _ghlostsShot++;
+            }
+            Debug.Log("Shooting Ghlosts");
+        }
+        else
+        {
+            _MyState = SHOOTERSTATES.STUNNED;
+        }
+        
+    }
+
     private void FollowPlayer()
     {
         _enemyAgent.SetDestination(_playerRef.transform.position);
@@ -310,6 +361,7 @@ public class ShootingMiniBoss : BossEnemy
             _enemyAgent.SetDestination(transform.position);
 
             _attachedShooter.newAttack = true;
+            _attachedShooter.attackInProgress = true;
             _MyState = SHOOTERSTATES.ATTACKING;
         }
 
@@ -374,13 +426,33 @@ public class ShootingMiniBoss : BossEnemy
         }
     }
 
+    public void HitByGhlost(GameObject objectHitting, float _damageHit)
+    {
+        if (objectHitting.GetComponent<DumbBossGlhost>() && (_MyState == SHOOTERSTATES.ABSORB))
+        {
+            _absorbedGhlosts.Add(objectHitting);
+            objectHitting.SetActive(false);
+        }
+        else if (objectHitting.GetComponent<DumbBossGlhost>())
+        {
+            base.GotHit(_damageHit);
+
+            if (_currBossHealth <= 0)
+            {
+                _bossBar.SetActive(false);
+
+                Die();
+            }
+        }
+    }
+
     //called once the boss is defeated
     protected override void Die()
     {
         _myRoom.CheckForEnd();
 
         _enemyAgent.enabled = false;
-
+        _attachedShooter.enabled = false;
         _playerRef.GoingToOutroCutscene();
 
         _ogCamPos = _cameraRef.transform.position;
@@ -483,7 +555,7 @@ public class ShootingMiniBoss : BossEnemy
             _myRenderer.materials[1] = _myMaterial;
 
             _enemyAgent.enabled = false;
-            //Debug.Log("Boss Reset");
+            Debug.Log("Boss Reset");
             transform.position = _startPos;
             transform.rotation = _startRot;
             /*
@@ -515,4 +587,9 @@ public class ShootingMiniBoss : BossEnemy
             _init = false;
         }
     }
+
+    public float GetDamageToBoss { get { return _damageToBoss; } }
+    public float GetDamageToPlayer { get { return _damageToPlayer; } }
+    public PlayerController GetPlayerRef { get { return _playerRef; } }
+    //public bool GetIfSpecialGhlosts { get { return _specialGhlosts; } }
 }

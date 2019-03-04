@@ -168,4 +168,5 @@ public class ColorMinion : BasicGlhost {
     }
 
     public Vector3 GetStartDirection { get { return _spawnDir; } set { _spawnDir = value; } }
+    public float GetMaxSpawnDistance { get { return _maxSpawnDistance; } set { _maxSpawnDistance = value; } }
 }
