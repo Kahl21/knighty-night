@@ -12,12 +12,17 @@ public class BaseTrap : MonoBehaviour {
 
     protected PlayerController _playerRef;
 
+    protected Menuing _menuRef;
+
+    protected bool _init = false;
+
     //start Function
     //checks if the trap is independent of a room
     //calls Init based on whether or not independent
     protected virtual void Start()
     {
-        if(_independentTrap)
+        _menuRef = Menuing.Instance;
+        if (_independentTrap)
         {
             Init();
         }

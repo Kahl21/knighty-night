@@ -55,7 +55,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4818580349054080}
-  - component: {fileID: 114200288888948272}
+  - component: {fileID: 114347279700671276}
   m_Layer: 0
   m_Name: DoubleGate
   m_TagString: Untagged
@@ -444,7 +444,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.7913585, y: 4.259515, z: 0.5513065}
   m_Center: {x: -0.82277477, y: 0.6844505, z: 0.19257617}
---- !u!114 &114200288888948272
+--- !u!114 &114347279700671276
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -452,10 +452,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1387904007907072}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9fc9e89431f5c6c49b98bc841975c8d7, type: 3}
+  m_Script: {fileID: 11500000, guid: 982b4c4b99d350141a9c9889ef5adee0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _doorSpeed: 3
-  _raycastDist: 1
-  _fadeInc: 1
-  isGate: 1
+  _doorSpeed: 4
+  _raycastDist: 0
+  _fadeInc: 0
+  _doorMoveDuration: 0.3

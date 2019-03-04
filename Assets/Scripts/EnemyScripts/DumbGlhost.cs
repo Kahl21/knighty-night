@@ -17,8 +17,10 @@ public class DumbGlhost : BaseEnemy
     [SerializeField]
     GhlostShooter _shooterRef;
 
+
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
+        _myAgent.enabled = false;
         _mySpawner = _spawner;
         _myMechanic = _incomingMech;
         _menuRef = Menuing.Instance;
@@ -49,6 +51,7 @@ public class DumbGlhost : BaseEnemy
         }
         else
         {
+            CheckForHit();
             Die();
         }       
 	}
@@ -69,7 +72,7 @@ public class DumbGlhost : BaseEnemy
             GameObject thingHit = hit.collider.gameObject;
             if (thingHit.GetComponent<PlayerController>())
             {
-                thingHit.GetComponent<PlayerController>().TakeDamage(_glhostDamage);
+                thingHit.GetComponent<PlayerController>().TakeDamage(_DamageToPlayer);
             }
             else
             {
@@ -134,7 +137,7 @@ public class DumbGlhost : BaseEnemy
     public override void Stop()
     {
         _canMove = false;
-        if(!_dead && _myAgent.enabled)
+        if(!_dead)
         {
             _myAgent.SetDestination(transform.position);
         }

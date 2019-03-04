@@ -469,4 +469,5 @@ public class DungeonMechanic : MonoBehaviour {
     public Mechanic GetMechanic { get { return _roomMechanic; } }
     public List<DoorMovement> GetDoors { get { return _doors; } }
     public List<BaseEnemy> GetCurrEnemyList { get { return _enemyList; } }
+    public List<BaseTrap> GetCurrTrapList { get { return _trapsInRoom; } }
 }
