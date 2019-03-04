@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 public class BasicGlhost : BaseEnemy
 {
-
+    protected Collider _myCollider;
 
     private void Start()
     {
@@ -108,7 +108,7 @@ public class BasicGlhost : BaseEnemy
     protected override void Die()
     {
         //Debug.DrawLine(transform.position, transform.position + _deathDirection*_collisionCheckDist);
-        if (dead == false)
+        if (_actualDead == false)
         {
             switch (_myMechanic)
             {
@@ -215,7 +215,7 @@ public class BasicGlhost : BaseEnemy
 
     void Dead()
     {
-        dead = true;
+        _actualDead = true;
         _myAnimations.Play("Death");
         Destroy(gameObject, 1f);
     }

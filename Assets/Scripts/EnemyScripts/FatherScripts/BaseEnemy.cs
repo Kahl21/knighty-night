@@ -18,6 +18,7 @@ public class BaseEnemy : MonoBehaviour {
     protected float _currTime;
     protected float _startTime;
     protected bool _dead = false;
+    protected bool _actualDead = false;
     protected bool _hit = false;
     protected bool _canMove = true;
     protected Vector3 _deathDirection;
@@ -50,8 +51,8 @@ public class BaseEnemy : MonoBehaviour {
     [SerializeField]
     protected Mechanic _myMechanic;
 
-	// Use this for initialization
-	public virtual void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
+    // Use this for initialization
+    public virtual void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
         _myAgent = GetComponent<NavMeshAgent>();
         _mySpawner = _spawner;
