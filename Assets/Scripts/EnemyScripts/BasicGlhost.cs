@@ -7,11 +7,14 @@ public class BasicGlhost : BaseEnemy
 {
     protected Collider _myCollider;
 
-    private void Start()
+    public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
+        base.Init(_spawner, _incomingMech);
         _myCollider = GetComponent<Collider>();
         if (_canMove)
-            _myAnimations.Play("Moving");
+        {
+            _myAnimations.Play("Movement");
+        }
     }
 
     // Update is called once per frame
@@ -27,10 +30,6 @@ public class BasicGlhost : BaseEnemy
                     Move();
                     CheckForHit();
                 }
-                else
-                {
-                    _myAnimations.Play("Nothing");
-                }
             }
             else
             {
@@ -44,7 +43,11 @@ public class BasicGlhost : BaseEnemy
     {
         if (Vector3.Distance(transform.position, _target.transform.position) <= _damageRange)
         {
-            //_myAnimations.Play("Moving");
+            if(_myAnimations.IsInTransition(0))
+            {
+                _myAnimations.Play("Attack");
+            }
+            
             //this is where you match the animation speed with the ghost speed
             //_myAnimations.speed = 10;
             _myAgent.SetDestination(transform.position);
@@ -52,7 +55,10 @@ public class BasicGlhost : BaseEnemy
         else
         {
             //animation breaker
-            //_myAnimations.Play("Moving");
+            if (_myAnimations.IsInTransition(0))
+            {
+                _myAnimations.Play("Movement");
+            }
             _myAgent.SetDestination(_target.transform.position);
         }
 
@@ -91,7 +97,7 @@ public class BasicGlhost : BaseEnemy
     {
         if (!_hit)
         {
-            _myAnimations.Play("Dazed");
+            _myAnimations.Play("Dazed_Start");
             _hit = true;
             _myAgent.enabled = false;
             _knockBack = _knockBackForce;
@@ -107,6 +113,11 @@ public class BasicGlhost : BaseEnemy
     //depending on what kind of room the ghost is in
     protected override void Die()
     {
+        if(!_actualDead)
+        {
+            _myAnimations.Play("Dazed_Loop");
+        }
+
         //Debug.DrawLine(transform.position, transform.position + _deathDirection*_collisionCheckDist);
         if (_actualDead == false)
         {
@@ -210,13 +221,5 @@ public class BasicGlhost : BaseEnemy
         _mySpawner.RemoveMe(this);
 
         Dead();
-    }
-
-
-    void Dead()
-    {
-        _actualDead = true;
-        _myAnimations.Play("Death");
-        Destroy(gameObject, 1f);
     }
 }

@@ -48,7 +48,6 @@ public class BaseEnemy : MonoBehaviour {
     protected Menuing _menuRef;
     protected PlayerController _target;
     protected DungeonMechanic _mySpawner;
-    [SerializeField]
     protected Mechanic _myMechanic;
 
     // Use this for initialization
@@ -73,7 +72,7 @@ public class BaseEnemy : MonoBehaviour {
         _myRenderer.materials[1] = _mySpookiness;
 
         _myAnimations = GetComponent<Animator>();
-        _myAnimations.Play("Moving", 0);
+        _myAnimations.Play("Movement", 0);
     }
 
     // Update is called once per frame
@@ -164,6 +163,13 @@ public class BaseEnemy : MonoBehaviour {
         _mySpawner.RemoveMe(this);
 
         Destroy(gameObject);
+    }
+
+    protected virtual void Dead()
+    {
+        _actualDead = true;
+        _myAnimations.Play("Death");
+        Destroy(gameObject, 1f);
     }
 
     //various Getters and Setters

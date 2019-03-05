@@ -219,7 +219,8 @@ public class TrapBossGlhost : BossEnemy
                     {
                         _GlhostsUnderMe[i].ParentYouself();
                     }
-                    _enemiesToCrush.SetActive(false);
+                    _enemiesToCrush.
+                    (false);
                 }
 
                 _startAttackTime = Time.time;
@@ -782,7 +783,6 @@ public class TrapBossGlhost : BossEnemy
                 _endingPlaying = false;
 
                 //Debug.Log("dead");
-                _myRoom.EndAll();
                 gameObject.SetActive(false);
             }
         }

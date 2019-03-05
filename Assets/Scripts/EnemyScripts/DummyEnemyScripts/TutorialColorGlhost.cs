@@ -13,7 +13,7 @@ public class TutorialColorGlhost : BaseEnemy  {
         _mySpawner = _spawner;
         _spawnPoint = transform.position;
 
-        _myBody = transform.GetChild(3).gameObject;
+        _myBody = transform.GetChild(2).gameObject;
         _myRenderer = _myBody.GetComponent<SkinnedMeshRenderer>();
         _mySpookiness = _myRenderer.materials[1];
 
@@ -34,7 +34,7 @@ public class TutorialColorGlhost : BaseEnemy  {
     {
         if (!_hit)
         {
-            Debug.Log("dead");
+            Debug.Log("Dazed_Start");
             _hit = true;
             _myAgent.enabled = false;
             _knockBack = _knockBackForce;
@@ -47,6 +47,11 @@ public class TutorialColorGlhost : BaseEnemy  {
 
     protected override void Die()
     {
+        if(_actualDead)
+        {
+            _myAnimations.Play("Dazed_Loop");
+        }
+
         if (Physics.Raycast(transform.position + Vector3.up, _deathDirection, out hit, _collisionCheckDist))
         {
             if (hit.collider.GetComponent<ColoredBlock>())
@@ -56,7 +61,7 @@ public class TutorialColorGlhost : BaseEnemy  {
                 {
                     other.CorrectMatch();
                     _mySpawner.RemoveMe(this);
-                    Destroy(gameObject);
+                    Dead();
                 }
                 else
                 {
@@ -74,6 +79,7 @@ public class TutorialColorGlhost : BaseEnemy  {
                 transform.position = _spawnPoint;
             }
         }
+
         transform.position += _deathDirection * _knockBack * Time.deltaTime;
     }
 

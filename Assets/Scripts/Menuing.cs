@@ -279,18 +279,6 @@ public class Menuing : MonoBehaviour {
         _managerRef.ResetGame();
     }
 
-    public void RestartGame()
-    {
-        //SceneManager.LoadScene(1);
-        StartCoroutine(LoadSpecificScene(1));
-        SetMenu(WhichUIMenu.PLAYER);
-        _playerRef.InMenu = false;
-        Time.timeScale = 1;
-        _paused = false;
-        _managerRef.SetGameReset = _playerRef.ResetPlayer;
-        _managerRef.ResetGame();
-    }
-
     public void BackToMainMenu()
     {
         //SceneManager.LoadScene(0);

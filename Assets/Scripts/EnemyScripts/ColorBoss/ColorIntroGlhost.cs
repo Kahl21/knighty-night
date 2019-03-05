@@ -33,13 +33,15 @@ public class ColorIntroGlhost : MonoBehaviour {
     GameObject _myBody;
     SkinnedMeshRenderer _myRenderer;
     Material _myMaterial;
-    CapsuleCollider _myCollider;
+    CapsuleCollider _myCapCollider;
+    Animator _myAnimations;
 
     BossEnemy _myBoss;
 
     public void Start()
     {
-        _myBody = transform.GetChild(3).gameObject;
+        _myAnimations = GetComponent<Animator>();
+        _myBody = transform.GetChild(2).gameObject;
         _myRenderer = _myBody.GetComponent<SkinnedMeshRenderer>();
         _myMaterial = _myRenderer.materials[1];
         _myMaterial.color = _myColor;
@@ -49,7 +51,7 @@ public class ColorIntroGlhost : MonoBehaviour {
     {
         _parentOBJ = transform.parent.gameObject;
         _myBoss = _parentOBJ.GetComponentInParent<BossEnemy>();
-        _myCollider = GetComponent<CapsuleCollider>();
+        _myCapCollider = GetComponent<CapsuleCollider>();
 
         transform.parent = null;
         _startPos = transform.position;
@@ -107,6 +109,7 @@ public class ColorIntroGlhost : MonoBehaviour {
 
             _hopping = false;
             _walking = true;
+            _myAnimations.Play("Movement", 0);
         }
 
         Vector3 c01, c12, c012;
@@ -126,10 +129,10 @@ public class ColorIntroGlhost : MonoBehaviour {
 
     public Color GotEaten()
     {
-        _walking = false;
         _amEaten = true;
-
-        _myCollider.enabled = false;
+        _walking = false;
+        
+        _myCapCollider.enabled = false;
         gameObject.SetActive(false);
 
         return _myColor;
@@ -142,7 +145,7 @@ public class ColorIntroGlhost : MonoBehaviour {
 
     public void ResetCutscene()
     {
-        _myCollider.enabled = true;
+        _myCapCollider.enabled = true;
         gameObject.SetActive(true);
 
         transform.parent = _parentOBJ.transform;

@@ -207,8 +207,7 @@ public class PlayerController : MonoBehaviour
         _currSpecialAmount = 0;
         _specialBar.GetComponent<Image>().fillAmount = _currSpecialAmount / _MaxSpecialAmount;
 
-
-        disableRooms();
+        
         _currPlayerSpeed = _playerSpeed;
         StopAllCoroutines();
         _doingSomething = false;
@@ -221,10 +220,15 @@ public class PlayerController : MonoBehaviour
         _bossCutsceneInit = false;
         _myRenderer.SetActive(true);
 
-        if (reachCheckpoint == true)                        //if the player has reached a checkpoint
+        if (reachCheckpoint == true)        //if the player has reached a checkpoint
+        {
             transform.position = checkpointPos;             //spawn player at checkpoint
+            //disableRooms();
+        }
         else
-            transform.position = _playerStartPos;           //else spawn player at players start position
+        {
+            transform.position = _playerStartPos;  //else spawn player at players start position
+        }
         _whatImDoing = Interactions.NONE;
         _myAnimations.Play("StandingIdle", 0);
     }
@@ -710,7 +714,7 @@ public class PlayerController : MonoBehaviour
                         {
                             if (!thingHit.GetComponent<BossEnemy>().AmHit && !thingHit.GetComponent<BossEnemy>().AmInvincible)
                             {
-                                if (thingHit.GetComponent<ColorBossGlhost>())
+                                if (thingHit.GetComponent<ColorBossGlhost>() || thingHit.GetComponent<MiniBossColor>())
                                 {
                                     thingHit.GetComponent<BossEnemy>().GotHit(_playerDamage / _playerDamageDivideOffsetForSpecialBosses);
 

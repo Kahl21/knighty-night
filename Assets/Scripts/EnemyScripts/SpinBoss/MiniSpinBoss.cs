@@ -225,9 +225,9 @@ public class MiniSpinBoss : BossEnemy
         {
             _startPos = transform.position;
             _startRot = transform.rotation;
-            _myBody = transform.GetChild(4).gameObject;
+            _myBody = transform.GetChild(2).gameObject;
             _mySkinRenderer = _myBody.GetComponent<SkinnedMeshRenderer>();
-            _myMaterial = _mySkinRenderer.materials[0];
+            _myMaterial = _mySkinRenderer.materials[1];
             _myColor = _myMaterial.color;
             _menuRef = Menuing.Instance;
             _playerRef = PlayerController.Instance;
@@ -629,7 +629,6 @@ public class MiniSpinBoss : BossEnemy
                 _endingPlaying = false;
 
                 //Debug.Log("dead");
-                _myRoom.EndAll();
                 gameObject.SetActive(false);
             }
         }

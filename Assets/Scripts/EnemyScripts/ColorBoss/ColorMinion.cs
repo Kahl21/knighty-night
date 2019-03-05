@@ -22,7 +22,7 @@ public class ColorMinion : BasicGlhost {
     protected Vector3 c0, c1;
     protected Vector3 _spawnDir;
     protected ColorBossGlhost _myBoss;
-    protected CapsuleCollider _myCollider;
+    protected CapsuleCollider _myCapCollider;
 
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
@@ -32,7 +32,7 @@ public class ColorMinion : BasicGlhost {
         _mySpookiness.color = _myColor;
         _mySpookiness = _myRenderer.materials[1];
 
-        _myCollider = GetComponent<CapsuleCollider>();
+        _myCapCollider = GetComponent<CapsuleCollider>();
         _mySpawner.AddEnemy(this);
         _myAnimations.Play("Nothing", 0);
         _goingToBoss = false;
@@ -110,7 +110,7 @@ public class ColorMinion : BasicGlhost {
     {
         c0 = transform.position;
         c1 = _mySpawner.GetBigBoy.transform.position;
-        _myCollider.enabled = false;
+        _myCapCollider.enabled = false;
 
         _startBackToBossTime = Time.time;
         _dead = false;
@@ -168,5 +168,4 @@ public class ColorMinion : BasicGlhost {
     }
 
     public Vector3 GetStartDirection { get { return _spawnDir; } set { _spawnDir = value; } }
-    public float GetMaxSpawnDistance { get { return _maxSpawnDistance; } set { _maxSpawnDistance = value; } }
 }

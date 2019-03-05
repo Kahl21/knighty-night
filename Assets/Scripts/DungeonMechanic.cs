@@ -288,7 +288,7 @@ public class DungeonMechanic : MonoBehaviour {
         {
             newEnemy.GetComponent<BaseEnemy>().SetColor = _coloredBlocks[listNum].GetColor;
             newEnemy.GetComponent<BaseEnemy>().SetPillar = _coloredBlocks[listNum].gameObject;
-            newEnemy.transform.GetChild(0).GetComponent<Light>().color = _coloredBlocks[listNum].GetColor;
+            newEnemy.transform.GetChild(4).GetComponent<Light>().color = _coloredBlocks[listNum].GetColor;
         }
         newEnemy.GetComponent<BaseEnemy>().Init(this, _roomMechanic);
         _enemyList.Add(newEnemy.GetComponent<BaseEnemy>());
