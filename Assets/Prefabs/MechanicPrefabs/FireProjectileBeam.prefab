@@ -79,20 +79,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 1694971175289670}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 906f264b30165854c9763f2c36bd9880, type: 3}
+  m_Script: {fileID: 11500000, guid: 087ac5ba522cd3442ab89914f762d103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _trapDamage: 0.5
   _independentTrap: 1
   _beginningDelay: 1
   _fireDelay: 1
-  _fireIncDuration: 0.5
+  _fireIncDuration: 1
   _burningDuration: 1.5
-  _startDelay: 0
+  _fireDistance: 2
   _debugDamageArea: 1
-  _spaceBetweenRays: 0.5
+  _spaceBetweenRays: 0.3
   _maxDetectDistance: 4
-  _mySmoke: {fileID: 0}
 --- !u!198 &198481907579298494
 ParticleSystem:
   m_ObjectHideFlags: 1

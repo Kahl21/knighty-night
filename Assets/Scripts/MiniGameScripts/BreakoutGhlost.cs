@@ -58,7 +58,7 @@ public class BreakoutGhlost : BaseEnemy {
             GameObject thingHit = hit.collider.gameObject;
 
             //Debug.Log("reflected");
-            if(thingHit.GetComponent<ColoredBlock>())
+            if(thingHit.GetComponent<BreakoutBlock>())
             {
                 _moveDir = Vector3.Reflect(checkDir, hit.normal);
                 _hit = false;

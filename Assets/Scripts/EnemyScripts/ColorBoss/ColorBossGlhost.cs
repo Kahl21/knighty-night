@@ -289,9 +289,10 @@ public class ColorBossGlhost : BossEnemy {
         {
             if (!_introGlhostList[i].AmEaten)
             {
-                //Debug.Log("returned");
+                Debug.Log("not Eaten");
                 return false;
             }
+            Debug.Log("Am Eaten");
         }
         return true;
     }

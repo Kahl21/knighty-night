@@ -40,7 +40,7 @@ public class SpikeTrap : BaseTrap {
     protected float BoxRadius;
 
     protected GameObject _spikes;
-    protected Vector3 _spikeStartPos;
+    protected Vector3 _startPos;
     protected Vector3 _currBound;
 
     protected Vector3 _scanStartPos;
@@ -54,7 +54,7 @@ public class SpikeTrap : BaseTrap {
     {
         base.Init();
         _spikes = transform.GetChild(0).gameObject;
-        _spikeStartPos = _spikes.transform.localPosition;
+        _startPos = _spikes.transform.localPosition;
         _scanStartPos = transform.position;
         
         _topLeftCorner = _scanStartPos + ((Vector3.forward + Vector3.left) * BoxRadius);
@@ -173,7 +173,7 @@ public class SpikeTrap : BaseTrap {
         {
             _currTime = 1;
 
-            _currBound = _spikeStartPos;
+            _currBound = _startPos;
             myState = SpikeState.RETREAT;
         }
     }
@@ -187,7 +187,7 @@ public class SpikeTrap : BaseTrap {
         }
         else
         {
-            _spikes.transform.localPosition = _spikeStartPos;
+            _spikes.transform.localPosition = _startPos;
 
             myState = SpikeState.NONE;
         }
@@ -203,7 +203,7 @@ public class SpikeTrap : BaseTrap {
         }
         else
         {
-            _spikes.transform.localPosition = _spikeStartPos;
+            _spikes.transform.localPosition = _startPos;
 
             myState = SpikeState.ROOMDONE;
         }
@@ -226,7 +226,7 @@ public class SpikeTrap : BaseTrap {
     //reset function
     public override void ResetTrap()
     {
-        _spikes.transform.localPosition = _spikeStartPos;
+        _spikes.transform.localPosition = _startPos;
         myState = SpikeState.NONE;
     }
 }

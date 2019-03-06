@@ -78,12 +78,12 @@ public class CathedralGlhost : BasicGlhost {
 
     protected virtual void FireProjectile()
     {
-        _currProjSpawn = (Time.time - _startProjSpawn) / _projectileSpawnWaitTime;
+        _currProjSpawn = (Time.time - _startTime) / _projectileSpawnWaitTime;
 
         if(_currProjSpawn >=1)
         {
             _currProjSpawn = 0;
-            _startProjSpawn = Time.time;
+            _startTime = Time.time;
             Vector3 _spawnPos = transform.position + (transform.forward * _projectileSpawnOffset) + Vector3.up;
             GameObject _newProj = Instantiate<GameObject>(_projectilePF, _spawnPos, transform.rotation, null);
             _newProj.GetComponent<CathedralProjectile>().Init(gameObject);

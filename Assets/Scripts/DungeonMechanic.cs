@@ -10,7 +10,8 @@ public enum Mechanic
     COLOR,
     TRAP,
     BOSS,
-    HEAL
+    HEAL,
+    BREAKOUT
 }
 
 public class DungeonMechanic : MonoBehaviour {
@@ -75,8 +76,18 @@ public class DungeonMechanic : MonoBehaviour {
     [SerializeField]
     GameObject _healObject;
 
+    [Header("If Breakout Room")]
+    [SerializeField]
+    GameObject _puckSpawnPoint;
+    BreakoutManager _breakRef;
+
     GameManager _managerRef;
     BoxCollider _myCollider;
+
+    [Header("Number Of The Next Checkpoint")]
+    public float nextCheckpoint;
+
+    //If Breakout Room
 
     private void Awake()
     {
@@ -147,6 +158,11 @@ public class DungeonMechanic : MonoBehaviour {
                 _managerRef.GetPlayer.GoingToIntroCutscene(_BigBad);
                 break;
             case Mechanic.HEAL:
+                break;
+            case Mechanic.BREAKOUT:
+                _breakRef = GetComponent<BreakoutManager>();
+                _breakRef.Init();
+                SpawnEnemy(0);
                 break;
             default:
                 break;
@@ -273,6 +289,9 @@ public class DungeonMechanic : MonoBehaviour {
                 _offsetSpawnPointsHolder.Add(_spawnPoints[spawnPosNum]);
                 _spawnPoints.Remove(_spawnPoints[spawnPosNum]);
                 break;
+            case Mechanic.BREAKOUT:
+                spawnPos = _puckSpawnPoint.transform.position;
+                break;
             default:
                 break;
         }
@@ -285,7 +304,7 @@ public class DungeonMechanic : MonoBehaviour {
         {
             newEnemy.GetComponent<BaseEnemy>().SetColor = _coloredBlocks[listNum].GetColor;
             newEnemy.GetComponent<BaseEnemy>().SetPillar = _coloredBlocks[listNum].gameObject;
-            newEnemy.transform.GetChild(0).GetComponent<Light>().color = _coloredBlocks[listNum].GetColor;
+            newEnemy.transform.GetChild(4).GetComponent<Light>().color = _coloredBlocks[listNum].GetColor;
         }
         newEnemy.GetComponent<BaseEnemy>().Init(this, _roomMechanic);
         _enemyList.Add(newEnemy.GetComponent<BaseEnemy>());
@@ -455,7 +474,13 @@ public class DungeonMechanic : MonoBehaviour {
                 break;
         }
     }
-    
+
+    public void DisableRoom()
+    {
+        _myCollider.enabled = false;
+        EndAll();
+    }
+
     public BossEnemy GetBigBoy { get { return _BigBad; } }
     public Mechanic GetMechanic { get { return _roomMechanic; } }
     public List<DoorMovement> GetDoors { get { return _doors; } }

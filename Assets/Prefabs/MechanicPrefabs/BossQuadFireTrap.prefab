@@ -88,7 +88,6 @@ GameObject:
   - component: {fileID: 33471555417368102}
   - component: {fileID: 23397683511469210}
   - component: {fileID: 65654746369220670}
-  - component: {fileID: 114587686410257844}
   m_Layer: 0
   m_Name: BossQuadFireTrap
   m_TagString: Untagged
@@ -249,7 +248,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1125903540563730}
   m_LocalRotation: {x: -0, y: 0.0000015497205, z: -0, w: 1}
-  m_LocalPosition: {x: -7.277605, y: 0.05, z: 28.697706}
+  m_LocalPosition: {x: -9.992529, y: 0.2, z: 53.664646}
   m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_Children:
   - {fileID: 4849823150160882}
@@ -349,31 +348,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1081284804447940}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f980050cd8bb3f4e9eb0c751edd85fa, type: 3}
+  m_Script: {fileID: 11500000, guid: 596bedb6dfadd16438342ddce8746d29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _trapDamage: 0.5
-  _independentTrap: 0
+  _independentTrap: 1
+  _fireDamage: 0
   _beginningDelay: 0
-  _fireDelay: 0
-  _fireIncDuration: 0
-  _burningDuration: 0
-  _fireDistance: 0
-  _debugDamageArea: 0
-  _spaceBetweenRays: 0
---- !u!114 &114587686410257844
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1125903540563730}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7244be9f6e805aa4facd88c5038d630c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _trapDamage: 0.5
-  _independentTrap: 0
+  _fireDelay: 1
+  _fireIncDuration: 0.5
+  _burningDuration: 1.5
+  _fireDistance: 2
+  _debugDamageArea: 1
+  _spaceBetweenRays: 0.3
+  _maxDetectDistance: 4
+  bossEntity: {fileID: 0}
 --- !u!114 &114700002010230682
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -382,18 +371,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1847238635275264}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f980050cd8bb3f4e9eb0c751edd85fa, type: 3}
+  m_Script: {fileID: 11500000, guid: 596bedb6dfadd16438342ddce8746d29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _trapDamage: 0.5
-  _independentTrap: 0
+  _independentTrap: 1
+  _fireDamage: 0
   _beginningDelay: 0
-  _fireDelay: 0
-  _fireIncDuration: 0
-  _burningDuration: 0
-  _fireDistance: 0
-  _debugDamageArea: 0
-  _spaceBetweenRays: 0
+  _fireDelay: 1
+  _fireIncDuration: 0.5
+  _burningDuration: 1.5
+  _fireDistance: 2
+  _debugDamageArea: 1
+  _spaceBetweenRays: 0.3
+  _maxDetectDistance: 4
+  bossEntity: {fileID: 0}
 --- !u!114 &114796316569854314
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -402,18 +394,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1392094871013960}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f980050cd8bb3f4e9eb0c751edd85fa, type: 3}
+  m_Script: {fileID: 11500000, guid: 596bedb6dfadd16438342ddce8746d29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _trapDamage: 0.5
-  _independentTrap: 0
+  _independentTrap: 1
+  _fireDamage: 0
   _beginningDelay: 0
-  _fireDelay: 0
-  _fireIncDuration: 0
-  _burningDuration: 0
-  _fireDistance: 0
-  _debugDamageArea: 0
-  _spaceBetweenRays: 0
+  _fireDelay: 1
+  _fireIncDuration: 0.5
+  _burningDuration: 1.5
+  _fireDistance: 2
+  _debugDamageArea: 1
+  _spaceBetweenRays: 0.3
+  _maxDetectDistance: 4
+  bossEntity: {fileID: 0}
 --- !u!114 &114800592066927646
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -422,18 +417,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1048917674402680}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f980050cd8bb3f4e9eb0c751edd85fa, type: 3}
+  m_Script: {fileID: 11500000, guid: 596bedb6dfadd16438342ddce8746d29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _trapDamage: 0.5
-  _independentTrap: 0
+  _independentTrap: 1
+  _fireDamage: 0
   _beginningDelay: 0
-  _fireDelay: 0
-  _fireIncDuration: 0
-  _burningDuration: 0
-  _fireDistance: 0
-  _debugDamageArea: 0
-  _spaceBetweenRays: 0
+  _fireDelay: 1
+  _fireIncDuration: 0.5
+  _burningDuration: 1.5
+  _fireDistance: 2
+  _debugDamageArea: 1
+  _spaceBetweenRays: 0.3
+  _maxDetectDistance: 4
+  bossEntity: {fileID: 0}
 --- !u!198 &198325412254563078
 ParticleSystem:
   m_ObjectHideFlags: 1

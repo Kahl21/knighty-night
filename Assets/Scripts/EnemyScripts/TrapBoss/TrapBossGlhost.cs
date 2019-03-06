@@ -506,10 +506,8 @@ public class TrapBossGlhost : BossEnemy
             
         }
         //Debug.DrawRay(transform.position + Vector3.up, this.transform.forward);
-
         
         WhatDoNext();
-        
     }
 
     //Attack
@@ -597,7 +595,6 @@ public class TrapBossGlhost : BossEnemy
     //Detects when he gets to the targeted tower and starts the quad fire attack on the pillar.
     private void QuadFireBeams()
     {
-
         if (_enemyAgent.hasPath == false)
         {
             //Moves all the variables from the boss to each fire trap gameobject
