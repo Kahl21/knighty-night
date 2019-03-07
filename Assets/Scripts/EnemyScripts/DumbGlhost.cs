@@ -5,30 +5,37 @@ using UnityEngine.AI;
 
 public class DumbGlhost : BaseEnemy
 {
+    [Header("Dumb Ghlost Variables")]
     [SerializeField]
     float moveSpeed;
+    [SerializeField]
+    float _DamageToBoss;
+    [SerializeField]
+    float _DamageToPlayer;
+    [SerializeField]
+    float _maxTravelTime;
+    [SerializeField]
+    GhlostShooter _shooterRef;
+
 
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
+        _myAgent.enabled = false;
         _mySpawner = _spawner;
         _myMechanic = _incomingMech;
-        _target = PlayerController.Instance;
         _menuRef = Menuing.Instance;
 
         _myBody = transform.GetChild(2).gameObject;
         _myRenderer = _myBody.GetComponent<SkinnedMeshRenderer>();
         _mySpookiness = _myRenderer.materials[1];
-        if (_myMechanic == Mechanic.COLOR)
-        {
-            _mySpookiness.color = _myColor;
-        }
+
         _spookColor = _mySpookiness.color;
         _spookColor.a = 0;
-        _mySpookiness.color = _spookColor;
         _myRenderer.materials[1] = _mySpookiness;
 
         _myAnimations = GetComponent<Animator>();
         _myAnimations.Play("Moving", 0);
+        _startTime = Time.time;
     }
 
     // Update is called once per frame
@@ -44,12 +51,12 @@ public class DumbGlhost : BaseEnemy
         }
         else
         {
+            CheckForHit();
             Die();
         }       
 	}
 
 
-    //Movement just makes all of the ghosts slowly move towards the player using an enemyAgent
     protected override void Move()
     {
         transform.position += transform.forward * moveSpeed * Time.deltaTime;
@@ -63,13 +70,15 @@ public class DumbGlhost : BaseEnemy
         if(Physics.Raycast(transform.position + Vector3.up, transform.forward, out hit, _damageRange))
         {
             GameObject thingHit = hit.collider.gameObject;
-            if(thingHit.GetComponent<PlayerController>())
+            if (thingHit.GetComponent<PlayerController>())
             {
-                thingHit.GetComponent<PlayerController>().TakeDamage(_glhostDamage);
+                thingHit.GetComponent<PlayerController>().TakeDamage(_DamageToPlayer);
             }
             else
             {
+                _shooterRef.removeGhlostFromScene(gameObject);
                 Destroy(gameObject);
+
             }
         }
     }
@@ -87,7 +96,7 @@ public class DumbGlhost : BaseEnemy
     public override void GotHit(Vector3 _flyDir, float _knockBackForce)
     {
         Debug.Log("Glhost Got Hit");
-        if(!_hit)
+        if(!_hit && (_myMechanic == Mechanic.COLOR || _myMechanic == Mechanic.NONE))
         {
             _hit = true;
             //_myAgent.enabled = false;
@@ -108,8 +117,15 @@ public class DumbGlhost : BaseEnemy
         
         if (Physics.Raycast(transform.position + Vector3.up, _deathDirection, out hit, _collisionCheckDist))
         {
-            if(!hit.collider.GetComponent<BaseEnemy>() && !hit.collider.GetComponent<PlayerController>())
+            if (hit.collider.GetComponent<ShootingMiniBoss>())
             {
+                hit.collider.GetComponent<ShootingMiniBoss>().HitByGhlost(this.gameObject, _DamageToPlayer);
+                _shooterRef.removeGhlostFromScene(gameObject);
+                Destroy(gameObject);
+            }
+            else if (!hit.collider.GetComponent<BaseEnemy>() && !hit.collider.GetComponent<PlayerController>())
+            {
+                _shooterRef.removeGhlostFromScene(gameObject);
                 Destroy(gameObject);
             }
         }
@@ -121,14 +137,19 @@ public class DumbGlhost : BaseEnemy
     public override void Stop()
     {
         _canMove = false;
-        if(!_dead && _myAgent.enabled)
+        if(!_dead)
         {
             _myAgent.SetDestination(transform.position);
         }
         _mySpawner.RemoveMe(this);
-
+        _shooterRef.removeGhlostFromScene(gameObject);
         Destroy(gameObject);
     }
 
     public float GetSpeed { get { return moveSpeed; } set { moveSpeed = value; } }
+    public float SetDamageToBoss { set { _DamageToBoss = value; } }
+    public float SetDamageToPlayer { set { _DamageToPlayer = value; } }
+    public float SetMaxTravelTime { set { _maxTravelTime = value; } }
+    public GhlostShooter SetShooterRef { set { _shooterRef = value; } }
+    public Color SetMyColor { set { _mySpookiness.color = value; } }
 }

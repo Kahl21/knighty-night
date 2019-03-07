@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerController : MonoBehaviour {
+
+public class PlayerController : MonoBehaviour
+{
 
     private static PlayerController _instance;
     public static PlayerController Instance
@@ -51,7 +53,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField]
     Menuing _menuRef;
     List<GameObject> _gameMenus;
-    
+
     [Header("Player UI")]
     GameObject _healthBar;
     bool _movingHealth = false;
@@ -141,7 +143,7 @@ public class PlayerController : MonoBehaviour {
     GameManager _managerRef;
     CameraFollow _cameraRef;
     BossEnemy _bossImFighting;
-    
+
     Interactions _whatImDoing = Interactions.NONE;
     MenuOrient _menuOrient = MenuOrient.VERT;
 
@@ -149,6 +151,9 @@ public class PlayerController : MonoBehaviour {
     //Johns Checkpoint Variables
     bool reachCheckpoint;
     Vector3 checkpointPos;
+    float currentCheckpoint;
+
+    public List<GameObject> baseRoomList;
 
     // Use this for initialization
     void Awake()
@@ -171,7 +176,7 @@ public class PlayerController : MonoBehaviour {
 
         _playerStartPos = _playerMenuPos;
         _playerStartRot = _playerMenuRot;
-        
+
         _myRenderer = transform.GetChild(0).gameObject;
         _myAnimations = GetComponent<Animator>();
 
@@ -190,6 +195,7 @@ public class PlayerController : MonoBehaviour {
         _healthBar = _gameMenus[2].transform.GetChild(0).gameObject;
         _specialBar = _gameMenus[2].transform.GetChild(1).gameObject;
         _specialBar.GetComponent<Image>().fillAmount = 0;
+        currentCheckpoint = 0;
     }
 
     //Called to reset the Player Stats
@@ -202,7 +208,6 @@ public class PlayerController : MonoBehaviour {
         _specialBar.GetComponent<Image>().fillAmount = _currSpecialAmount / _MaxSpecialAmount;
 
         
-
         _currPlayerSpeed = _playerSpeed;
         StopAllCoroutines();
         _doingSomething = false;
@@ -215,20 +220,26 @@ public class PlayerController : MonoBehaviour {
         _bossCutsceneInit = false;
         _myRenderer.SetActive(true);
 
-        if (reachCheckpoint == true)                        //if the player has reached a checkpoint
+        if (reachCheckpoint == true)        //if the player has reached a checkpoint
+        {
             transform.position = checkpointPos;             //spawn player at checkpoint
+            //disableRooms();
+        }
         else
-            transform.position = _playerStartPos;           //else spawn player at players start position
+        {
+            transform.position = _playerStartPos;  //else spawn player at players start position
+        }
         _whatImDoing = Interactions.NONE;
         _myAnimations.Play("StandingIdle", 0);
     }
 
     // Update is called once per frame
-    void Update () {
+    void Update()
+    {
 
-        if(_inMenu)                                         //if the player is in the menu
+        if (_inMenu)                                         //if the player is in the menu
         {
-            if(!_menuRef.AreCreditsRolling)                 //if the credits arent rolling in the menuing script
+            if (!_menuRef.AreCreditsRolling)                 //if the credits arent rolling in the menuing script
             {
                 MoveMenu();                                 //move menu function
                 MenuInput();                                //menu input 
@@ -242,11 +253,11 @@ public class PlayerController : MonoBehaviour {
             }
 
         }
-        else if(_inCutscene)                                //if the player is in a cutscene
+        else if (_inCutscene)                                //if the player is in a cutscene
         {
             _startHealthTime = Time.time;                   //player heathtime equals current time
             _startSpecialTime = Time.time;                  //players special time is current time
-            if(_isIntroPlaying)                             //if the intro is playing
+            if (_isIntroPlaying)                             //if the intro is playing
             {
                 MoveIntoPosition();                         //move player into position function
             }
@@ -259,7 +270,7 @@ public class PlayerController : MonoBehaviour {
                 LerpHealthBar();                            //lerp health bar function
             }
 
-            if(_movingSpecial)                              //if moving special
+            if (_movingSpecial)                              //if moving special
             {
                 LerpSpecialBar();                           //lerp special bar function
             }
@@ -275,12 +286,12 @@ public class PlayerController : MonoBehaviour {
                 WhatAmIEvenDoing();                         //else what are you doing with your life. theres so much meaning to this universe and instead you are reading this extrordinarily long comment which really doesnt have a point much like, i assume, this function that probably just checks to see what else the player can do/ why it isnt doing what its supposed to
             }
         }
-	}
+    }
 
     //Called every frame to see if the input to bring up the pause menu is pressed
     private void CheckForPause()                            //check for pause function
     {
-        if(Input.GetButtonDown("Pause"))                    //if the player presses the pause button
+        if (Input.GetButtonDown("Pause"))                    //if the player presses the pause button
         {
             _menuRef.Pause();                               //start pause function from the menuing script
         }
@@ -290,14 +301,14 @@ public class PlayerController : MonoBehaviour {
     //looks for input on control stick to see if the player moved in correct direction
     private void MoveMenu()                                 //move menu script
     {
-        if(_menuOrient == MenuOrient.VERT)                  //if menu orient is equal to menu orient vert
+        if (_menuOrient == MenuOrient.VERT)                  //if menu orient is equal to menu orient vert
         {
             float _updown = Input.GetAxis("VertMove");      //updown is equal to vertical movement
-            if(_updown > 0.5f)                              //if there is some vert movement greater than 0.5
+            if (_updown > 0.5f)                              //if there is some vert movement greater than 0.5
             {
                 _menuRef.MenuUpOrDown(true);                //MenuUpOrDown from the Menuing Script is true
             }
-            else if(_updown < -0.5f)                        //else if its less than -0.05f
+            else if (_updown < -0.5f)                        //else if its less than -0.05f
             {
                 _menuRef.MenuUpOrDown(false);               //MenuUpOrDown from the Menuing Script is false
             }
@@ -305,7 +316,7 @@ public class PlayerController : MonoBehaviour {
         else                                                //else 
         {
             float _leftright = Input.GetAxis("HorizMove");  //_leftright equals horizontal movement
-            if(_leftright > 0.5f)                           //if leftright is greater than or equal to 0.5f
+            if (_leftright > 0.5f)                           //if leftright is greater than or equal to 0.5f
             {
                 _menuRef.MenuUpOrDown(true);                //the MenuUpOrDown from menuing script is true
             }
@@ -320,7 +331,7 @@ public class PlayerController : MonoBehaviour {
     //OnClicks the button that is selected
     private void MenuInput()
     {
-        if(Input.GetButtonDown("MenuSelect"))           //if the player presses the menu select button
+        if (Input.GetButtonDown("MenuSelect"))           //if the player presses the menu select button
         {
             _menuRef.SelectButton();                    //start the selectButton Function from the Menuing Script
         }
@@ -355,7 +366,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     //lerps the onscreen health bar to give a smooth transistion of hearts
-    private void LerpHealthBar()                    
+    private void LerpHealthBar()
     {
         _currLerpHealth = (Time.time - _startHealthTime) / _healthBarLerpDuration;          //current lerp health is equal to current time minus start health time then divided by lerp health duration
 
@@ -405,8 +416,8 @@ public class PlayerController : MonoBehaviour {
     private void LerpSpecialBar()
     {
         _currSpecial = (Time.time - _startSpecialTime) / _specialBarLerpDuration;           //current special is equal to the current time minus the start special time divided by the special bar lerp duration
-    
-        float s01;                                                                          
+
+        float s01;
 
         s01 = (1 - _currSpecial) * s0 + _currSpecial * s1;                                  //s01 is equal to 1 minus current special times s0 plus current special times s1
 
@@ -423,7 +434,7 @@ public class PlayerController : MonoBehaviour {
     //call when the player is about to go into a boss fight
     public void GoingToIntroCutscene(BossEnemy thingToInit)
     {
-        
+
         _bossImFighting = thingToInit;                                                      //the boss im fighting from the boss enemy script equals thing to initialize
         cs0 = transform.position;                                                           //cs0 (Vector3) is equal to the transform position
         cs1 = _bossImFighting.GetIntroPos;                                                  //cs1 is equal to the bosses intro position
@@ -447,20 +458,20 @@ public class PlayerController : MonoBehaviour {
     {
         _currCutsceneTime = (Time.time - _startCutsceneTime) / _playerCutsceneMovementDuration;         //current cutscene time is equal to the current time minus the start cutscene time divided by the player cutscene movement duration
 
-        if(_currCutsceneTime >= 1)                                                          //if the current cutscene time is greater than 1
+        if (_currCutsceneTime >= 1)                                                          //if the current cutscene time is greater than 1
         {
             _currCutsceneTime = 1;                                                          //then the current cutscene time is 1
-            if(!_bossCutsceneInit)
+            if (!_bossCutsceneInit)
             {
                 _bossImFighting.Init();                                                     //initialize the boss im bout to fight
                 _bossCutsceneInit = true;                                                   //boss cutscene starts
             }
-           
+
         }
 
         Vector3 cs01;
 
-        cs01 = (1 - _currCutsceneTime) * cs0 + _currCutsceneTime * cs1;                         
+        cs01 = (1 - _currCutsceneTime) * cs0 + _currCutsceneTime * cs1;
 
         transform.position = cs01;                                                              //the players current position is equal to cs01
         transform.LookAt(transform.position + Vector3.forward);                                 //make the player look at its current position plus forward
@@ -472,11 +483,11 @@ public class PlayerController : MonoBehaviour {
     private void CheckForMovement()
     {
         _move = new Vector3(Input.GetAxis("HorizMove"), 0, -Input.GetAxis("VertMove"));         //move is euqal to the new vecto3 which only allows forward, backward, left, and right
-        
+
 
         if (_move.magnitude <= 0)                                                               //if the moves magnitude is less than or equal to zero
         {
-            if(!_doingSomething)                                                                //if not doing anything
+            if (!_doingSomething)                                                                //if not doing anything
             {
                 _myAnimations.Play("StandingIdle", 0);                                          //play the idle animation
             }
@@ -496,9 +507,11 @@ public class PlayerController : MonoBehaviour {
             if (thingHit.GetComponent<WinScript>())                                                     //if the thing hit is a win script
             {
                 _move = Vector3.zero;                                                                   //there is no movement
+                baseRoomList.Clear();
                 if (thingHit.GetComponent<WinScript>().IsLastLevel())                                   //if the win script is attached to the last level
                 {
                     EndLevel(true);                                                                     //end level is equal to true
+
                 }
                 else
                 {
@@ -508,6 +521,7 @@ public class PlayerController : MonoBehaviour {
             else if (thingHit.GetComponent<DungeonMechanic>())                                          //else if the player hit a dungeon mechanic
             {
                 thingHit.GetComponent<DungeonMechanic>().Init();                                        //initialize the mechanic
+                addRoom(thingHit);
             }
             else if (thingHit.GetComponent<BaseEnemy>())                                                //else if the player hit a base enemy
             {
@@ -517,14 +531,11 @@ public class PlayerController : MonoBehaviour {
             {
                 TakeDamage(thingHit.GetComponent<BossEnemy>().GetDamage);                               //have the player take damage
             }
-            else if(thingHit.GetComponent<CathedralProjectile>())
-            {
-                TakeDamage(thingHit.GetComponent<CathedralProjectile>().GetDamage);
-            }
-            else if(!thingHit.GetComponent<HealingGrace>() || !thingHit.GetComponent<SpikeTrap>())      //else if the player did not hit any of the above and it isnt a spike trap or healing spot
+            else if (!thingHit.GetComponent<HealingGrace>() || !thingHit.GetComponent<SpikeTrap>())      //else if the player did not hit any of the above and it isnt a spike trap or healing spot
             {
                 _move = Vector3.zero;                                                                   //you should probably stop cause i got not clue what you hit homeboy
             }
+
         }
 
         if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out hit, _collisionDetectDist))      //creates a raycast infront of the player
@@ -536,8 +547,10 @@ public class PlayerController : MonoBehaviour {
                 if (thingHit.GetComponent<HealingGrace>().isCheckpoint)                                          //if this healing grace is a checkpoint
                 {
                     reachCheckpoint = true;                                                                     //the player has reached a checkpoint
+                    currentCheckpoint = thingHit.GetComponent<HealingGrace>().checkpointNumber;
                     checkpointPos.x = thingHit.GetComponent<HealingGrace>().transform.position.x;               //the checkpoint's x position is whatever the healing graces is
                     checkpointPos.z = thingHit.GetComponent<HealingGrace>().transform.position.z;               //the checkpoint's y position is whatever the healing graces is
+
                 }
 
                 if (!_healing && _playerHealth < _maxHealthValue)                                               //if the player is not healing and current health is less than max health
@@ -556,7 +569,7 @@ public class PlayerController : MonoBehaviour {
                             thingHit.GetComponent<HealingGrace>().StartFade();                                  //start the healing grace's fade
                         }
                         else                                                                                    //if the amount heal is less than or equal to max possible health
-                        { 
+                        {
                             thingHit.GetComponent<HealingGrace>().GetHealingAmount = 0;                         //healing graces healing amount is zero
                             thingHit.GetComponent<HealingGrace>().StartFade();                                  //start healing grace's fade
                         }
@@ -570,11 +583,11 @@ public class PlayerController : MonoBehaviour {
 
 
             }
-            else if(thingHit.GetComponent<SpikeTrap>())                                                         //if the playe hit a spike trap
+            else if (thingHit.GetComponent<SpikeTrap>())                                                         //if the playe hit a spike trap
             {
-                thingHit.GetComponent<SpikeTrap>().StartTell();                                                 
+                thingHit.GetComponent<SpikeTrap>().StartTell();
             }
-            else if(thingHit.GetComponent<HazardFloor>())
+            else if (thingHit.GetComponent<HazardFloor>())
             {
                 TakeDamage(thingHit.GetComponent<HazardFloor>().GetHazardDamage);
             }
@@ -595,7 +608,7 @@ public class PlayerController : MonoBehaviour {
 
     //checks player input of left stick to rotate player
     private void LookAround()
-    {   
+    {
         _look = new Vector3(Input.GetAxis("HorizLook"), 0, -Input.GetAxis("VertLook"));
 
         if (_look.magnitude > 0.5f)
@@ -701,9 +714,9 @@ public class PlayerController : MonoBehaviour {
                         {
                             if (!thingHit.GetComponent<BossEnemy>().AmHit && !thingHit.GetComponent<BossEnemy>().AmInvincible)
                             {
-                                if(thingHit.GetComponent<ColorBossGlhost>() || thingHit.GetComponent<MiniBossColor>())
+                                if (thingHit.GetComponent<ColorBossGlhost>() || thingHit.GetComponent<MiniBossColor>())
                                 {
-                                    thingHit.GetComponent<BossEnemy>().GotHit(_playerDamage/_playerDamageDivideOffsetForSpecialBosses);
+                                    thingHit.GetComponent<BossEnemy>().GotHit(_playerDamage / _playerDamageDivideOffsetForSpecialBosses);
 
                                     IncSpecialMeter(_specialInc, true);
                                 }
@@ -713,16 +726,12 @@ public class PlayerController : MonoBehaviour {
 
                                     IncSpecialMeter(_specialInc, true);
                                 }
-                               
+
                             }
                         }
-                        else if(thingHit.GetComponent<TrapLever>())
+                        else if (thingHit.GetComponent<TrapLever>())
                         {
                             thingHit.GetComponent<TrapLever>().StartRotation();
-                        }
-                        else if(thingHit.GetComponent<CathedralProjectile>())
-                        {
-                            thingHit.GetComponent<CathedralProjectile>().HitProjectile(transform.forward);
                         }
                     }
                 }
@@ -730,7 +739,7 @@ public class PlayerController : MonoBehaviour {
             case Interactions.WAVESPECIAL:
                 _currentSwingTime = (Time.time - _SwingStartTime) / _swordSwingDuration;
 
-                if(_currentSwingTime > 1)
+                if (_currentSwingTime > 1)
                 {
                     _currentSwingTime = 1;
                     ResetSword();
@@ -747,6 +756,7 @@ public class PlayerController : MonoBehaviour {
     {
         if (!_invincible)
         {
+            //AudioManager.instance.PlayerDamaged();
             _invincible = true;
             IncHealthMeter(_damageTaken, false);
 
@@ -759,7 +769,7 @@ public class PlayerController : MonoBehaviour {
                 _myAnimations.Play("Death");
                 EndLevel(false);
             }
-        }        
+        }
     }
 
     //started when the player gets hit
@@ -781,7 +791,7 @@ public class PlayerController : MonoBehaviour {
     //called to show that the player has Iframes
     IEnumerator Blinkin()
     {
-        while(_blinkin)
+        while (_blinkin)
         {
             yield return new WaitForSeconds(.15f);
             if (_myRenderer.activeInHierarchy)
@@ -816,6 +826,24 @@ public class PlayerController : MonoBehaviour {
             _loseImage.SetActive(true);
         }
         _inMenu = true;
+    }
+
+    private void addRoom(GameObject room)
+    {
+        if (!baseRoomList.Contains(room))
+            baseRoomList.Add(room);
+    }
+
+    private void disableRooms()
+    {
+        for (int i = 0; i < baseRoomList.Count; i++)
+        {
+            DungeonMechanic basicRoom = baseRoomList[i].GetComponent<DungeonMechanic>();
+            if (basicRoom.nextCheckpoint <= currentCheckpoint)
+            {
+                baseRoomList[i].SetActive(false);
+            }
+        }
     }
 
     //various getters and setters

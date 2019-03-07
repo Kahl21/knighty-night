@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SpikeTrap : BaseTrap {
 
-    enum SpikeState
+    protected enum SpikeState
     {
         NONE,
         TELL,
@@ -18,38 +18,36 @@ public class SpikeTrap : BaseTrap {
 
     [Header("Spike Trap Variables")]
     [SerializeField]
-    float _tellSpeed;
+    protected float _tellSpeed;
     [SerializeField]
-    float _tellDistance;
+    protected float _tellDistance;
     [SerializeField]
-    float _attackDelayDuration;
+    protected float _attackDelayDuration;
     [SerializeField]
-    float _attackSpeed;
+    protected float _attackSpeed;
     [SerializeField]
-    float _attackDistance;
+    protected float _attackDistance;
     [SerializeField]
-    float _retreatDelayDuration;
-    [SerializeField]
-    float _retreatSpeed;
+    protected float _retreatSpeed;
 
-    float _currTime;
-    float _startTIme;
+    protected float _currTime;
+    protected float _startTIme;
 
     [Header("HitBox Variables")]
     [SerializeField]
-    bool _debug;
+    protected bool _debug;
     [SerializeField]
-    float BoxRadius;
+    protected float BoxRadius;
 
-    GameObject _spikes;
-    Vector3 _startPos;
-    Vector3 _currBound;
+    protected GameObject _spikes;
+    protected Vector3 _startPos;
+    protected Vector3 _currBound;
 
-    Vector3 _scanStartPos;
-    Vector3 _topLeftCorner;
-    Vector3 _bottomRightCorner;
+    protected Vector3 _scanStartPos;
+    protected Vector3 _topLeftCorner;
+    protected Vector3 _bottomRightCorner;
 
-    SpikeState myState = SpikeState.NONE;
+    protected SpikeState myState = SpikeState.NONE;
 
     //Init function
     public override void Init()
@@ -63,7 +61,7 @@ public class SpikeTrap : BaseTrap {
         _bottomRightCorner = _scanStartPos + ((Vector3.back + Vector3.right) * BoxRadius);
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         switch (myState)
         {
@@ -103,7 +101,7 @@ public class SpikeTrap : BaseTrap {
     }
 
     //Starts spikes 
-    public void StartTell()
+    public virtual void StartTell()
     {
         if(myState == SpikeState.NONE)
         {
@@ -115,7 +113,7 @@ public class SpikeTrap : BaseTrap {
 
     //Does a tell for the spikes
     //spikes will come out of the holes but not deal damage
-    private void DoTell()
+    protected virtual void DoTell()
     {
         if(_spikes.transform.localPosition.y <= _currBound.y)
         {
@@ -131,7 +129,7 @@ public class SpikeTrap : BaseTrap {
     }
 
     //delay inbetween the tell and attack
-    private void StartAttackDelay()
+    protected virtual void StartAttackDelay()
     {
         _currTime = (Time.time - _startTIme) / _attackDelayDuration;
 
@@ -146,7 +144,7 @@ public class SpikeTrap : BaseTrap {
 
     //spike shoot up from the ground
     //damages the player if they are on top of the plates
-    private void Attack()
+    protected virtual void Attack()
     {
         if (_spikes.transform.localPosition.y <= _currBound.y)
         {
@@ -167,7 +165,7 @@ public class SpikeTrap : BaseTrap {
     }
 
     //delay before the retreat
-    private void StartRetreatDelay()
+    protected virtual void StartRetreatDelay()
     {
         _currTime = (Time.time - _startTIme) / _attackDelayDuration;
 
@@ -181,7 +179,7 @@ public class SpikeTrap : BaseTrap {
     }
 
     //spikes will slowly retreat
-    private void RetreatSpikes()
+    protected virtual void RetreatSpikes()
     {
         if (_spikes.transform.localPosition.y >= _currBound.y)
         {
@@ -197,7 +195,7 @@ public class SpikeTrap : BaseTrap {
 
     //if the room finishes while the spikes are doing anything
     //spikes will retreat
-    private void RoomDoneRetreat()
+    protected virtual void RoomDoneRetreat()
     {
         if (_spikes.transform.localPosition.y >= _currBound.y)
         {

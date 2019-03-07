@@ -5,23 +5,24 @@ using UnityEngine;
 public class DoorMovement : MonoBehaviour {
 
     [SerializeField]
-    float _doorSpeed;
+    protected float _doorSpeed;
     [SerializeField]
-    float _raycastDist;
+    protected float _raycastDist;
 
-    Vector3 _startPos;
+    protected Vector3 _startPos;
 
-    bool falling = false;
-    bool rising = false;
+    protected bool falling = false;
+    protected bool rising = false;
 
-    MeshRenderer _myRenderer;
-    Material _myMaterial;
-    Color _myColor;
+    protected MeshRenderer _myRenderer;
+    protected Material _myMaterial;
+    protected Color _myColor;
     [SerializeField]
-    float _fadeInc;
-
-	// Use this for initialization
-	void Awake () {
+    protected float _fadeInc;
+    
+    // Use this for initialization
+    protected  virtual void Awake ()
+    {
         _myRenderer = GetComponent<MeshRenderer>();
         _myMaterial = _myRenderer.material;
         _myColor = _myMaterial.color;
@@ -32,19 +33,20 @@ public class DoorMovement : MonoBehaviour {
         _myRenderer.enabled = false;
 	}
 
-    public void Init()
+    public virtual void Init()
     {
         _myRenderer.enabled = true;
         falling = true;
     }
 
-    public void RoomDone()
+    public virtual void RoomDone()
     {
+        falling = false;
         rising = true;
     }
 
     // Update is called once per frame
-    void Update () {
+    protected virtual void Update () {
         if(falling)
         {
             Fall();
@@ -53,11 +55,11 @@ public class DoorMovement : MonoBehaviour {
         {
             Rise();
         }
-	}
+    }
 
-    void Fall()
+    protected virtual void Fall()
     {
-        if(Physics.Raycast(transform.position, Vector3.down, _raycastDist))
+        if (Physics.Raycast(transform.position, Vector3.down, _raycastDist))
         {
             falling = false;
             _myColor.a = 1;
@@ -71,9 +73,9 @@ public class DoorMovement : MonoBehaviour {
         transform.position += Vector3.down * _doorSpeed * Time.deltaTime;
     }
 
-    void Rise()
+    protected virtual void Rise()
     {
-        if(transform.position.y >= _startPos.y)
+        if (transform.position.y >= _startPos.y)
         {
             rising = false;
             transform.position = _startPos;

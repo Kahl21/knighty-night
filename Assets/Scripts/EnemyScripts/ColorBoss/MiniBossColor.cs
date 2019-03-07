@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class MiniBossColor : BossEnemy
 {
+
     //Strategies for the Color Boss
     protected enum ColorStrats
     {
@@ -105,8 +106,6 @@ public class MiniBossColor : BossEnemy
     float _hardFollowPercentage;
     [SerializeField]
     float _hardBouncePercentage;
-    [SerializeField]
-    float _hardChargePercentage;
 
     [Header("Hard Follow Player Varibales")]
     [SerializeField]
@@ -419,12 +418,6 @@ public class MiniBossColor : BossEnemy
                 _startAttackTime = Time.time;
                 _myAttack = ColorStrats.BOUNCE;
             }
-            else
-            {
-                //Debug.Log("Charge Chosen");
-                _enemyAgent.enabled = false;
-                _startAttackTime = Time.time;
-            }
         }
     }
 
@@ -545,9 +538,6 @@ public class MiniBossColor : BossEnemy
         }
     }
 
-    //Attack
-    //Boss will rev up by moving backwards
-    //boss will then charge at the player and stop once it hits something
 
     //spawn the glhosts that can damage him
     private void SpawnGlhosts(float _spawnAngle, float _angleOffset)
@@ -692,8 +682,7 @@ public class MiniBossColor : BossEnemy
         {
             _currAttackTime = (Time.time - _startAttackTime) / _deathDuration;
             //Debug.Log("showing death");
-
-
+            
             if (_currAttackTime > 1)
             {
                 _currAttackTime = 1;
@@ -734,7 +723,6 @@ public class MiniBossColor : BossEnemy
                 _endingPlaying = false;
 
                 //Debug.Log("dead");
-                _myRoom.EndAll();
                 gameObject.SetActive(false);
             }
         }
@@ -786,5 +774,3 @@ public class MiniBossColor : BossEnemy
 
     public Color GetColor { get { return _myColor; } }
 }
-
-

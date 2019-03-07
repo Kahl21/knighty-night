@@ -78,6 +78,9 @@ public class DungeonMechanic : MonoBehaviour {
     GameManager _managerRef;
     BoxCollider _myCollider;
 
+    [Header("Number Of The Next Checkpoint")]
+    public float nextCheckpoint;
+
     private void Awake()
     {
         _managerRef = GameManager.Instance;
@@ -285,7 +288,7 @@ public class DungeonMechanic : MonoBehaviour {
         {
             newEnemy.GetComponent<BaseEnemy>().SetColor = _coloredBlocks[listNum].GetColor;
             newEnemy.GetComponent<BaseEnemy>().SetPillar = _coloredBlocks[listNum].gameObject;
-            newEnemy.transform.GetChild(0).GetComponent<Light>().color = _coloredBlocks[listNum].GetColor;
+            newEnemy.transform.GetChild(4).GetComponent<Light>().color = _coloredBlocks[listNum].GetColor;
         }
         newEnemy.GetComponent<BaseEnemy>().Init(this, _roomMechanic);
         _enemyList.Add(newEnemy.GetComponent<BaseEnemy>());
@@ -455,9 +458,16 @@ public class DungeonMechanic : MonoBehaviour {
                 break;
         }
     }
-    
+
+    public void DisableRoom()
+    {
+        _myCollider.enabled = false;
+        EndAll();
+    }
+
     public BossEnemy GetBigBoy { get { return _BigBad; } }
     public Mechanic GetMechanic { get { return _roomMechanic; } }
     public List<DoorMovement> GetDoors { get { return _doors; } }
     public List<BaseEnemy> GetCurrEnemyList { get { return _enemyList; } }
+    public List<BaseTrap> GetCurrTrapList { get { return _trapsInRoom; } }
 }

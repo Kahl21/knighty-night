@@ -37,6 +37,12 @@ public class ShootingMiniBoss : BossEnemy
     int _numOfCasts = 4;
     RaycastHit hitObj = new RaycastHit();
 
+    [Header("Base Spawned Enemies")]
+    [SerializeField]
+    float _damageToBoss;
+    [SerializeField]
+    float _damageToPlayer;
+
     [Header("Follow Player Varibales")]
     [SerializeField]
     float _followDuration;
@@ -54,9 +60,10 @@ public class ShootingMiniBoss : BossEnemy
     float _currentTime;
     GhlostShooter _attachedShooter;
     [HideInInspector]
-    public bool _attackInProgress = false;
     float _startAttackTime;
     float _currAttackTime;
+
+    
 
     SHOOTERSTATES _MyState = SHOOTERSTATES.FOLLOWING;
 
@@ -64,99 +71,6 @@ public class ShootingMiniBoss : BossEnemy
     
     protected override void PlayIntro()
     {
-        /*
-        if (!_cameraInPosition)
-        {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            if (_currAttackTime >= 1)
-            {
-                _currAttackTime = 1;
-                if (!_glhostsCrushed)
-                {
-                    for (int i = 0; i < _GlhostsUnderMe.Count; i++)
-                    {
-                        _GlhostsUnderMe[i].Init();
-                    }
-                    _glhostsCrushed = true;
-                }
-            }
-
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
-        }
-        else if (!_fallFinished)
-        {
-            _currAttackTime = (Time.time - _startAttackTime) / _introFallAndStopDuration;
-
-            if (_currAttackTime >= 1)
-            {
-                _currAttackTime = 1;
-
-                if (_enemiesToCrush.activeInHierarchy)
-                {
-                    for (int i = 0; i < _GlhostsUnderMe.Count; i++)
-                    {
-                        _GlhostsUnderMe[i].ParentYouself();
-                    }
-                    _enemiesToCrush.SetActive(false);
-                }
-
-                _startAttackTime = Time.time;
-                _fallFinished = true;
-            }
-
-            Vector3 fall = Vector3.down * Time.deltaTime * _introFallSpeed;
-            if (Physics.Raycast(transform.position, fall, _downCheckDistance))
-            {
-
-                fall = Vector3.zero;
-            }
-
-            transform.position += fall;
-        }
-        else if (!_turnToPlayerFinished)
-        {
-            _currAttackTime = (Time.time - _startAttackTime) / _introTurnAroundDuration;
-
-            transform.Rotate(Vector3.up, _introTurnAroundSpeed);
-
-            if (_currAttackTime >= 1)
-            {
-                _currAttackTime = 1;
-
-                cam0 = _cameraRef.transform.position;
-                cam1 = _ogCamPos;
-
-                _startAttackTime = Time.time;
-                transform.LookAt(_playerRef.transform.position);
-                _turnToPlayerFinished = true;
-            }
-
-
-        }
-        else
-        {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
-
-            if (_currAttackTime >= 1)
-            {
-                _currAttackTime = 1;
-                _startAttackTime = Time.time;
-                _playerRef.AmInCutscene = false;
-                StartFight();
-            }
-        }
-        */
         _playerRef.AmInCutscene = false;
         _cameraInPosition = true;
         StartFight();
@@ -309,6 +223,7 @@ public class ShootingMiniBoss : BossEnemy
             _enemyAgent.SetDestination(transform.position);
 
             _attachedShooter.newAttack = true;
+            _attachedShooter.attackInProgress = true;
             _MyState = SHOOTERSTATES.ATTACKING;
         }
 
@@ -373,13 +288,28 @@ public class ShootingMiniBoss : BossEnemy
         }
     }
 
+    public void HitByGhlost(GameObject objectHitting, float _damageHit)
+    {
+        if (objectHitting.GetComponent<DumbGlhost>())
+        {
+            base.GotHit(_damageHit);
+
+            if (_currBossHealth <= 0)
+            {
+                _bossBar.SetActive(false);
+
+                Die();
+            }
+        }
+    }
+
     //called once the boss is defeated
     protected override void Die()
     {
         _myRoom.CheckForEnd();
 
         _enemyAgent.enabled = false;
-
+        _attachedShooter.enabled = false;
         _playerRef.GoingToOutroCutscene();
 
         _ogCamPos = _cameraRef.transform.position;
@@ -474,6 +404,7 @@ public class ShootingMiniBoss : BossEnemy
     {
         if (_init)
         {
+            _attachedShooter.MyReset();
             gameObject.SetActive(true);
             _myRenderer.enabled = true;
             _myColor.a = 1;
@@ -481,7 +412,7 @@ public class ShootingMiniBoss : BossEnemy
             _myRenderer.materials[1] = _myMaterial;
 
             _enemyAgent.enabled = false;
-            //Debug.Log("Boss Reset");
+            Debug.Log("Boss Reset");
             transform.position = _startPos;
             transform.rotation = _startRot;
             /*
@@ -513,4 +444,8 @@ public class ShootingMiniBoss : BossEnemy
             _init = false;
         }
     }
+
+    public float GetDamageToBoss { get { return _damageToBoss; } }
+    public float GetDamageToPlayer { get { return _damageToPlayer; } }
+    public PlayerController GetPlayerRef { get { return _playerRef; } }
 }
