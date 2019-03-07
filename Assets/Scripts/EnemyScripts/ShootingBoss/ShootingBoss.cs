@@ -21,8 +21,8 @@ public class ShootingBoss : BossEnemy
 
     [Header("Shooting Boss Variables")]
     //[SerializeField]
-    float _timeBetweenAttacks;
-    float _realTimeBetweenAttacks;
+    //float _timeBetweenAttacks;
+    //float _realTimeBetweenAttacks;
     [SerializeField]
     float _stunnedTime;
     [SerializeField]
@@ -59,7 +59,8 @@ public class ShootingBoss : BossEnemy
     float _hardTimeBetweenAttacks;
 
     [Header("Color Attack Variables")]
-    
+    [SerializeField]
+    float _colorDamageToBoss;
 
     [Header("Special Attack Variables")]
     [SerializeField]
@@ -78,12 +79,15 @@ public class ShootingBoss : BossEnemy
     float _shootRate;
     [SerializeField]
     float _rotationAngle = 0;
+    [SerializeField]
+    float _absorbDelay;
     int _ghlostsShot = 0;
     bool _invinciblesAddad = false;
     [SerializeField]
     List<GameObject> _absorbingGhlosts;
     [SerializeField]
     List<GameObject> _absorbedGhlosts;
+    bool _specialPulseAttack = false;
     //[SerializeField]
     //float _normalAtttackPercentage;
 
@@ -138,12 +142,12 @@ public class ShootingBoss : BossEnemy
 
             if (!_managerRef.HardModeOn)
             {
-                _realTimeBetweenAttacks = _timeBetweenAttacks;
+                //_realTimeBetweenAttacks = _timeBetweenAttacks;
                 _realFollowDuration = _followDuration;
             }
             else
             {
-                _realTimeBetweenAttacks = _hardTimeBetweenAttacks;
+                //_realTimeBetweenAttacks = _hardTimeBetweenAttacks;
                 _realFollowDuration = _hardFollowDuration;
             }
         }
@@ -240,8 +244,17 @@ public class ShootingBoss : BossEnemy
     {
         if (_attachedShooter.attackInProgress != true)
         {
-            _MyState = SHOOTERSTATES.CHECKFORABSORB;
-            _startTimer = Time.time;
+            if (_specialPulseAttack == true)
+            {
+                _MyState = SHOOTERSTATES.CHECKFORABSORB;
+                _specialPulseAttack = false;
+                _startTimer = Time.time;
+            }
+            else
+            {
+                _MyState = SHOOTERSTATES.STUNNED;
+                _startTimer = Time.time;
+            }
         }
     }
 
@@ -257,15 +270,16 @@ public class ShootingBoss : BossEnemy
 
     private void CheckForCanAbsorb()
     {
-        for (int ghlost = 0; ghlost < _attachedShooter.GetGhlostsInScene.Count; ghlost++)
+        float timeTaken = Time.time - _startTimer;
+        if (timeTaken > _absorbDelay)
         {
-            if (_attachedShooter.GetGhlostsInScene[ghlost].GetComponent<DumbBossGlhost>().GetSpeed != 0)
-            {
-                return;
-            }
+            _absorbingGhlosts = new List<GameObject>();
+            _absorbedGhlosts = new List<GameObject>();
+            _invinciblesAddad = false;
+            _startTimer = Time.time;
+            _MyState = SHOOTERSTATES.ABSORB;
         }
-        _invinciblesAddad = false;
-        _MyState = SHOOTERSTATES.ABSORB;
+        
     }
 
     private void AbsorbAtk()
@@ -284,32 +298,6 @@ public class ShootingBoss : BossEnemy
                     _absorbingGhlosts.Add(_attachedShooter.GetGhlostsInScene[index]);
                 }
             }
-            /*
-            Debug.DrawRay(transform.position + (Vector3.up * 1f), (transform.forward * 100f), Color.green);
-            if (Physics.Raycast(transform.position + (Vector3.up * 1f), transform.forward, out hit, 100f))
-            {
-                
-                //transform.eulerAngles += new Vector3(0, angle, 0);
-                if (hit.collider.GetComponent<DumbBossGlhost>())
-                {
-                    if (hit.collider.GetComponent<DumbBossGlhost>().GetMyMechanic == Mechanic.CHASE)
-                    {
-                        for (int i = 0; i < _absorbingGhlo`sts.Count; i++)
-                        {
-                            if (hit.collider.gameObject == _absorbingGhlosts[i])
-                            {
-                                return;
-                            }
-                        }
-                        DumbBossGlhost ghlostRef = hit.collider.GetComponent<DumbBossGlhost>();
-                        ghlostRef.GetSpeed = _absorbSpeed;
-                        ghlostRef.setMove(transform.eulerAngles);
-                        _absorbingGhlosts.Add(ghlostRef.gameObject);
-                    }
-                }
-
-            }
-            */
             _invinciblesAddad = true;
         }
         else if(_absorbingGhlosts.Count != _absorbedGhlosts.Count)
@@ -336,17 +324,29 @@ public class ShootingBoss : BossEnemy
             if (timeTaken >= _shootRate * _ghlostsShot)
             {
                 DumbBossGlhost ghlostRef = _absorbedGhlosts[_ghlostsShot].GetComponent<DumbBossGlhost>();
+                ghlostRef.transform.rotation = transform.rotation;
                 ghlostRef.gameObject.SetActive(true);
-                ghlostRef.setMove(_playerRef.transform.position);
+                ghlostRef.ShootMe(_playerRef.transform.rotation);
+                ghlostRef.setMyState = DumbBossGlhost.DUMBSTATE.DIE;
                 _ghlostsShot++;
             }
             Debug.Log("Shooting Ghlosts");
         }
         else
         {
+            _startTimer = Time.time;
             _MyState = SHOOTERSTATES.STUNNED;
         }
         
+    }
+    private void changeColor()
+    {
+        Debug.Log("Change Color");
+        List<Color> possibleColors = _attachedShooter.GetGhlostColors;
+        int _rando = Random.Range(0, possibleColors.Count);
+        _myColor = possibleColors[_rando];
+        _myMaterial.color = _myColor;
+        _myRenderer.materials[1] = _myMaterial;
     }
 
     private void FollowPlayer()
@@ -359,7 +359,7 @@ public class ShootingBoss : BossEnemy
         if (timeTaken > _realFollowDuration)
         {
             _enemyAgent.SetDestination(transform.position);
-
+            changeColor();
             _attachedShooter.newAttack = true;
             _attachedShooter.attackInProgress = true;
             _MyState = SHOOTERSTATES.ATTACKING;
@@ -397,7 +397,7 @@ public class ShootingBoss : BossEnemy
     {
         if (_incColor == _myColor)
         {
-            GotHit(_damageTaken);
+            GotHit(_colorDamageToBoss);
             return true;
         }
         else
@@ -591,5 +591,6 @@ public class ShootingBoss : BossEnemy
     public float GetDamageToBoss { get { return _damageToBoss; } }
     public float GetDamageToPlayer { get { return _damageToPlayer; } }
     public PlayerController GetPlayerRef { get { return _playerRef; } }
+    public bool SetSpecialPulseAttack { get { return _specialPulseAttack; } set { _specialPulseAttack = value; } }
     //public bool GetIfSpecialGhlosts { get { return _specialGhlosts; } }
 }

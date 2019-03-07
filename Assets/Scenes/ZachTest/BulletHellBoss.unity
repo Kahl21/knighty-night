@@ -5691,6 +5691,83 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4606198890252792, guid: 3d9b81aa5bcaeda4badfd059ac09f2d2,
     type: 2}
   m_PrefabInternal: {fileID: 827003045}
+--- !u!1001 &838219769
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4909685599722174, guid: 1cd3ac7712db8a849b061cf03b078dd9, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: -1.8451595
+      objectReference: {fileID: 0}
+    - target: {fileID: 4909685599722174, guid: 1cd3ac7712db8a849b061cf03b078dd9, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: -0.2922187
+      objectReference: {fileID: 0}
+    - target: {fileID: 4909685599722174, guid: 1cd3ac7712db8a849b061cf03b078dd9, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 2.7569127
+      objectReference: {fileID: 0}
+    - target: {fileID: 4909685599722174, guid: 1cd3ac7712db8a849b061cf03b078dd9, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4909685599722174, guid: 1cd3ac7712db8a849b061cf03b078dd9, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4909685599722174, guid: 1cd3ac7712db8a849b061cf03b078dd9, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4909685599722174, guid: 1cd3ac7712db8a849b061cf03b078dd9, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4909685599722174, guid: 1cd3ac7712db8a849b061cf03b078dd9, type: 2}
+      propertyPath: m_RootOrder
+      value: 22
+      objectReference: {fileID: 0}
+    - target: {fileID: 199312530880723480, guid: 1cd3ac7712db8a849b061cf03b078dd9,
+        type: 2}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 0226575477944444a9782710f42faa72, type: 2}
+    - target: {fileID: 199312530880723480, guid: 1cd3ac7712db8a849b061cf03b078dd9,
+        type: 2}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: 0226575477944444a9782710f42faa72, type: 2}
+    - target: {fileID: 199728182690157618, guid: 1cd3ac7712db8a849b061cf03b078dd9,
+        type: 2}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: bea86f7dcfb1b674eb82c231da811551, type: 2}
+    - target: {fileID: 199728182690157618, guid: 1cd3ac7712db8a849b061cf03b078dd9,
+        type: 2}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: bea86f7dcfb1b674eb82c231da811551, type: 2}
+    - target: {fileID: 199479057432812312, guid: 1cd3ac7712db8a849b061cf03b078dd9,
+        type: 2}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: bea86f7dcfb1b674eb82c231da811551, type: 2}
+    - target: {fileID: 199479057432812312, guid: 1cd3ac7712db8a849b061cf03b078dd9,
+        type: 2}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: bea86f7dcfb1b674eb82c231da811551, type: 2}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1cd3ac7712db8a849b061cf03b078dd9, type: 2}
+  m_IsPrefabAsset: 0
+--- !u!1 &838219770 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1837159504727174, guid: 1cd3ac7712db8a849b061cf03b078dd9,
+    type: 2}
+  m_PrefabInternal: {fileID: 838219769}
 --- !u!1001 &845718625
 Prefab:
   m_ObjectHideFlags: 0
@@ -6340,8 +6417,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _normalGhlostPrefab: {fileID: 1099749849767518, guid: b257491553f0482479bab2d8095ca858,
     type: 2}
-  _InvincibleGhlostPrefab: {fileID: 1179898473132936, guid: 236704419cfa35741966931f8af6ca9e,
-    type: 2}
+  _InvincibleGhlostPrefab: {fileID: 838219770}
   newAttack: 0
   attackInProgress: 0
   _SpawnedDistAway: 1.5
@@ -6358,9 +6434,11 @@ MonoBehaviour:
   _spiralSpawnRate: 0.1
   _spiralRotateSpeed: 200
   _spiralGhlostTravelSpeed: 5
-  _pulseAttackPercentage: 100
-  _lineAttackPercentage: 0
-  _spiralAttackPercentage: 0
+  _pulseAttackPercentage: 50
+  _lineAttackPercentage: 25
+  _spiralAttackPercentage: 25
+  _specialPulsePercentage: 70
+  _regularPulsePercentage: 30
   _specialGhlosts: 1
   _coloredSpawnPercentage: 5
   _invincibleSpawnPercentage: 10
@@ -6410,6 +6488,7 @@ MonoBehaviour:
   _followDuration: 5
   _hardFollowDuration: 0
   _hardTimeBetweenAttacks: 0
+  _colorDamageToBoss: 0
   _absorbAttackPercentage: 0
   _normalAtttackPercentage: 0
   _absorbSpeed: 10
@@ -6417,6 +6496,7 @@ MonoBehaviour:
   _shootingFollowOffset: 1
   _shootRate: 0.4
   _rotationAngle: 0
+  _absorbDelay: 5
   _absorbingGhlosts: []
   _absorbedGhlosts: []
   _attackInProgress: 0
