@@ -4,9 +4,7 @@ using UnityEngine;
 
 public class GraveyardGlhost : BasicGlhost {
 
-    [Header("Graveyard Glhost Variables")]
-    [SerializeField]
-    protected bool _alwaysInvincible;
+    [Header("Graveyard Ghlost Variables")]
     [SerializeField]
     protected Color _invincibleColor;
     protected Color _startingColor;
@@ -17,6 +15,14 @@ public class GraveyardGlhost : BasicGlhost {
     protected float _invCurrTime;
     protected float _invStartTime;
     protected bool _invincible = false;
+
+    [Header("Chase Ghlost Variables")]
+    [SerializeField]
+    protected bool _alwaysInvincible;
+    [SerializeField]
+    protected float _distanceToTransform;
+    protected bool _canChange = true;
+    protected GameObject _swarmChangePoint;
 
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
@@ -47,6 +53,12 @@ public class GraveyardGlhost : BasicGlhost {
                     {
                         ChangeInvincible();
                     }
+
+                    if(!_canChange)
+                    {
+                        CheckForTransform();
+                    }
+
                     Move();
                     CheckForHit();
                 }
@@ -96,6 +108,14 @@ public class GraveyardGlhost : BasicGlhost {
         }
     }
 
+    public void ColorChange(Color incColor)
+    {
+        _invincibleColor = incColor;
+        _spookColor = _invincibleColor;
+        _mySpookiness.color = _spookColor;
+        _myRenderer.materials[1] = _mySpookiness;
+    }
+
     public override void GotHit(Vector3 _flyDir, float _knockBackForce)
     {
         if(!_invincible)
@@ -103,4 +123,18 @@ public class GraveyardGlhost : BasicGlhost {
             base.GotHit(_flyDir, _knockBackForce);
         }
     }
+
+    private void CheckForTransform()
+    {
+        if(Vector3.Distance(transform.position, _swarmChangePoint.transform.position) < _distanceToTransform)
+        {
+            _invincible = false;
+            _particle.SetActive(false);
+            _spookColor = _startingColor;
+            _myMechanic = Mechanic.SWARM;
+            _canChange = false;
+        }
+    }
+
+    public bool IsChanged { get { return _canChange; } set { _canChange = value; } }
 }

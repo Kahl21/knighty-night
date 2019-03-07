@@ -3121,11 +3121,11 @@ MonoBehaviour:
   _spookyOffset: 7.5
   _cheatingDistance: 0
   _cheatingSensitivity: 0
-  _myMechanic: 0
-  _alwaysInvincible: 0
-  _invincibleColor: {r: 0, g: 0, b: 0, a: 0}
+  _invincibleColor: {r: 0, g: 0, b: 0, a: 1}
   _particle: {fileID: 1496576594527614}
   _invincibleChangeDuration: 1
+  _alwaysInvincible: 0
+  _distanceToTransform: 0
 --- !u!136 &136152425730835960
 CapsuleCollider:
   m_ObjectHideFlags: 1

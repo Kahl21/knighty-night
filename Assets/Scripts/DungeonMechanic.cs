@@ -57,6 +57,8 @@ public class DungeonMechanic : MonoBehaviour {
     GameObject _spawnPoint;
     [SerializeField]
     float _howManyGlhostsToSpawn;
+    [SerializeField]
+    List<MazeCheckpoint> _mazeCheckpoints;
 
     [Header("If Color Room Variables")]
     [SerializeField]
@@ -137,6 +139,11 @@ public class DungeonMechanic : MonoBehaviour {
                 for (int i = 0; i < _howManyGlhostsToSpawn; i++)
                 {
                     SpawnEnemy(0);
+                }
+
+                for (int i = 0; i < _mazeCheckpoints.Count; i++)
+                {
+                    _mazeCheckpoints[i].Init(this, _enemyList, _mazeCheckpoints);
                 }
                 break;
             case Mechanic.COLOR:
@@ -432,6 +439,10 @@ public class DungeonMechanic : MonoBehaviour {
                     {
                         _doors[i].RoomDone();
                     }
+                }
+                for (int i = 0; i < _mazeCheckpoints.Count; i++)
+                {
+                    _mazeCheckpoints[i].MyReset();
                 }
                 EndAll();
                 break;
