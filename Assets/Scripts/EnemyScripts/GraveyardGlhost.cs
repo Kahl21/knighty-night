@@ -19,7 +19,6 @@ public class GraveyardGlhost : BasicGlhost {
     [Header("Chase Ghlost Variables")]
     [SerializeField]
     protected bool _alwaysInvincible;
-    [SerializeField]
     protected float _distanceToTransform;
     protected bool _canChange = true;
     protected GameObject _swarmChangePoint;
@@ -31,6 +30,7 @@ public class GraveyardGlhost : BasicGlhost {
         if(_alwaysInvincible)
         {
             _spookColor = _invincibleColor;
+            _distanceToTransform = _mySpawner.GetChangeDistance;
             _particle.SetActive(true);
             _invincible = true;
         }
@@ -54,7 +54,7 @@ public class GraveyardGlhost : BasicGlhost {
                         ChangeInvincible();
                     }
 
-                    if(!_canChange)
+                    if(_canChange)
                     {
                         CheckForTransform();
                     }
@@ -126,15 +126,19 @@ public class GraveyardGlhost : BasicGlhost {
 
     private void CheckForTransform()
     {
-        if(Vector3.Distance(transform.position, _swarmChangePoint.transform.position) < _distanceToTransform)
+        Vector3 changePoint = _swarmChangePoint.transform.position;
+        changePoint.y = transform.position.y;
+
+        if (Vector3.Distance(transform.position, changePoint) < _distanceToTransform)
         {
             _invincible = false;
             _particle.SetActive(false);
             _spookColor = _startingColor;
-            _myMechanic = Mechanic.SWARM;
             _canChange = false;
+            _dead = false;
         }
     }
 
     public bool IsChanged { get { return _canChange; } set { _canChange = value; } }
+    public GameObject SetEndPoint { set { _swarmChangePoint = value; } }
 }

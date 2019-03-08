@@ -17,11 +17,11 @@ public class MazeCheckpoint : MonoBehaviour {
         _myRoom = myroom;
         _myListOfEnemies = enemyListRef;
         _otherCheckpoints = checkpoints;
-        _otherCheckpoints.Remove(this);
     }
 
     public void CheckPointHit()
     {
+        _myCollider = GetComponent<BoxCollider>();
         _myCollider.enabled = false;
         for (int i = 0; i < _myListOfEnemies.Count; i++)
         {
@@ -30,12 +30,16 @@ public class MazeCheckpoint : MonoBehaviour {
 
         for (int i = 0; i < _otherCheckpoints.Count; i++)
         {
-            _otherCheckpoints[i].MyReset();
+            if(_otherCheckpoints[i] != this)
+            {
+                _otherCheckpoints[i].MyReset();
+            }
         }
     }
 
     public void MyReset()
     {
+        _myCollider = GetComponent<BoxCollider>();
         _myCollider.enabled = true;
     }
 }

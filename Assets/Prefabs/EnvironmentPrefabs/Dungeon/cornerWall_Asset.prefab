@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 23065060058942224}
   - component: {fileID: 65604824889986712}
   - component: {fileID: 65679294898635312}
+  - component: {fileID: 114538289318108962}
   m_Layer: 0
   m_Name: cornerWall_Asset
   m_TagString: Untagged
@@ -109,3 +110,14 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 400, y: 400, z: 66.59351}
   m_Center: {x: -199.99995, y: 200, z: -32}
+--- !u!114 &114538289318108962
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1887715319213772}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a3a8a79136638040a3e030bb86a9e41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

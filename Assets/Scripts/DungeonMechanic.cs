@@ -59,6 +59,12 @@ public class DungeonMechanic : MonoBehaviour {
     float _howManyGlhostsToSpawn;
     [SerializeField]
     List<MazeCheckpoint> _mazeCheckpoints;
+    [SerializeField]
+    bool _debugChangeArea;
+    [SerializeField]
+    float _ghlostChangeDistance;
+    [SerializeField]
+    GameObject _chaseChangePoint;
 
     [Header("If Color Room Variables")]
     [SerializeField]
@@ -217,6 +223,15 @@ public class DungeonMechanic : MonoBehaviour {
         }
     }
 
+    private void OnDrawGizmos()
+    {
+        if(_debugChangeArea)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(_chaseChangePoint.transform.position, _ghlostChangeDistance);
+        }
+    }
+
     void SpawningDelay()
     {
         _currSpawningTime = (Time.time - _startSpawningTime) / _delayBetweenSpawns;
@@ -306,13 +321,21 @@ public class DungeonMechanic : MonoBehaviour {
         spawnPos.y = 0;
         //Debug.Log(spawnPos);
         GameObject newEnemy = Instantiate<GameObject>(_enemyPreFab, spawnPos, _enemyPreFab.transform.rotation);
-        
-        if(_roomMechanic == Mechanic.COLOR)
+
+        switch (_roomMechanic)
         {
-            newEnemy.GetComponent<BaseEnemy>().SetColor = _coloredBlocks[listNum].GetColor;
-            newEnemy.GetComponent<BaseEnemy>().SetPillar = _coloredBlocks[listNum].gameObject;
-            newEnemy.transform.GetChild(4).GetComponent<Light>().color = _coloredBlocks[listNum].GetColor;
+            case Mechanic.CHASE:
+                newEnemy.GetComponent<GraveyardGlhost>().SetEndPoint = _chaseChangePoint;
+                break;
+            case Mechanic.COLOR:
+                newEnemy.GetComponent<BaseEnemy>().SetColor = _coloredBlocks[listNum].GetColor;
+                newEnemy.GetComponent<BaseEnemy>().SetPillar = _coloredBlocks[listNum].gameObject;
+                newEnemy.transform.GetChild(4).GetComponent<Light>().color = _coloredBlocks[listNum].GetColor;
+                break;
+            default:
+                break;
         }
+
         newEnemy.GetComponent<BaseEnemy>().Init(this, _roomMechanic);
         _enemyList.Add(newEnemy.GetComponent<BaseEnemy>());
         _glhostsSpawned++;
@@ -497,4 +520,5 @@ public class DungeonMechanic : MonoBehaviour {
     public List<DoorMovement> GetDoors { get { return _doors; } }
     public List<BaseEnemy> GetCurrEnemyList { get { return _enemyList; } }
     public List<BaseTrap> GetCurrTrapList { get { return _trapsInRoom; } }
+    public float GetChangeDistance { get { return _ghlostChangeDistance; } }
 }
