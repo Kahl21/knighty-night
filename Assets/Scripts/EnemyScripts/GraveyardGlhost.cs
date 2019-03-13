@@ -20,7 +20,7 @@ public class GraveyardGlhost : BasicGlhost {
     [SerializeField]
     protected bool _alwaysInvincible;
     protected float _distanceToTransform;
-    protected bool _canChange = true;
+    protected bool _canChange = false;
     protected GameObject _swarmChangePoint;
 
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
@@ -33,6 +33,7 @@ public class GraveyardGlhost : BasicGlhost {
             _distanceToTransform = _mySpawner.GetChangeDistance;
             _particle.SetActive(true);
             _invincible = true;
+            _canChange = true;
         }
         else
         {
