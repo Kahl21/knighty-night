@@ -16,6 +16,7 @@ public class PM_Teleporter : MonoBehaviour {
 		
 	}
 
+    
     public void TriggerTeleport(Collider other)
     {
         if (other.GetComponent<PlayerController>().transform || other.GetComponent<PM_BasicGhlost>())
@@ -23,4 +24,5 @@ public class PM_Teleporter : MonoBehaviour {
             transform.parent.GetComponent<PM_Manager>().teleportObject(other.gameObject, this.gameObject);
         }
     }
+    
 }

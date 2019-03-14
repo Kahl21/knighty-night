@@ -7,8 +7,10 @@ public class PM_BasicGhlost : BaseEnemy
 {
     protected enum BASICSTATES
     {
+        NONE,
         CHASING,
         MOVING,
+        FINDTARGET,
         DIE
     }
 
@@ -39,6 +41,9 @@ public class PM_BasicGhlost : BaseEnemy
                 {
                     switch (_myState)
                     {
+                        case BASICSTATES.NONE:
+                            break;
+
                         case BASICSTATES.MOVING:
                         Move();
                         CheckForHit();
@@ -46,6 +51,10 @@ public class PM_BasicGhlost : BaseEnemy
 
                         case BASICSTATES.CHASING:
                             FollowPlayer();
+                            break;
+
+                        case BASICSTATES.FINDTARGET:
+                            findNewTarget();
                             break;
 
                         case BASICSTATES.DIE:
@@ -87,7 +96,10 @@ public class PM_BasicGhlost : BaseEnemy
         _myAnimations.Play("Moving", 0);
         _startTime = Time.time;
 
-        findNewTarget();
+        random = Random.Range(0, _managerInstance.GetTargetPoints.Count - 1);
+        _staticTarget = _managerInstance.GetTargetPoints[random];
+        _myAgent.SetDestination(_staticTarget.transform.position);
+        _myState = BASICSTATES.MOVING;
     }
 
     protected override void Move()
@@ -99,6 +111,12 @@ public class PM_BasicGhlost : BaseEnemy
         else
         {
 
+        }
+
+        if (_myAgent.hasPath == false)
+        {
+            Debug.Log("No Path");
+            _myState = BASICSTATES.FINDTARGET;
         }
         //BasicMovement();
         //transform.position += moveDirection * moveSpeed * Time.deltaTime;
@@ -146,11 +164,14 @@ public class PM_BasicGhlost : BaseEnemy
     void findNewTarget()
     {
         random = Random.Range(0, _managerInstance.GetTargetPoints.Count - 1);
+
         if (_managerInstance.GetTargetPoints[random] != _staticTarget)
         {
             _staticTarget = _managerInstance.GetTargetPoints[random];
         }
-        _myAgent.SetDestination(_staticTarget.transform.position);
+
+        _myAgent.SetDestination(_staticTarget.transform.localPosition);
+        _myState = BASICSTATES.MOVING;
     }
 
     //This is used for the ghlosts secondary movement.
@@ -174,7 +195,7 @@ public class PM_BasicGhlost : BaseEnemy
             }
             else if(thingHit == _staticTarget)
             {
-                findNewTarget();
+                //_myState = BASICSTATES.FINDTARGET;
             }
         }
     }

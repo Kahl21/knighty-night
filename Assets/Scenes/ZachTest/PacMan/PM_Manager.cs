@@ -36,8 +36,13 @@ public class PM_Manager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        spawnGhlost();
+    }
+
+    void spawnGhlost()
+    {
         _currTime = Time.time - _startTimer;
-        if (_currTime >= ghostSpawnDelay && _ghostsInScene.Count <= maxGhostsInScene)
+        if (_currTime >= ghostSpawnDelay && _ghostsInScene.Count < maxGhostsInScene)
         {
             random = Random.Range(0, _spawnPoints.Count);
             GameObject ghostInstance;
