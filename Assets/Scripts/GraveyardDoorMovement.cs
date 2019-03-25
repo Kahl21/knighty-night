@@ -9,26 +9,38 @@ public class GraveyardDoorMovement : DoorMovement
     GameObject rightDoor;
 
     [SerializeField]
-    float _doorMoveDuration;
-    float _startTime;
-    float _currTime;
+    float _rotationAmount;
+    [SerializeField]
+    Vector3 _leftRot;
+    [SerializeField]
+    Vector3 _rightRot;
+    [SerializeField]
+    Vector3 _leftGoTo;
+    [SerializeField]
+    Vector3 _rightGoTo;
 
     // Use this for initialization
     protected override void Awake()
     {
         leftDoor = this.transform.GetChild(0).gameObject;
-        rightDoor = this.transform.GetChild(1).gameObject;
+        leftDoor.transform.parent = null;
+        _leftRot = leftDoor.transform.localEulerAngles;
+        _leftGoTo = _leftRot;
+        _leftGoTo.y += _rotationAmount;
+        rightDoor = this.transform.GetChild(0).gameObject;
+        rightDoor.transform.parent = null;
+        _rightRot = rightDoor.transform.localEulerAngles;
+        _rightGoTo = _rightRot;
+        _rightRot.y -= _rotationAmount;
     }
 
     public override void Init()
     {
-        _startTime = Time.time;
         falling = true;
     }
 
     public override void RoomDone()
     {
-        _startTime = Time.time;
         rising = true;
     }
 
@@ -46,30 +58,30 @@ public class GraveyardDoorMovement : DoorMovement
     }
 
     protected override void Fall()
-    {
-        _currTime = (Time.time - _startTime) / _doorMoveDuration;
-
-        leftDoor.transform.Rotate(Vector3.up * _doorSpeed);
-        rightDoor.transform.Rotate(Vector3.down * _doorSpeed);
-
-        if(_currTime >= 1)
+    { 
+        if(leftDoor.transform.localEulerAngles.y <= _leftGoTo.y)
         {
-            _currTime = 1;
+            leftDoor.transform.Rotate(Vector3.up * _doorSpeed);
+            rightDoor.transform.Rotate(Vector3.down * _doorSpeed);
+        }
+        else
+        {
             falling = false;
         }
+        
     }
 
     protected override void Rise()
     {
-        _currTime = (Time.time - _startTime) / _doorMoveDuration;
 
-        leftDoor.transform.Rotate(Vector3.down * _doorSpeed);
-        rightDoor.transform.Rotate(Vector3.up * _doorSpeed);
-
-        if (_currTime >= 1)
+        if (leftDoor.transform.localEulerAngles.y >= _leftRot.y)
         {
-            _currTime = 1;
+            leftDoor.transform.Rotate(Vector3.down * _doorSpeed);
+            rightDoor.transform.Rotate(Vector3.up * _doorSpeed);
+        }
+        else
+        {
             rising = false;
         }
-    }
+    } 
 }
