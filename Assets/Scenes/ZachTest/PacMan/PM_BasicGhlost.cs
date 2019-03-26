@@ -9,6 +9,7 @@ public class PM_BasicGhlost : BaseEnemy
     {
         NONE,
         CHASING,
+        INVINCIBLE,
         MOVING,
         FINDTARGET,
         DIE
@@ -45,6 +46,11 @@ public class PM_BasicGhlost : BaseEnemy
                         break;
 
                     case BASICSTATES.MOVING:
+                        Move();
+                        CheckForHit();
+                        break;
+
+                    case BASICSTATES.INVINCIBLE:
                         Move();
                         CheckForHit();
                         break;
@@ -99,7 +105,7 @@ public class PM_BasicGhlost : BaseEnemy
         random = Random.Range(0, _managerInstance.GetTargetPoints.Count - 1);
         _staticTarget = _managerInstance.GetTargetPoints[random];
         _myAgent.SetDestination(_staticTarget.transform.position);
-        _myState = BASICSTATES.MOVING;
+        _myState = BASICSTATES.INVINCIBLE;
     }
 
     protected override void Move()
@@ -132,7 +138,7 @@ public class PM_BasicGhlost : BaseEnemy
         }
 
         _myAgent.SetDestination(_staticTarget.transform.localPosition);
-        _myState = BASICSTATES.MOVING;
+        _myState = BASICSTATES.INVINCIBLE;
     }
 
     //This is used for the ghlosts secondary movement.
@@ -187,7 +193,11 @@ public class PM_BasicGhlost : BaseEnemy
 
         if (Physics.Raycast(transform.position + Vector3.up, _deathDirection, out hit, .4f))
         {
-            if (!hit.collider.GetComponent<BaseEnemy>() && !hit.collider.GetComponent<PlayerController>())
+            if (_myState == BASICSTATES.INVINCIBLE)
+            {
+
+            }
+            else if (!hit.collider.GetComponent<BaseEnemy>() && !hit.collider.GetComponent<PlayerController>())
             {
                 //_shooterRef.removeGhlostFromScene(gameObject);
                 Destroy(gameObject);
