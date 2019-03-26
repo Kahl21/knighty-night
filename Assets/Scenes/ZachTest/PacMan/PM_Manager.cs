@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PM_Manager : MonoBehaviour
 {
@@ -22,15 +23,26 @@ public class PM_Manager : MonoBehaviour
     [SerializeField]
     int maxGhostsInScene;
 
+    [Header("Score Variables")]
+    [SerializeField]
+    int _coinValue;
+    [SerializeField]
+    int _currentScore = 0;
+    [SerializeField]
+    Text _scoreText;
+
     float _startTimer;
     float _currTime;
     int random;
+    PlayerController _playerRef;
 
     // Use this for initialization
     void Start()
     {
+        _scoreText.text = "Score: " + _currentScore;
         _startTimer = Time.time;
         _ghostsInScene = new List<GameObject>();
+        _playerRef = PlayerController.Instance;
     }
 
     // Update is called once per frame
@@ -74,6 +86,13 @@ public class PM_Manager : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void AddToScore(GameObject coin)
+    {
+        _currentScore += _coinValue;
+        _scoreText.text = "Score: " + _currentScore;
+        Destroy(coin);
     }
 
     public List<GameObject> GetTargetPoints { get { return _targetPoints; } }

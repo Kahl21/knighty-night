@@ -525,6 +525,10 @@ public class PlayerController : MonoBehaviour {
             {
                 thingHit.GetComponent<PM_Teleporter>().TriggerTeleport(gameObject.GetComponent<Collider>());
             }
+            else if (thingHit.GetComponent<Collectable>())
+            {
+                thingHit.GetComponent<Collectable>().AddToScore();
+            }
             else if(!thingHit.GetComponent<HealingGrace>() || !thingHit.GetComponent<SpikeTrap>())      //else if the player did not hit any of the above and it isnt a spike trap or healing spot
             {
                 _move = Vector3.zero;                                                                   //you should probably stop cause i got not clue what you hit homeboy
