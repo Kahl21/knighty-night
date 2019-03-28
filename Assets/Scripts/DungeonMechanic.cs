@@ -207,10 +207,14 @@ public class DungeonMechanic : MonoBehaviour {
             }
             else                                                        //else
             {
-                for (int i = 0; i < _secondaryMechanic.GetDoors.Count; i++)
+                if(_doors.Count > 0)
                 {
-                    _secondaryMechanic.GetDoors[i].Init();              //initialize the doors on the secondary rooms doors
+                    for (int i = 0; i < _secondaryMechanic.GetDoors.Count; i++)
+                    {
+                        _secondaryMechanic.GetDoors[i].Init();              //initialize the doors on the secondary rooms doors
+                    }
                 }
+                
             }
         }
        
@@ -554,7 +558,22 @@ public class DungeonMechanic : MonoBehaviour {
             case Mechanic.BOSS:
 
                 _BigBad = _enemyPreFab.GetComponent<BossEnemy>();       //grabs boss in room
-                EndAll();                                               //ends the room
+
+                try
+                {
+                    if (_BigBad.GetComponent<TrapBossGlhost>())
+                    {
+                        for (int i = 0; i < _trapsInRoom.Count; i++)
+                        {
+                            _trapsInRoom[i].ResetTrap();                          //stop all of the traps
+                        }
+                    }
+                    EndAll();
+                }
+                catch
+                {
+                    EndAll();                                                   //ends the room
+                }                 
                 _BigBad.MyReset();                                      //resets the boss
                 break;
 

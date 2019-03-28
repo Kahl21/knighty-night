@@ -919,4 +919,7 @@ public class PlayerController : MonoBehaviour
 
     public GameObject SetWinImage { set { _winImage = value; } }
     public GameObject SetLoseImage { set { _loseImage = value; } }
+
+    public float GetCurrCheckpoint { get { return currentCheckpoint; } set { currentCheckpoint = value; } }
+    public bool DoesHaveCheckpoint { get { return reachCheckpoint; } set { reachCheckpoint = value; } }
 }

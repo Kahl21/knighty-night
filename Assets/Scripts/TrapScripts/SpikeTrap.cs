@@ -40,7 +40,7 @@ public class SpikeTrap : BaseTrap {
     protected float BoxRadius;
 
     protected GameObject _spikes;
-    protected Vector3 _startPos;
+    protected Vector3 _spikeStartPos;
     protected Vector3 _currBound;
 
     protected Vector3 _scanStartPos;
@@ -54,7 +54,7 @@ public class SpikeTrap : BaseTrap {
     {
         base.Init();
         _spikes = transform.GetChild(0).gameObject;
-        _startPos = _spikes.transform.localPosition;
+        _spikeStartPos = _spikes.transform.localPosition;
         _scanStartPos = transform.position;
         
         _topLeftCorner = _scanStartPos + ((Vector3.forward + Vector3.left) * BoxRadius);
@@ -149,11 +149,7 @@ public class SpikeTrap : BaseTrap {
         if (_spikes.transform.localPosition.y <= _currBound.y)
         {
             _spikes.transform.localPosition += Vector3.up * _attackSpeed * Time.deltaTime;
-            Vector3 _playerPos = _playerRef.transform.position;
-            if(_playerPos.z < _topLeftCorner.z && _playerPos.x > _topLeftCorner.x && _playerPos.z > _bottomRightCorner.z && _playerPos.x < _bottomRightCorner.x)
-            {
-                _playerRef.TakeDamage(_trapDamage);
-            }
+            SearchAreaForPlayer();
         }
         else
         {
@@ -168,12 +164,13 @@ public class SpikeTrap : BaseTrap {
     protected virtual void StartRetreatDelay()
     {
         _currTime = (Time.time - _startTIme) / _attackDelayDuration;
+        SearchAreaForPlayer();
 
         if (_currTime >= 1)
         {
             _currTime = 1;
 
-            _currBound = _startPos;
+            _currBound = _spikeStartPos;
             myState = SpikeState.RETREAT;
         }
     }
@@ -184,10 +181,11 @@ public class SpikeTrap : BaseTrap {
         if (_spikes.transform.localPosition.y >= _currBound.y)
         {
             _spikes.transform.localPosition += Vector3.down * _retreatSpeed * Time.deltaTime;
+            SearchAreaForPlayer();
         }
         else
         {
-            _spikes.transform.localPosition = _startPos;
+            _spikes.transform.localPosition = _spikeStartPos;
 
             myState = SpikeState.NONE;
         }
@@ -203,9 +201,24 @@ public class SpikeTrap : BaseTrap {
         }
         else
         {
-            _spikes.transform.localPosition = _startPos;
+            _spikes.transform.localPosition = _spikeStartPos;
 
             myState = SpikeState.ROOMDONE;
+        }
+    }
+
+    protected virtual void SearchAreaForPlayer()
+    {
+        Vector3 _playerPos = _playerRef.transform.position;
+
+        _scanStartPos = transform.position;
+
+        _topLeftCorner = _scanStartPos + ((Vector3.forward + Vector3.left) * BoxRadius);
+        _bottomRightCorner = _scanStartPos + ((Vector3.back + Vector3.right) * BoxRadius);
+
+        if (_playerPos.z < _topLeftCorner.z && _playerPos.x > _topLeftCorner.x && _playerPos.z > _bottomRightCorner.z && _playerPos.x < _bottomRightCorner.x)
+        {
+            _playerRef.TakeDamage(_trapDamage);
         }
     }
 
@@ -226,7 +239,7 @@ public class SpikeTrap : BaseTrap {
     //reset function
     public override void ResetTrap()
     {
-        _spikes.transform.localPosition = _startPos;
+        _spikes.transform.localPosition = _spikeStartPos;
         myState = SpikeState.NONE;
     }
 }

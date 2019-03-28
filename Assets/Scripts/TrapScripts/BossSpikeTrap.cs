@@ -15,6 +15,7 @@ public class BossSpikeTrap : SpikeTrap {
     float _realRetreatSpeed;
     float _moveSpeed;
 
+    Vector3 _startPos;
     TrapBossGlhost _bossRef;
 
     public override void Init()
@@ -23,6 +24,7 @@ public class BossSpikeTrap : SpikeTrap {
         _realAttackDelayDuration = _attackDelayDuration;
         _realAttackSpeed = _attackSpeed;
         _realRetreatSpeed = _retreatSpeed;
+        _startPos = transform.position;
     }
 
     protected override void Update()
@@ -87,16 +89,7 @@ public class BossSpikeTrap : SpikeTrap {
         if (_spikes.transform.localPosition.y <= _currBound.y)
         {
             _spikes.transform.localPosition += Vector3.up * _realAttackSpeed * Time.deltaTime;
-            Vector3 _playerPos = _playerRef.transform.position;
-            if (_playerPos.z < _topLeftCorner.z && _playerPos.x > _topLeftCorner.x && _playerPos.z > _bottomRightCorner.z && _playerPos.x < _bottomRightCorner.x)
-            {
-                _playerRef.TakeDamage(_trapDamage);
-                _possessed = false;
-                _realAttackDelayDuration = _attackDelayDuration;
-                _realAttackSpeed = _attackSpeed;
-                _realRetreatSpeed = _retreatSpeed;
-                _bossRef.IsNotPossessing = true;
-            }
+            SearchAreaForPlayer();
         }
         else
         {
@@ -111,12 +104,13 @@ public class BossSpikeTrap : SpikeTrap {
     protected override void StartRetreatDelay()
     {
         _currTime = (Time.time - _startTIme) / _realAttackDelayDuration;
+        SearchAreaForPlayer();
 
         if (_currTime >= 1)
         {
             _currTime = 1;
 
-            _currBound = _startPos;
+            _currBound = _spikeStartPos;
             myState = SpikeState.RETREAT;
         }
     }
@@ -127,16 +121,40 @@ public class BossSpikeTrap : SpikeTrap {
         if (_spikes.transform.localPosition.y >= _currBound.y)
         {
             _spikes.transform.localPosition += Vector3.down * _realRetreatSpeed * Time.deltaTime;
+            SearchAreaForPlayer();
         }
         else
         {
-            _spikes.transform.localPosition = _startPos;
+            _spikes.transform.localPosition = _spikeStartPos;
 
             myState = SpikeState.NONE;
 
             if (_possessed)
             {
                 base.StartTell();
+            }
+        }
+    }
+
+    protected override void SearchAreaForPlayer()
+    {
+        Vector3 _playerPos = _playerRef.transform.position;
+
+        _scanStartPos = transform.position;
+
+        _topLeftCorner = _scanStartPos + ((Vector3.forward + Vector3.left) * BoxRadius);
+        _bottomRightCorner = _scanStartPos + ((Vector3.back + Vector3.right) * BoxRadius);
+
+        if (_playerPos.z < _topLeftCorner.z && _playerPos.x > _topLeftCorner.x && _playerPos.z > _bottomRightCorner.z && _playerPos.x < _bottomRightCorner.x)
+        {
+            _playerRef.TakeDamage(_trapDamage);
+            if(_possessed)
+            {
+                _possessed = false;
+                _realAttackDelayDuration = _attackDelayDuration;
+                _realAttackSpeed = _attackSpeed;
+                _realRetreatSpeed = _retreatSpeed;
+                _bossRef.IsNotPossessing = true;
             }
         }
     }
@@ -159,5 +177,31 @@ public class BossSpikeTrap : SpikeTrap {
         playerPos.y = transform.position.y;
 
         transform.position = Vector3.MoveTowards(transform.position, playerPos, _moveSpeed * Time.deltaTime);
+    }
+
+
+
+    //stops the trap if room is finished
+    public override void DisableTrap()
+    {
+        if (myState != SpikeState.NONE)
+        {
+            _startTIme = Time.time;
+            myState = SpikeState.DONERETREAT;
+        }
+        else
+        {
+            myState = SpikeState.ROOMDONE;
+        }
+        _possessed = false;
+    }
+
+    //reset function
+    public override void ResetTrap()
+    {
+        _possessed = false;
+        transform.position = _startPos;
+        _spikes.transform.localPosition = _spikeStartPos;
+        myState = SpikeState.NONE;
     }
 }

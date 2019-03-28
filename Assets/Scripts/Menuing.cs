@@ -248,6 +248,8 @@ public class Menuing : MonoBehaviour {
         Time.timeScale = 1;
         _paused = false;
 
+        _playerRef.GetCurrCheckpoint = 0;
+        _playerRef.DoesHaveCheckpoint = false;
         _playerRef.InMenu = false;
         _playerRef.ResetPlayer();
         SetMenu(WhichUIMenu.PLAYER);
@@ -264,6 +266,8 @@ public class Menuing : MonoBehaviour {
         }
 
         _managerRef.SetGameReset = _playerRef.ResetPlayer;
+        _playerRef.GetCurrCheckpoint = 0;
+        _playerRef.DoesHaveCheckpoint = false;
         _playerRef.InMenu = false;
         Time.timeScale = 1;
         _paused = false;

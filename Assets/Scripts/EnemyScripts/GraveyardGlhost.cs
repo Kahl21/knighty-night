@@ -19,9 +19,12 @@ public class GraveyardGlhost : BasicGlhost {
     [Header("Chase Ghlost Variables")]
     [SerializeField]
     protected bool _alwaysInvincible;
+    [SerializeField]
+    protected bool _doesNotChangeSpookieness;
     protected float _distanceToTransform;
     protected bool _canChange = false;
     protected GameObject _swarmChangePoint;
+    
 
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
@@ -68,6 +71,13 @@ public class GraveyardGlhost : BasicGlhost {
             {
                 Die();
             }
+        }
+    }
+    protected override void ChangeSpookiness()
+    {
+        if(_doesNotChangeSpookieness)
+        {
+            base.ChangeSpookiness();
         }
     }
 

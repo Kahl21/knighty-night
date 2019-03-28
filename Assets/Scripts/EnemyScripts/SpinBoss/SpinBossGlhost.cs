@@ -582,10 +582,10 @@ public class SpinBossGlhost : BossEnemy
                 GameObject thingHit = hit.collider.gameObject;
 
                 //Debug.Log("reflected");
-                //if (thingHit.GetComponent<BossWall>())
-                //{
-                   // _moveDir = Vector3.Reflect(checkDir, hit.normal);
-                //}
+                if (thingHit.GetComponent<BossWall>()|| thingHit.GetComponent<DoorMovement>())
+                {
+                    _moveDir = Vector3.Reflect(checkDir, hit.normal);
+                }
             }
 
             _calcAngle = 0;
