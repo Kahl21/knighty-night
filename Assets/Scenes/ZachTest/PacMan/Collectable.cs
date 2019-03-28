@@ -5,6 +5,9 @@ using UnityEngine;
 public class Collectable : MonoBehaviour
 {
     PM_Manager _pmGameManager;
+
+    [SerializeField]
+    bool isSword = false;
 	// Use this for initialization
 	void Start ()
     {
@@ -16,4 +19,6 @@ public class Collectable : MonoBehaviour
         _pmGameManager.AddToScore(this.gameObject);
         Destroy(this.gameObject);
     }
+
+    public bool IsSword { get { return isSword; } }
 }

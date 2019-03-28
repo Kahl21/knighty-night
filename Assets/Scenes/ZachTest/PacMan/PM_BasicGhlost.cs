@@ -56,7 +56,7 @@ public class PM_BasicGhlost : BaseEnemy
                         break;
 
                     case BASICSTATES.CHASING:
-                        FollowPlayer();
+                        Move();
                         break;
 
                     case BASICSTATES.FINDTARGET:
@@ -116,7 +116,9 @@ public class PM_BasicGhlost : BaseEnemy
         if (_managerInstance.PlayerHasSpecialSword == true)
         {
             //Disable Particle effects and turn white
+            transform.GetChild(4).gameObject.SetActive(false);
             _myAgent.SetDestination(PlayerController.Instance.GetComponent<Transform>().position);
+            _myState = BASICSTATES.CHASING;
         }
         else
         {
@@ -175,7 +177,7 @@ public class PM_BasicGhlost : BaseEnemy
     public override void GotHit(Vector3 _flyDir, float _knockBackForce)
     {
         
-        if (!_hit && (_myState == BASICSTATES.FINDTARGET || _myState == BASICSTATES.MOVING || _myState == BASICSTATES.NONE))
+        if (!_hit && (_myState == BASICSTATES.CHASING || _myState == BASICSTATES.MOVING || _myState == BASICSTATES.NONE))
         {
             Debug.Log("Glhost Got Hit");
             _hit = true;

@@ -25,6 +25,7 @@ public class PM_Manager : MonoBehaviour
     List<GameObject> _targetPoints;
     [SerializeField]
     List<GameObject> _spawnPoints;
+    [SerializeField]
     List<GameObject> _ghostsInScene;
 
     [Header("Spawner Variables")]
@@ -70,10 +71,12 @@ public class PM_Manager : MonoBehaviour
     Transform[] _swarmSpawnPoints;
     [SerializeField]
     GameObject _swordPowerUp;
+    float[] _spawnTimers;
 
     float _startTimer;
     float _currTime;
     int random;
+    int spawnCounter = 0;
     PlayerController _playerRef;
     bool _playerHasSpecialSword = false;
     PHASES _pmPhase = PHASES.START;
@@ -85,6 +88,7 @@ public class PM_Manager : MonoBehaviour
         _startTimer = Time.time;
         _ghostsInScene = new List<GameObject>();
         _playerRef = PlayerController.Instance;
+        _spawnTimers = new float[_swarmSpawnPoints.Length];
 
         _targetPoints = new List<GameObject>();
 
@@ -108,11 +112,11 @@ public class PM_Manager : MonoBehaviour
                 break;
 
             case PHASES.INITPHASE:
-                spawnGhlost(_ghostSpawnDelay, _maxInitialGhostsInScene);
+                spawnGhlost();
                 break;
 
             case PHASES.COLOREDPHASE:
-                spawnGhlost(_ghostSpawnDelay, _maxInitialGhostsInScene);
+                spawnGhlost();
                 CheckForPillarsCompleted();
                 break;
 
@@ -137,12 +141,13 @@ public class PM_Manager : MonoBehaviour
     }
 
     //Needs to be setup for different spawn points
-    private void spawnGhlost(float spawnDelay, float maxInScene)
+    private void spawnGhlost()
     {
         _currTime = Time.time - _startTimer;
-        if (_currTime >= spawnDelay && _ghostsInScene.Count < maxInScene)
+        if (_currTime >= (_ghostSpawnDelay * spawnCounter) && _ghostsInScene.Count < _maxInitialGhostsInScene)
         {
             random = Random.Range(0, _spawnPoints.Count);
+
             GameObject ghostInstance;
             ghostInstance = Instantiate(_ghostPrefab);
             ghostInstance.transform.parent = null;
@@ -150,6 +155,7 @@ public class PM_Manager : MonoBehaviour
             ghostInstance.GetComponent<PM_BasicGhlost>().BasicInit(GetComponent<PM_Manager>());
             _ghostsInScene.Add(ghostInstance);
             _startTimer = Time.time;
+            spawnCounter++;
         }
     }
 
@@ -200,6 +206,13 @@ public class PM_Manager : MonoBehaviour
         _currentCoins = Instantiate(_coinLayoutPrefab);
         _currentCoins.SetActive(true);
 
+        _swordPowerUp.SetActive(true);
+
+        for (int index = 0; index < _spawnTimers.Length; index++)
+        {
+            _spawnTimers[0] = Time.time;
+        }
+
         _pmPhase = PHASES.KILLPHASE;
     }
 
@@ -209,9 +222,21 @@ public class PM_Manager : MonoBehaviour
         {
             for (int index = 0; index < _swarmSpawnPoints.Length; index++)
             {
+                Debug.Log("Spawning from point " + index);
                 if (_ghostsInScene.Count < _finalMaxGhostsInScene)
                 {
-                    spawnGhlost(_finalGhostSpawnDelay, _finalMaxGhostsInScene);
+                    _currTime = Time.time - _spawnTimers[index];
+                    if (_currTime >= _finalGhostSpawnDelay && _ghostsInScene.Count < _finalMaxGhostsInScene)
+                    {
+
+                        GameObject ghostInstance;
+                        ghostInstance = Instantiate(_ghostPrefab);
+                        ghostInstance.transform.parent = null;
+                        ghostInstance.transform.position = _swarmSpawnPoints[index].transform.position;
+                        ghostInstance.GetComponent<PM_BasicGhlost>().BasicInit(GetComponent<PM_Manager>());
+                        _ghostsInScene.Add(ghostInstance);
+                        _spawnTimers[index] = Time.time;
+                    }
                 }
             }
         }
@@ -244,8 +269,26 @@ public class PM_Manager : MonoBehaviour
 
     public void AddToScore(GameObject coin)
     {
-        _currentScore += _coinValue;
-        _scoreText.text = "Score: " + _currentScore + "/" + _initialScoreNeeded;
+
+
+        if (coin.GetComponent<Collectable>() && coin.GetComponent<Collectable>().IsSword != true)
+        {
+            _currentScore += _coinValue;
+            _scoreText.text = "Score: " + _currentScore + "/" + _initialScoreNeeded;
+        }
+        else if(coin.GetComponent<Collectable>() && coin.GetComponent<Collectable>().IsSword == true)
+        {
+            _playerHasSpecialSword = true;
+        }
+        else
+        {
+            if (coin.GetComponent<PM_BasicGhlost>())
+            {
+                _ghostsInScene.Remove(coin);
+            }
+            _currentScore += _coinValue;
+            _scoreText.text = "Score: " + _currentScore + "/" + _initialScoreNeeded;
+        }
 
         if (_pmPhase == PHASES.INITPHASE && _currentScore>=_initialScoreNeeded)
         {

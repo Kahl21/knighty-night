@@ -527,6 +527,7 @@ public class PlayerController : MonoBehaviour {
             }
             else if (thingHit.GetComponent<Collectable>())
             {
+                Debug.Log("Hit Coin");
                 thingHit.GetComponent<Collectable>().AddToScore();
             }
             else if(!thingHit.GetComponent<HealingGrace>() || !thingHit.GetComponent<SpikeTrap>())      //else if the player did not hit any of the above and it isnt a spike trap or healing spot

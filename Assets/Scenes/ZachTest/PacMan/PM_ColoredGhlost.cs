@@ -44,8 +44,8 @@ public class PM_ColoredGhlost : BaseEnemy
         _myRenderer = _myBody.GetComponent<SkinnedMeshRenderer>();
         _mySpookiness = _myRenderer.materials[1];
 
-        _spookColor = _mySpookiness.color;
-        _spookColor.a = 0;
+        //_spookColor = _mySpookiness.color;
+        //_spookColor.a = 0;
         _myRenderer.materials[1] = _mySpookiness;
 
         _myAnimations = GetComponent<Animator>();
@@ -69,10 +69,11 @@ public class PM_ColoredGhlost : BaseEnemy
 
         _myColor = Color;
         _mySpookiness.color = Color;
-        _mySpookiness = _myRenderer.materials[1];
 
         _spookColor = _mySpookiness.color;
-        _spookColor.a = 0;
+        _spookColor.a = 1;
+        _mySpookiness.color = _spookColor;
+
         _myRenderer.materials[1] = _mySpookiness;
 
         _myAnimations = GetComponent<Animator>();
@@ -187,6 +188,7 @@ public class PM_ColoredGhlost : BaseEnemy
         }
     }
 
+    /*
     //changes how clear the ghost is depending on how close they are to the player
     protected override void ChangeSpookiness()
     {
@@ -194,6 +196,7 @@ public class PM_ColoredGhlost : BaseEnemy
         _mySpookiness.color = _spookColor;
         _myRenderer.materials[1] = _mySpookiness;
     }
+    */
 
     //function to be called when the player hits them
     //sets the ghost to the "Dead" state
