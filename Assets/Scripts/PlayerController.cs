@@ -756,10 +756,24 @@ public class PlayerController : MonoBehaviour
 
                         if (thingHit.GetComponent<BaseEnemy>())
                         {
-                            if (!thingHit.GetComponent<BaseEnemy>().AmHit)
+                            try
                             {
-                                thingHit.GetComponent<BaseEnemy>().GotHit(transform.forward, _swordSwingKnockback);
-                                IncSpecialMeter(_specialInc, true);
+                                if(!thingHit.GetComponent<GraveyardGlhost>().AmInvincible)
+                                {
+                                    if (!thingHit.GetComponent<BaseEnemy>().AmHit)
+                                    {
+                                        thingHit.GetComponent<BaseEnemy>().GotHit(transform.forward, _swordSwingKnockback);
+                                        IncSpecialMeter(_specialInc, true);
+                                    }
+                                }
+                            }
+                            catch
+                            {
+                                if (!thingHit.GetComponent<BaseEnemy>().AmHit)
+                                {
+                                    thingHit.GetComponent<BaseEnemy>().GotHit(transform.forward, _swordSwingKnockback);
+                                    IncSpecialMeter(_specialInc, true);
+                                }
                             }
                         }
                         else if (thingHit.GetComponent<BossEnemy>())

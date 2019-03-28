@@ -200,8 +200,10 @@ public class BossSpikeTrap : SpikeTrap {
     public override void ResetTrap()
     {
         _possessed = false;
+        _realAttackDelayDuration = _attackDelayDuration;
+        _realAttackSpeed = _attackSpeed;
+        _realRetreatSpeed = _retreatSpeed;
         transform.position = _startPos;
-        _spikes.transform.localPosition = _spikeStartPos;
         myState = SpikeState.NONE;
     }
 }

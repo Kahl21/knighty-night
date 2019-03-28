@@ -29,8 +29,17 @@ public class GraveyardGlhost : BasicGlhost {
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
         base.Init(_spawner, _incomingMech);
+
+        if(_doesNotChangeSpookieness)
+        {
+            _spookColor.a = 1;
+            _mySpookiness.color = _spookColor;
+            _myRenderer.materials[1] = _mySpookiness;
+        }
+
         _startingColor = _spookColor;
-        if(_alwaysInvincible)
+
+        if (_alwaysInvincible)
         {
             _spookColor = _invincibleColor;
             _distanceToTransform = _mySpawner.GetChangeDistance;
@@ -75,7 +84,7 @@ public class GraveyardGlhost : BasicGlhost {
     }
     protected override void ChangeSpookiness()
     {
-        if(_doesNotChangeSpookieness)
+        if(!_doesNotChangeSpookieness)
         {
             base.ChangeSpookiness();
         }
@@ -145,11 +154,14 @@ public class GraveyardGlhost : BasicGlhost {
             _invincible = false;
             _particle.SetActive(false);
             _spookColor = _startingColor;
+            _mySpookiness.color = _spookColor;
+            _myRenderer.materials[1] = _mySpookiness;
             _canChange = false;
             _dead = false;
         }
     }
 
     public bool IsChanged { get { return _canChange; } set { _canChange = value; } }
+    public bool AmInvincible { get { return _invincible; } }
     public GameObject SetEndPoint { set { _swarmChangePoint = value; } }
 }

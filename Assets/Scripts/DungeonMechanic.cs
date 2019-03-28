@@ -466,9 +466,22 @@ public class DungeonMechanic : MonoBehaviour {
 
         if(_trapsInRoom.Count > 0)                                      //if there are any traps in the room
         {
-            for (int i = 0; i < _trapsInRoom.Count; i++)
+            try
             {
-                _trapsInRoom[i].DisableTrap();                          //stop all of the traps
+                if (_BigBad.GetComponent<TrapBossGlhost>())
+                {
+                    for (int i = 0; i < _trapsInRoom.Count; i++)
+                    {
+                        _trapsInRoom[i].ResetTrap();                          //stop all of the traps
+                    }
+                }
+            }
+            catch
+            {
+                for (int i = 0; i < _trapsInRoom.Count; i++)
+                {
+                    _trapsInRoom[i].DisableTrap();                          //stop all of the traps
+                }
             }
         }
 
@@ -557,23 +570,8 @@ public class DungeonMechanic : MonoBehaviour {
 
             case Mechanic.BOSS:
 
-                _BigBad = _enemyPreFab.GetComponent<BossEnemy>();       //grabs boss in room
-
-                try
-                {
-                    if (_BigBad.GetComponent<TrapBossGlhost>())
-                    {
-                        for (int i = 0; i < _trapsInRoom.Count; i++)
-                        {
-                            _trapsInRoom[i].ResetTrap();                          //stop all of the traps
-                        }
-                    }
-                    EndAll();
-                }
-                catch
-                {
-                    EndAll();                                                   //ends the room
-                }                 
+                _BigBad = _enemyPreFab.GetComponent<BossEnemy>();       //grabs boss in room                
+                EndAll();                                                   //ends the room                                
                 _BigBad.MyReset();                                      //resets the boss
                 break;
 

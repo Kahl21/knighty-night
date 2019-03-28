@@ -1617,9 +1617,38 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114408303204952900, guid: ba64178319ee24542ab9f46e3aaf6d10,
+        type: 2}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: f6541f8374974974f897a546ce5183de,
+        type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ba64178319ee24542ab9f46e3aaf6d10, type: 2}
   m_IsPrefabAsset: 0
+--- !u!1 &503096507 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1554753218433512, guid: ba64178319ee24542ab9f46e3aaf6d10,
+    type: 2}
+  m_PrefabInternal: {fileID: 503096506}
+--- !u!95 &503096508
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 503096507}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: e1e48a2a4f372f94a96c89a8b6b65fdc, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &518275205
 GameObject:
   m_ObjectHideFlags: 0
