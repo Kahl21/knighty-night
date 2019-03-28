@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 
 public class PM_Manager : MonoBehaviour
@@ -48,15 +49,17 @@ public class PM_Manager : MonoBehaviour
     [SerializeField]
     List<GameObject> _coloredPillars;
     [SerializeField]
-    List<Vector3> _colorSpawnPoints;
+    List<Transform> _colorSpawnPoints;
     [SerializeField]
     GameObject _coloredGhlostPrefab;
+    [SerializeField]
+    float _travelRadius;
 
     float _startTimer;
     float _currTime;
     int random;
     PlayerController _playerRef;
-    PHASES _pmPhase = PHASES.INITPHASE;
+    PHASES _pmPhase = PHASES.START;
 
     // Use this for initialization
     void Start()
@@ -73,7 +76,7 @@ public class PM_Manager : MonoBehaviour
         switch (_pmPhase)
         {
             case PHASES.START:
-
+                Init();
                 break;
 
             case PHASES.INITPHASE:
@@ -81,6 +84,7 @@ public class PM_Manager : MonoBehaviour
                 break;
 
             case PHASES.COLOREDPHASE:
+                spawnGhlost();
                 CheckForPillarsCompleted();
                 break;
 
@@ -122,10 +126,11 @@ public class PM_Manager : MonoBehaviour
 
     private void CheckForPillarsCompleted()
     {
+        /*
         int completedPillars = 0;
         for (int index = 0; index < _coloredPillars.Count; index++)
         {
-            if (_coloredPillars[index])
+            if (_coloredPillars[index].activeSelf == false)
             {
                 completedPillars++;
             }
@@ -135,6 +140,7 @@ public class PM_Manager : MonoBehaviour
         {
             _pmPhase = PHASES.KILLPHASE;
         }
+        */
     }
 
     public void teleportObject(GameObject teleportingObj, GameObject enteredTeleporter)
@@ -165,7 +171,8 @@ public class PM_Manager : MonoBehaviour
         {
             _coloredPillars[index].SetActive(true);
             GameObject coloredObj = Instantiate(_coloredGhlostPrefab);
-            coloredObj.transform.position = _colorSpawnPoints[index];
+            coloredObj.transform.position = _colorSpawnPoints[index].position;
+            coloredObj.GetComponent<PM_ColoredGhlost>().InitColor(_coloredPillars[index].GetComponent<ColoredBlock>().GetColor, _targetPoints, _travelRadius);
         }
         _pmPhase = PHASES.COLOREDPHASE;
     }
@@ -179,11 +186,12 @@ public class PM_Manager : MonoBehaviour
     {
         _currentScore += _coinValue;
         _scoreText.text = "Score: " + _currentScore + "/" + _initialScoreNeeded;
-        Destroy(coin);
 
         if (_pmPhase == PHASES.INITPHASE && _currentScore>=_initialScoreNeeded)
         {
+            Debug.Log("Enough Coins reached");
             EnableColoredPillars();
+            _pmPhase = PHASES.COLOREDPHASE;
         }
     }
 

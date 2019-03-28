@@ -91,6 +91,7 @@ public class PM_BasicGhlost : BaseEnemy
     {
         _myAgent = GetComponent<NavMeshAgent>();
         _myAgent.enabled = true;
+        //_myAgent.radius = 0.001f;
         _target = PlayerController.Instance;
         _menuRef = Menuing.Instance;
 
@@ -103,8 +104,10 @@ public class PM_BasicGhlost : BaseEnemy
         _startTime = Time.time;
 
         random = Random.Range(0, _managerInstance.GetTargetPoints.Count - 1);
+        //GetComponent<NavMeshAgent>().radius = 0.00001f;
         _staticTarget = _managerInstance.GetTargetPoints[random];
         _myAgent.SetDestination(_staticTarget.transform.position);
+        
         _myState = BASICSTATES.INVINCIBLE;
     }
 
@@ -113,6 +116,7 @@ public class PM_BasicGhlost : BaseEnemy
         if (_myState == BASICSTATES.CHASING)
         {
             _myAgent.SetDestination(_target.transform.position);
+            
         }
         else
         {

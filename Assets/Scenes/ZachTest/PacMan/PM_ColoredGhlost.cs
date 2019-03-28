@@ -25,6 +25,9 @@ public class PM_ColoredGhlost : BaseEnemy
     [SerializeField]
     PM_Manager _pmManagerRef;
 
+    List<GameObject> _travelPoints;
+    GameObject _currentTarget;
+
     DUMBSTATE _myDumbState = DUMBSTATE.NONE;
 
 
@@ -50,10 +53,46 @@ public class PM_ColoredGhlost : BaseEnemy
         _startTime = Time.time;
     }
 
-    public void InitColor(Color incColor)
+    public void InitColor(Color incColor, List<GameObject> travelPoints, float travelRadius)
     {
+        _canMove = true;
+        _myAgent = gameObject.GetComponent<NavMeshAgent>();
+        _myAgent.enabled = false;
+
+        _myBody = transform.GetChild(2).gameObject;
+        _myRenderer = _myBody.GetComponent<SkinnedMeshRenderer>();
+        _mySpookiness = _myRenderer.materials[1];
+
+        _spookColor = _mySpookiness.color;
+        _spookColor.a = 0;
+        _myRenderer.materials[1] = _mySpookiness;
+
+        _myAnimations = GetComponent<Animator>();
+        _myAnimations.Play("Moving", 0);
+        _startTime = Time.time;
+
         _mySpookiness.color = incColor;
         _mySpookiness = _myRenderer.materials[1];
+
+        _myAgent.enabled = true;
+
+
+        //Travel Points not working correctly, and color not displaying
+        for (int index = 0; index < travelPoints.Count; index++)
+        {
+            if (Vector3.Distance(travelPoints[index].transform.position, transform.position) > travelRadius)
+            {
+                travelPoints.RemoveAt(index);
+            }
+        }
+
+        for (int count = 0; count < travelPoints.Count; count++)
+        {
+            Debug.Log(travelPoints[count]);
+        }
+
+        _travelPoints = travelPoints;
+        findNewTarget();
     }
 
     // Update is called once per frame
@@ -87,25 +126,29 @@ public class PM_ColoredGhlost : BaseEnemy
         }
     }
 
+    void findNewTarget()
+    {
+        int random;
+        random = Random.Range(0, _travelPoints.Count - 1);
+
+        if (_travelPoints[random] != _currentTarget)
+        {
+            _currentTarget = _travelPoints[random];
+        }
+
+        _myAgent.SetDestination(_currentTarget.transform.localPosition);
+        _myDumbState = DUMBSTATE.TRAVELING;
+    }
 
     protected override void Move()
     {
-        
-        _myAgent.enabled = false;
-        transform.position += transform.forward * moveSpeed * Time.deltaTime;
-    }
-
-    protected void ColorMove()
-    {
-        _currTime = Time.time - _startTime;
-        if (_currTime <= _maxTravelTime)
+        if (_myAgent.hasPath == false)
         {
-            transform.position += transform.forward * moveSpeed * Time.deltaTime;
+            Debug.Log("No Path");
+            findNewTarget();
         }
-        else
-        {
-            moveSpeed = 0;
-        }
+        //BasicMovement();
+        //transform.position += moveDirection * moveSpeed * Time.deltaTime;
     }
 
     //shoots a raycast in front of the enemy
