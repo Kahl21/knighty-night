@@ -17,8 +17,10 @@ public class PM_Manager : MonoBehaviour
 
     [Header("Teleporters in the scene")]
     [SerializeField]
-    [Tooltip("Make sure linked teleporters are next to each other\nand children of this gameobject")]
+    [Tooltip("Make sure linked teleporters are next to each other \nand children of this gameobject")]
     List<GameObject> _teleporters;
+    [SerializeField]
+    GameObject _targetPointContainer;
     [SerializeField]
     List<GameObject> _targetPoints;
     [SerializeField]
@@ -29,9 +31,13 @@ public class PM_Manager : MonoBehaviour
     [SerializeField]
     GameObject _ghostPrefab;
     [SerializeField]
-    float ghostSpawnDelay;
+    [Tooltip("This prefab needs to be disabled initially")]
+    GameObject _coinLayoutPrefab;
+    GameObject _currentCoins;
     [SerializeField]
-    int maxGhostsInScene;
+    float _ghostSpawnDelay;
+    [SerializeField]
+    int _maxInitialGhostsInScene;
 
     [Header("Score Variables")]
     [SerializeField]
@@ -55,10 +61,21 @@ public class PM_Manager : MonoBehaviour
     [SerializeField]
     float _travelRadius;
 
+    [Header("Phase 3 Variables")]
+    [SerializeField]
+    float _finalGhostSpawnDelay;
+    [SerializeField]
+    int _finalMaxGhostsInScene;
+    [SerializeField]
+    Transform[] _swarmSpawnPoints;
+    [SerializeField]
+    GameObject _swordPowerUp;
+
     float _startTimer;
     float _currTime;
     int random;
     PlayerController _playerRef;
+    bool _playerHasSpecialSword = false;
     PHASES _pmPhase = PHASES.START;
 
     // Use this for initialization
@@ -68,6 +85,17 @@ public class PM_Manager : MonoBehaviour
         _startTimer = Time.time;
         _ghostsInScene = new List<GameObject>();
         _playerRef = PlayerController.Instance;
+
+        _targetPoints = new List<GameObject>();
+
+        _currentCoins = Instantiate(_coinLayoutPrefab);
+        _currentCoins.SetActive(true);
+
+        foreach (Transform item in _targetPointContainer.transform.GetComponentsInChildren<Transform>())
+        {
+            _targetPoints.Add(item.gameObject);
+        }
+        _targetPoints.RemoveAt(0);
     }
 
     // Update is called once per frame
@@ -80,16 +108,16 @@ public class PM_Manager : MonoBehaviour
                 break;
 
             case PHASES.INITPHASE:
-                spawnGhlost();
+                spawnGhlost(_ghostSpawnDelay, _maxInitialGhostsInScene);
                 break;
 
             case PHASES.COLOREDPHASE:
-                spawnGhlost();
+                spawnGhlost(_ghostSpawnDelay, _maxInitialGhostsInScene);
                 CheckForPillarsCompleted();
                 break;
 
             case PHASES.KILLPHASE:
-
+                WavePhase();
                 break;
 
             case PHASES.END:
@@ -108,10 +136,11 @@ public class PM_Manager : MonoBehaviour
         _pmPhase = PHASES.INITPHASE;
     }
 
-    void spawnGhlost()
+    //Needs to be setup for different spawn points
+    private void spawnGhlost(float spawnDelay, float maxInScene)
     {
         _currTime = Time.time - _startTimer;
-        if (_currTime >= ghostSpawnDelay && _ghostsInScene.Count < maxGhostsInScene)
+        if (_currTime >= spawnDelay && _ghostsInScene.Count < maxInScene)
         {
             random = Random.Range(0, _spawnPoints.Count);
             GameObject ghostInstance;
@@ -126,7 +155,7 @@ public class PM_Manager : MonoBehaviour
 
     private void CheckForPillarsCompleted()
     {
-        /*
+        
         int completedPillars = 0;
         for (int index = 0; index < _coloredPillars.Count; index++)
         {
@@ -138,9 +167,9 @@ public class PM_Manager : MonoBehaviour
 
         if (completedPillars == _coloredPillars.Count)
         {
-            _pmPhase = PHASES.KILLPHASE;
+            InitKillPhase();
         }
-        */
+        
     }
 
     public void teleportObject(GameObject teleportingObj, GameObject enteredTeleporter)
@@ -164,7 +193,38 @@ public class PM_Manager : MonoBehaviour
         }
     }
 
-    //Finish this. Need to initialize the colored ghlosts color and start their moving process
+    private void InitKillPhase()
+    {
+        //Initialize new set of coins
+        Destroy(_currentCoins);
+        _currentCoins = Instantiate(_coinLayoutPrefab);
+        _currentCoins.SetActive(true);
+
+        _pmPhase = PHASES.KILLPHASE;
+    }
+
+    private void WavePhase()
+    {
+        if (_playerHasSpecialSword == false)
+        {
+            for (int index = 0; index < _swarmSpawnPoints.Length; index++)
+            {
+                if (_ghostsInScene.Count < _finalMaxGhostsInScene)
+                {
+                    spawnGhlost(_finalGhostSpawnDelay, _finalMaxGhostsInScene);
+                }
+            }
+        }
+        else
+        {
+            if (_ghostsInScene.Count == 0)
+            {
+                Debug.Log("Level Complete");
+            }
+        }
+        
+    }
+
     private void EnableColoredPillars()
     {
         for (int index = 0; index < _coloredPillars.Count; index++)
@@ -172,7 +232,7 @@ public class PM_Manager : MonoBehaviour
             _coloredPillars[index].SetActive(true);
             GameObject coloredObj = Instantiate(_coloredGhlostPrefab);
             coloredObj.transform.position = _colorSpawnPoints[index].position;
-            coloredObj.GetComponent<PM_ColoredGhlost>().InitColor(_coloredPillars[index].GetComponent<ColoredBlock>().GetColor, _targetPoints, _travelRadius);
+            coloredObj.GetComponent<PM_ColoredGhlost>().InitColor(_coloredPillars[index].GetComponent<ColoredBlock>().GetColor, GetComponent<PM_Manager>(), _travelRadius, _coloredPillars[index]);
         }
         _pmPhase = PHASES.COLOREDPHASE;
     }
@@ -196,4 +256,5 @@ public class PM_Manager : MonoBehaviour
     }
 
     public List<GameObject> GetTargetPoints { get { return _targetPoints; } }
+    public bool PlayerHasSpecialSword { get { return _playerHasSpecialSword; } }
 }

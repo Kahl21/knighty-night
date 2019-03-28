@@ -53,14 +53,22 @@ public class PM_ColoredGhlost : BaseEnemy
         _startTime = Time.time;
     }
 
-    public void InitColor(Color incColor, List<GameObject> travelPoints, float travelRadius)
+    public void InitColor(Color Color, PM_Manager _managerRef, float travelRadius, GameObject myPillar)
     {
+        _travelPoints = new List<GameObject>();
+        _pmManagerRef = _managerRef;
+        _myPillar = myPillar;
+
         _canMove = true;
         _myAgent = gameObject.GetComponent<NavMeshAgent>();
         _myAgent.enabled = false;
 
         _myBody = transform.GetChild(2).gameObject;
         _myRenderer = _myBody.GetComponent<SkinnedMeshRenderer>();
+        _mySpookiness = _myRenderer.materials[1];
+
+        _myColor = Color;
+        _mySpookiness.color = Color;
         _mySpookiness = _myRenderer.materials[1];
 
         _spookColor = _mySpookiness.color;
@@ -71,27 +79,40 @@ public class PM_ColoredGhlost : BaseEnemy
         _myAnimations.Play("Moving", 0);
         _startTime = Time.time;
 
-        _mySpookiness.color = incColor;
-        _mySpookiness = _myRenderer.materials[1];
+        
 
         _myAgent.enabled = true;
 
+        _travelPoints = _managerRef.GetTargetPoints;
 
-        //Travel Points not working correctly, and color not displaying
-        for (int index = 0; index < travelPoints.Count; index++)
+        List<GameObject> newPointList = new List<GameObject>();
+
+
+        //Pulls the list of travel points and checks to see if each one is in range to travel to.
+        //If it is that point is added to a new list
+        for (int index = 0; index < _travelPoints.Count; index++)
         {
-            if (Vector3.Distance(travelPoints[index].transform.position, transform.position) > travelRadius)
+            //Debug.Log("Point " + index + " is " + Vector3.Distance(_travelPoints[index].transform.position, transform.position) + " away");
+
+            GameObject travelPointInQuesstion = _travelPoints[index];
+
+            if (Vector3.Distance(travelPointInQuesstion.transform.position, transform.position) <= travelRadius)
             {
-                travelPoints.RemoveAt(index);
+                newPointList.Add(travelPointInQuesstion);
             }
+            
         }
 
-        for (int count = 0; count < travelPoints.Count; count++)
+        _travelPoints = newPointList;
+
+        /* Debug
+        for (int count = 0; count < _travelPoints.Count; count++)
         {
-            Debug.Log(travelPoints[count]);
+            Debug.Log("Point " + count + " is " +
+                Vector3.Distance(_travelPoints[count].transform.position, transform.position) + " away");
         }
+        */
 
-        _travelPoints = travelPoints;
         findNewTarget();
     }
 
@@ -129,7 +150,7 @@ public class PM_ColoredGhlost : BaseEnemy
     void findNewTarget()
     {
         int random;
-        random = Random.Range(0, _travelPoints.Count - 1);
+        random = Random.Range(0, _travelPoints.Count);
 
         if (_travelPoints[random] != _currentTarget)
         {
@@ -163,26 +184,6 @@ public class PM_ColoredGhlost : BaseEnemy
             {
                 thingHit.GetComponent<PlayerController>().TakeDamage(_DamageToPlayer);
             }
-            else if(thingHit.GetComponent<ShootingBoss>())
-            {
-                if (_myDumbState == DUMBSTATE.DIE)
-                {
-                    if (thingHit.GetComponent<ColoredBlock>().GetColor == _myColor)
-                    {
-                        _pmManagerRef.DisablePillar(this.gameObject);
-                        Destroy(gameObject);
-                    }
-                    else
-                    {
-                        
-                    }
-                }
-                else
-                {
-                    thingHit.GetComponent<ShootingBoss>().HitByGhlost(gameObject, 0f);
-                }
-
-            }
         }
     }
 
@@ -199,7 +200,7 @@ public class PM_ColoredGhlost : BaseEnemy
     public override void GotHit(Vector3 _flyDir, float _knockBackForce)
     {
         Debug.Log("Glhost Got Hit");
-        if (!_hit && (_myMechanic == Mechanic.COLOR || _myMechanic == Mechanic.NONE))
+        if (!_hit && (_myDumbState == DUMBSTATE.TRAVELING))
         {
             _hit = true;
             _myAgent.enabled = false;
@@ -217,14 +218,50 @@ public class PM_ColoredGhlost : BaseEnemy
     protected override void Die()
     {
         //Debug.DrawLine(transform.position, transform.position + _deathDirection*_collisionCheckDist);
-
-        if (Physics.Raycast(transform.position + Vector3.up, _deathDirection, out hit, _collisionCheckDist))
+        Vector3 _newDeathDirection = _deathDirection;
+        if (Vector3.Distance(transform.position, _myPillar.transform.position) <= _cheatingDistance)
         {
-            if (!hit.collider.GetComponent<BaseEnemy>() && !hit.collider.GetComponent<PlayerController>())
+            if (transform.position.z > _myPillar.transform.position.z)
             {
-                Destroy(gameObject);
+                _newDeathDirection.z -= _cheatingSensitivity;
+            }
+            else if (transform.position.z < _myPillar.transform.position.z)
+            {
+                _newDeathDirection.z += _cheatingSensitivity;
+            }
+
+            if (transform.position.x > _myPillar.transform.position.x)
+            {
+                _newDeathDirection.x -= _cheatingSensitivity;
+            }
+            else if (transform.position.x > _myPillar.transform.position.x)
+            {
+                _newDeathDirection.x += _cheatingSensitivity;
             }
         }
+
+        if (Physics.Raycast(transform.position + Vector3.up, _deathDirection, out hit, .4f))
+        {
+            if (hit.collider.GetComponent<ColoredBlock>())
+            {
+                if (hit.collider.GetComponent<ColoredBlock>().GetColor == _myColor)
+                {
+                    _pmManagerRef.DisablePillar(hit.collider.gameObject);
+                    Destroy(this.gameObject);
+                }
+
+            }
+            else
+            {
+                _newDeathDirection = Vector3.zero;
+                _myAgent.enabled = true;
+                findNewTarget();
+                _hit = false;
+                _dead = false;
+            }
+        }
+
+        _deathDirection = _newDeathDirection;
         transform.position += _deathDirection * _knockBack * Time.deltaTime;
     }
 

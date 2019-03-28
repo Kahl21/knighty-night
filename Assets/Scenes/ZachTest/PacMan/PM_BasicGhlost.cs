@@ -113,21 +113,20 @@ public class PM_BasicGhlost : BaseEnemy
 
     protected override void Move()
     {
-        if (_myState == BASICSTATES.CHASING)
+        if (_managerInstance.PlayerHasSpecialSword == true)
         {
-            _myAgent.SetDestination(_target.transform.position);
-            
+            //Disable Particle effects and turn white
+            _myAgent.SetDestination(PlayerController.Instance.GetComponent<Transform>().position);
         }
         else
         {
-
+            if (_myAgent.hasPath == false)
+            {
+                Debug.Log("No Path");
+                _myState = BASICSTATES.FINDTARGET;
+            }
         }
 
-        if (_myAgent.hasPath == false)
-        {
-            Debug.Log("No Path");
-            _myState = BASICSTATES.FINDTARGET;
-        }
         //BasicMovement();
         //transform.position += moveDirection * moveSpeed * Time.deltaTime;
     }
@@ -204,6 +203,7 @@ public class PM_BasicGhlost : BaseEnemy
             else if (!hit.collider.GetComponent<BaseEnemy>() && !hit.collider.GetComponent<PlayerController>())
             {
                 //_shooterRef.removeGhlostFromScene(gameObject);
+                _managerInstance.AddToScore(gameObject);
                 Destroy(gameObject);
             }
         }
