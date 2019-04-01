@@ -12,15 +12,30 @@ public class BaseTrap : MonoBehaviour {
 
     protected PlayerController _playerRef;
 
+    protected Menuing _menuRef;
+
+    protected bool _init = false;
+
+    protected GameObject _Audio;
+    protected AudioSource _speaker;
+    protected AudioManager _audioManager;
+    protected float volSFX;
+
     //start Function
     //checks if the trap is independent of a room
     //calls Init based on whether or not independent
     protected virtual void Start()
     {
-        if(_independentTrap)
+        _menuRef = Menuing.Instance;
+        if (_independentTrap)
         {
             Init();
         }
+
+        _Audio = GameObject.Find("AudioManager");
+        _audioManager = _Audio.GetComponent<AudioManager>();
+        volSFX = _audioManager.volSFX;
+
     }
 
     //init function

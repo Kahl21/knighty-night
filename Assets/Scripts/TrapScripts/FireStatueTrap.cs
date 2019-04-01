@@ -25,6 +25,7 @@ public class FireStatueTrap : BaseTrap {
     float _fireIncDuration;
     [SerializeField]
     float _burningDuration;
+    [SerializeField]
     float _startDelay;
     float _currDelay;
 
@@ -40,11 +41,15 @@ public class FireStatueTrap : BaseTrap {
     ParticleSystem _myFire;
     public ParticleSystem _mySmoke;
 
+    public AudioClip fireNoise;
+
     FireState _mystate = FireState.NONE;
 
     //Start Function
     protected override void Start()
     {
+        _speaker = this.transform.GetComponent<AudioSource>();
+
         _myFire = transform.GetChild(0).transform.GetComponent<ParticleSystem>();
         _mySmoke = transform.GetChild(1).transform.GetComponent<ParticleSystem>();
         _mySmoke.Stop();
@@ -145,6 +150,7 @@ public class FireStatueTrap : BaseTrap {
 
         _currDetectDistance = _maxDetectDistance * _currDelay;
 
+        PlayNoise();
         LookForPlayer();
         
         if (_currDelay >= 1)
@@ -184,7 +190,7 @@ public class FireStatueTrap : BaseTrap {
         _currDelay = (Time.time - _startDelay) / _fireIncDuration;
 
         _currDetectDistance = _maxDetectDistance * (1 - _currDelay);
-
+        
         LookForPlayer();
         if (_currDelay >= 1)
         {
@@ -239,9 +245,18 @@ public class FireStatueTrap : BaseTrap {
         }
     }
 
+    //plays noise
+    private void PlayNoise()
+    {
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(fireNoise, volSFX);
+    }
+
+
     //stops trap once the room is finished
     public override void DisableTrap()
     {
+        _myFire.Stop();
         _mystate = FireState.ROOMDONE;
     }
 

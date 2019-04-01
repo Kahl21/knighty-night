@@ -20,6 +20,12 @@ public class TrapLever : MonoBehaviour {
 
     DungeonMechanic _myRoom;
 
+    GameObject _Audio;
+    AudioSource _speaker;
+    AudioManager _audioManager;
+    float volSFX;
+    public AudioClip leverHit;
+
     //init function while in a room
     public void Init(DungeonMechanic Room)
     {
@@ -28,6 +34,11 @@ public class TrapLever : MonoBehaviour {
         //Debug.Log(_lever.name);
         _startPos.z = _startingRotation;
         _lever.transform.localEulerAngles = _startPos;
+
+        _Audio = GameObject.Find("AudioManager");
+        _audioManager = _Audio.GetComponent<AudioManager>();
+        volSFX = _audioManager.volSFX;
+        _speaker = this.transform.GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -52,6 +63,9 @@ public class TrapLever : MonoBehaviour {
     //rotates the lever to show its activated
     private void activateSwitch()
     {
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(leverHit, volSFX);
+
         _currRotate = (Time.time - _startRotate) / _rotateDuration;
 
         _lever.transform.Rotate(transform.forward, _rotateSpeed * Time.deltaTime);
