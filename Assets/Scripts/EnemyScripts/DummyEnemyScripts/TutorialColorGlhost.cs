@@ -7,6 +7,9 @@ public class TutorialColorGlhost : BaseEnemy  {
 
     Vector3 _spawnPoint;
 
+    public AudioClip ghostHit;
+    public AudioClip ghostCorrectColor;
+
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
         _myAgent = GetComponent<NavMeshAgent>();
@@ -19,6 +22,8 @@ public class TutorialColorGlhost : BaseEnemy  {
 
         _mySpookiness.color = _myColor;
         _myRenderer.materials[1] = _mySpookiness;
+
+        _speaker = this.GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -34,7 +39,7 @@ public class TutorialColorGlhost : BaseEnemy  {
     {
         if (!_hit)
         {
-            Debug.Log("dead");
+            Debug.Log("Dazed_Start");
             _hit = true;
             _myAgent.enabled = false;
             _knockBack = _knockBackForce;
@@ -47,6 +52,11 @@ public class TutorialColorGlhost : BaseEnemy  {
 
     protected override void Die()
     {
+        if(_actualDead)
+        {
+            _myAnimations.Play("Dazed_Loop");
+        }
+
         if (Physics.Raycast(transform.position + Vector3.up, _deathDirection, out hit, _collisionCheckDist))
         {
             if (hit.collider.GetComponent<ColoredBlock>())
@@ -56,7 +66,7 @@ public class TutorialColorGlhost : BaseEnemy  {
                 {
                     other.CorrectMatch();
                     _mySpawner.RemoveMe(this);
-                    Destroy(gameObject);
+                    Dead();
                 }
                 else
                 {
@@ -74,6 +84,7 @@ public class TutorialColorGlhost : BaseEnemy  {
                 transform.position = _spawnPoint;
             }
         }
+
         transform.position += _deathDirection * _knockBack * Time.deltaTime;
     }
 

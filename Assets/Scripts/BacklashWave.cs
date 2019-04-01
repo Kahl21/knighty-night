@@ -97,7 +97,7 @@ public class BacklashWave : MonoBehaviour {
                 }
                 else if (thingHit.GetComponent<BossEnemy>())
                 {
-                    if(thingHit.GetComponent<ColorBossGlhost>())
+                    if(thingHit.GetComponent<ColorBossGlhost>() || thingHit.GetComponent<MiniBossColor>())
                     {
                         thingHit.GetComponent<BossEnemy>().GotHit(_waveDamage/_waveDamageDivideOffsetForSpecialBosses);
                     }

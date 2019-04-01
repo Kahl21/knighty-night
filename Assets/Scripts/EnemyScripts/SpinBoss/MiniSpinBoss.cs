@@ -110,7 +110,12 @@ public class MiniSpinBoss : BossEnemy
     float _hardPinballAttackDuration;
 
     protected GameObject _myBody;
-    protected SkinnedMeshRenderer _mySkinRenderer;
+    //protected SkinnedMeshRenderer _mySkinRenderer;
+
+    [Header("Sound Variables")]
+    public AudioClip bossSpin;
+    public AudioClip bossDazed;
+    public AudioClip bossDeath;
 
     SPINSTRATS _MyAttack = SPINSTRATS.FOLLOW;
 
@@ -290,6 +295,8 @@ public class MiniSpinBoss : BossEnemy
         cam1.y = _cameraRef.transform.position.y;
         _cameraRef.AmFollowingPlayer = false;
 
+        _speaker = this.transform.GetComponent<AudioSource>();
+
         _totalPercentage = _realFollowPercentage + _realPinballAttackPercentage;
 
         _startAttackTime = Time.time;
@@ -429,6 +436,10 @@ public class MiniSpinBoss : BossEnemy
     {
         if(_tellPinballing)
         {
+
+            if (!_speaker.isPlaying)
+                _speaker.PlayOneShot(bossSpin, volSFX);
+
             _currAttackTime = (Time.time - _startAttackTime) / _realPinballTellDuration;
             
             if (_currAttackTime >= 1)
@@ -510,6 +521,10 @@ public class MiniSpinBoss : BossEnemy
 
     private void Stunned()
     {
+
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(bossDazed, volSFX);
+
         _currAttackTime = (Time.time - _startAttackTime) / _realStunnedDuration;
 
         //Debug.Log("stunned");
@@ -543,6 +558,8 @@ public class MiniSpinBoss : BossEnemy
 
     protected override void Die()
     {
+        _speaker.PlayOneShot(bossDeath, volSFX);
+
         _myRoom.CheckForEnd();
 
         _enemyAgent.enabled = false;
@@ -629,7 +646,6 @@ public class MiniSpinBoss : BossEnemy
                 _endingPlaying = false;
 
                 //Debug.Log("dead");
-                _myRoom.EndAll();
                 gameObject.SetActive(false);
             }
         }

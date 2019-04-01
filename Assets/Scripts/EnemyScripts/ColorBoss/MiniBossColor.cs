@@ -1,42 +1,48 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.AI;
 
-public class SpinBossGlhost : BossEnemy
+public class MiniBossColor : BossEnemy
 {
-    //Strategy Enum for the Spin Boss
-    protected enum SPINSTRATS
+
+    //Strategies for the Color Boss
+    protected enum ColorStrats
     {
         DOWNTIME,
         FOLLOW,
-        SPIN,
-        PINBALL,
-        STUNNED
+        BOUNCE,
+        STUNNED,
+        EATGLHOSTS
     }
 
-    [Header("Spin Boss Intro Variables")]
+    [Header("Color Boss Intro Variables")]
     [SerializeField]
-    float _introFallAndStopDuration;
+    float _introMoveSpeed;
     [SerializeField]
-    float _introFallSpeed;
+    float _introJumpBackDistance;
     [SerializeField]
-    float _downCheckDistance;
+    float _introJumpBackDuration;
     [SerializeField]
-    float _introTurnAroundSpeed;
+    float _introJumpBackHeight;
     [SerializeField]
-    float _introTurnAroundDuration;
-    [SerializeField]
-    GameObject _enemiesToCrush;
-    List<CutsceneGlhosts> _GlhostsUnderMe;
+    GameObject _colorIntroGlhosts;
+    List<ColorIntroGlhost> _introGlhostList;
     Vector3 _ogCamPos;
     bool _cameraInPosition = false;
-    bool _fallFinished = false;
-    bool _turnToPlayerFinished = false;
-    bool _glhostsCrushed = false;
+    bool _glhostsDone = false;
+    bool _eatingFinished = false;
+    bool _jumpingFinished = false;
 
-    [Header("Spin Boss Variables")]
+    [Header("Color Boss Variables")]
+    [SerializeField]
+    Color _basicColor;
+    [SerializeField]
+    GameObject _colorBossMinion;
+    [SerializeField]
+    List<Color> _colorsForMinions;
+    List<Color> _realColorsForMinions;
+    List<Color> _ColorsLeft;
+    List<Color> _currColors;
     [SerializeField]
     float _timeBetweenAttacks;
     float _realTimeBetweenAttacks;
@@ -53,64 +59,43 @@ public class SpinBossGlhost : BossEnemy
     int _numOfCasts;
     float _calcAngle;
     [SerializeField]
-    float _maxDistanceOut;
-    [SerializeField]
     bool _debug;
 
-    [Header("Percentages of Attacks")]
+    [Header("Percentage Variables")]
+    float _startAttackTime;
+    float _currAttackTime;
     [SerializeField]
     float _followPercentage;
     float _realFollowPercentage;
     [SerializeField]
-    float _spinAttackPercentage;
-    float _realSpinAttackPercentage;
-    [SerializeField]
-    float _pinballAttackPercentage;
-    float _realPinballAttackPercentage;
+    float _bouncePercentage;
+    float _realBouncePercentage;
     float _totalPercentage;
 
-    [Header("Follow Player Varibales")]
+    [Header("Follow Player Variables")]
     [SerializeField]
     float _followDuration;
     float _realFollowDuration;
 
-    [Header("Spawn Spin Variables")]
+    [Header("Bounce Attack Variables")]
     [SerializeField]
-    GameObject _enemyToSpawn;
+    int _numberOfBounces;
+    int _realNumOfBounces;
+    int _currBounces;
     [SerializeField]
-    float _spinningSpeed;
-    float _realSpinningSpeed;
-    float _currSpinningSpeed;
+    float _bouncingAirtime;
+    float _realBouncingAirtime;
     [SerializeField]
-    float _spinAttackDuration;
-    float _realSpinAttackDuration;
+    float _bounceHeight;
     [SerializeField]
-    float _spawnDelayDuration;
-    float _realSpawnDelayDuration;
-    float _currSpawnTime;
-    float _startSpawnTime;
+    float _bounceSpawnAngle;
+    [SerializeField]
+    float _bounceSpawnAngleOffset;
+    Vector3 c0, c1, c2;
 
-    [Header("Pinball Variables")]
+    [Header("Color Boss Hard Variables")]
     [SerializeField]
-    float _pinballDetectionAngle;
-    [SerializeField]
-    int _pinballNumOfCasts;
-    [SerializeField]
-    float _speedWhilePinballing;
-    float _realSpeedWhilePinballing;
-    [SerializeField]
-    float _pinballTellDuration;
-    float _realPinballTellDuration;
-    bool _tellPinballing;
-    [SerializeField]
-    float _pinballAttackDuration;
-    float _realPinballAttackDuration;
-    Vector3 _moveDir;
-
-    float _startAttackTime;
-    float _currAttackTime;
-
-    [Header("Spin Boss Hard Variables")]
+    List<Color> _hardColorsForMinions;
     [SerializeField]
     float _hardTimeBetweenAttacks;
     [SerializeField]
@@ -120,40 +105,26 @@ public class SpinBossGlhost : BossEnemy
     [SerializeField]
     float _hardFollowPercentage;
     [SerializeField]
-    float _hardSpinAttackPercentage;
-    [SerializeField]
-    float _hardPinballAttackPercentage;
+    float _hardBouncePercentage;
 
     [Header("Hard Follow Player Varibales")]
     [SerializeField]
     float _hardFollowDuration;
 
-    [Header("Hard Spawn Spin Variables")]
+    [Header("Hard Bounce Variables")]
     [SerializeField]
-    float _hardSpinningSpeed;
+    int _hardNumofBounces;
     [SerializeField]
-    float _hardSpinAttackDuration;
-    [SerializeField]
-    float _hardSpawnDelayDuration;
+    float _hardBounceAirtime;
 
-    [Header("Hard Pinball Variables")]
-    [SerializeField]
-    float _hardSpeedWhilePinballing;
-    [SerializeField]
-    float _hardPinballTellDuration;
-    [SerializeField]
-    float _hardPinballAttackDuration;
-
-    [Header("Sound Variables")]
-    public AudioClip bossSpin;
-    public AudioClip bossDazed;
+    [Header("Sound Objects")]
     public AudioClip bossDeath;
+    public AudioClip bossDazed;
+    public AudioClip bossBounce;
+    public AudioClip ghostSpawn;
 
 
-    GameObject dazedParticle;
-
-
-    SPINSTRATS _MyAttack = SPINSTRATS.FOLLOW;
+    ColorStrats _myAttack = ColorStrats.FOLLOW;
 
     //intro cutscene function
     protected override void PlayIntro()
@@ -165,13 +136,13 @@ public class SpinBossGlhost : BossEnemy
             if (_currAttackTime >= 1)
             {
                 _currAttackTime = 1;
-                if (!_glhostsCrushed)
+                if (!_glhostsDone)
                 {
-                    for (int i = 0; i < _GlhostsUnderMe.Count; i++)
+                    for (int i = 0; i < _introGlhostList.Count; i++)
                     {
-                        _GlhostsUnderMe[i].Init();
+                        _introGlhostList[i].Init();
                     }
-                    _glhostsCrushed = true;
+                    _glhostsDone = true;
                 }
             }
 
@@ -181,41 +152,41 @@ public class SpinBossGlhost : BossEnemy
 
             _cameraRef.transform.position = cam01;
         }
-        else if (!_fallFinished)
+        else if (!_eatingFinished)
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _introFallAndStopDuration;
-
-            if (_currAttackTime >= 1)
+            Vector3 run = transform.forward * Time.deltaTime * _introMoveSpeed;
+            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), run, out hit, _bossCollisionDetectDistance))
             {
-                _currAttackTime = 1;
-
-                if (_enemiesToCrush.activeInHierarchy)
+                if (hit.collider.GetComponent<ColorIntroGlhost>())
                 {
-                    for (int i = 0; i < _GlhostsUnderMe.Count; i++)
+                    _myColor = hit.collider.GetComponent<ColorIntroGlhost>().GotEaten();
+                    _myMaterial.color = _myColor;
+                    _mySkinRenderer.materials[1] = _myMaterial;
+                    if (CheckForIntroEatingDone())
                     {
-                        _GlhostsUnderMe[i].ParentYouself();
+                        if (_colorIntroGlhosts.activeInHierarchy)
+                        {
+                            for (int i = 0; i < _introGlhostList.Count; i++)
+                            {
+                                _introGlhostList[i].ParentYouself();
+                            }
+                            _colorIntroGlhosts.SetActive(false);
+                        }
+
+                        c0 = transform.position;
+                        c2 = transform.position - (transform.forward * _introJumpBackDistance);
+                        c1 = ((c0 + c2) / 2) + (Vector3.up * _introJumpBackHeight);
+                        _startAttackTime = Time.time;
+                        _eatingFinished = true;
                     }
-                    _enemiesToCrush.SetActive(false);
                 }
-
-                _startAttackTime = Time.time;
-                _fallFinished = true;
             }
 
-            Vector3 fall = Vector3.down * Time.deltaTime * _introFallSpeed;
-            if (Physics.Raycast(transform.position, fall, _downCheckDistance))
-            {
-
-                fall = Vector3.zero;
-            }
-
-            transform.position += fall;
+            transform.position += run;
         }
-        else if (!_turnToPlayerFinished)
+        else if (!_jumpingFinished)
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _introTurnAroundDuration;
-
-            transform.Rotate(Vector3.up, _introTurnAroundSpeed);
+            _currAttackTime = (Time.time - _startAttackTime) / _introJumpBackDuration;
 
             if (_currAttackTime >= 1)
             {
@@ -225,11 +196,26 @@ public class SpinBossGlhost : BossEnemy
                 cam1 = _ogCamPos;
 
                 _startAttackTime = Time.time;
-                transform.LookAt(_playerRef.transform.position);
-                _turnToPlayerFinished = true;
+                transform.LookAt(transform.position + Vector3.back);
+
+                _myMaterial.color = _basicColor;
+                _mySkinRenderer.materials[1] = _myMaterial;
+
+                _jumpingFinished = true;
+            }
+            else if (_currAttackTime >= .5f)
+            {
+                transform.LookAt(transform.position + Vector3.back);
             }
 
+            Vector3 c01, c12, c012;
 
+            c01 = (1 - _currAttackTime) * c0 + _currAttackTime * c1;
+            c12 = (1 - _currAttackTime) * c1 + _currAttackTime * c2;
+
+            c012 = (1 - _currAttackTime) * c01 + _currAttackTime * c12;
+
+            transform.position = c012;
         }
         else
         {
@@ -254,9 +240,9 @@ public class SpinBossGlhost : BossEnemy
     //called when any other objects for the cutscene are done with their intros
     public override void CheckForIntroEnd()
     {
-        for (int i = 0; i < _GlhostsUnderMe.Count; i++)
+        for (int i = 0; i < _introGlhostList.Count; i++)
         {
-            if (!_GlhostsUnderMe[i].AmDone)
+            if (!_introGlhostList[i].LookingIsDone)
             {
                 //Debug.Log("returned");
                 return;
@@ -268,49 +254,62 @@ public class SpinBossGlhost : BossEnemy
         _cameraInPosition = true;
     }
 
+    //checks when the boss is done eating the ghosts on screen
+    private bool CheckForIntroEatingDone()
+    {
+        for (int i = 0; i < _introGlhostList.Count; i++)
+        {
+            if (!_introGlhostList[i].AmEaten)
+            {
+                //Debug.Log("returned");
+                return false;
+            }
+        }
+        return true;
+    }
+
     //called for Init, after the cutscene
     public override void Init()
     {
         if (!_hasInit)
         {
             base.Init();
+            _myMaterial.color = _basicColor;
+            _mySkinRenderer.materials[1] = _myMaterial;
+
+            _realColorsForMinions = new List<Color>();
+            _ColorsLeft = new List<Color>();
 
             if (!_managerRef.HardModeOn)
             {
+                _realColorsForMinions = _colorsForMinions;
                 _realFollowPercentage = _followPercentage;
-                _realSpinAttackPercentage = _spinAttackPercentage;
-                _realPinballAttackPercentage = _pinballAttackPercentage;
+                _realBouncePercentage = _bouncePercentage;
                 _realTimeBetweenAttacks = _timeBetweenAttacks;
                 _realStunnedDuration = _stunnedDuration;
                 _realFollowDuration = _followDuration;
-                _realSpinningSpeed = _spinningSpeed;
-                _realSpinAttackDuration = _spinAttackDuration;
-                _realSpawnDelayDuration = _spawnDelayDuration;
-                _realSpeedWhilePinballing = _speedWhilePinballing;
-                _realPinballTellDuration = _pinballTellDuration;
-                _realPinballAttackDuration = _pinballAttackDuration;
+                _realNumOfBounces = _numberOfBounces;
+                _realBouncingAirtime = _bouncingAirtime;
             }
             else
             {
+                _realColorsForMinions = _hardColorsForMinions;
                 _realFollowPercentage = _hardFollowPercentage;
-                _realSpinAttackPercentage = _hardSpinAttackPercentage;
-                _realPinballAttackPercentage = _hardPinballAttackPercentage;
+                _realBouncePercentage = _hardBouncePercentage;
                 _realTimeBetweenAttacks = _hardTimeBetweenAttacks;
                 _realStunnedDuration = _hardStunnedDuration;
                 _realFollowDuration = _hardFollowDuration;
-                _realSpinningSpeed = _hardSpinningSpeed;
-                _realSpinAttackDuration = _hardSpinAttackDuration;
-                _realSpawnDelayDuration = _hardSpawnDelayDuration;
-                _realSpeedWhilePinballing = _hardSpeedWhilePinballing;
-                _realPinballTellDuration = _hardPinballTellDuration;
-                _realPinballAttackDuration = _hardPinballAttackDuration;
+                _realNumOfBounces = _hardNumofBounces;
+                _realBouncingAirtime = _hardBounceAirtime;
             }
 
-            _GlhostsUnderMe = new List<CutsceneGlhosts>();
+            _ColorsLeft = _realColorsForMinions;
 
-            for (int i = 0; i < _enemiesToCrush.transform.childCount; i++)
+            _introGlhostList = new List<ColorIntroGlhost>();
+
+            for (int i = 0; i < _colorIntroGlhosts.transform.childCount; i++)
             {
-                _GlhostsUnderMe.Add(_enemiesToCrush.transform.GetChild(i).GetComponent<CutsceneGlhosts>());
+                _introGlhostList.Add(_colorIntroGlhosts.transform.GetChild(i).GetComponent<ColorIntroGlhost>());
             }
         }
 
@@ -318,15 +317,18 @@ public class SpinBossGlhost : BossEnemy
         cam0 = _cameraRef.transform.position;
         cam1 = transform.position + _camOffset;
         cam1.y = _cameraRef.transform.position.y;
-        _cameraRef.AmFollowingPlayer = false;
-
+        float _midpoint = 0;
+        for (int i = 0; i < _introGlhostList.Count; i++)
+        {
+            _midpoint += _introGlhostList[i].transform.position.x;
+        }
 
         _speaker = this.transform.GetComponent<AudioSource>();
-        dazedParticle = this.transform.GetChild(5).gameObject;
-        dazedParticle.SetActive(false);
 
+        cam1.x = _midpoint / _introGlhostList.Count;
+        _cameraRef.AmFollowingPlayer = false;
 
-        _totalPercentage = _realFollowPercentage + _realSpinAttackPercentage + _realPinballAttackPercentage;
+        _totalPercentage = _realFollowPercentage + _realBouncePercentage;
 
         _startAttackTime = Time.time;
         _myAI = BossAI.INTRO;
@@ -336,18 +338,14 @@ public class SpinBossGlhost : BossEnemy
     //starts fight
     protected override void StartFight()
     {
-        if (!_init)
-        {
-            _bossBar.SetActive(true);
-            _laggedBossHealthBar.fillAmount = 1;
-            _actualBossHealthBar.fillAmount = 1;
+        _bossBar.SetActive(true);
+        _laggedBossHealthBar.fillAmount = 1;
+        _actualBossHealthBar.fillAmount = 1;
 
-            _enemyAgent.enabled = true;
-            _cameraRef.AmFollowingPlayer = true;
-            _calcAngle = _startAngle;
+        _enemyAgent.enabled = true;
+        _cameraRef.AmFollowingPlayer = true;
+        _calcAngle = _startAngle;
 
-            
-        }
         _myAI = BossAI.FIGHTING;
         _init = true;
     }
@@ -370,25 +368,24 @@ public class SpinBossGlhost : BossEnemy
                     }
 
                     base.Update();
-                    switch (_MyAttack)
+                    switch (_myAttack)
                     {
-                        case SPINSTRATS.DOWNTIME:
+                        case ColorStrats.DOWNTIME:
                             WhatDoNext();
                             break;
-                        case SPINSTRATS.FOLLOW:
+                        case ColorStrats.FOLLOW:
                             FollowPlayer();
                             break;
-                        case SPINSTRATS.SPIN:
-                            SpinInPlace();
+                        case ColorStrats.BOUNCE:
+                            BounceAttack();
                             break;
-                        case SPINSTRATS.PINBALL:
-                            PlaySomePinball();
-                            break;
-                        case SPINSTRATS.STUNNED:
+                        case ColorStrats.STUNNED:
                             Stunned();
                             break;
+                        case ColorStrats.EATGLHOSTS:
+                            WaitingForFood();
+                            break;
                         default:
-                            //Debug.Log("No Attack Set");
                             break;
                     }
                 }
@@ -415,24 +412,19 @@ public class SpinBossGlhost : BossEnemy
             {
                 //Debug.Log("follow Chosen");
                 _startAttackTime = Time.time;
-                _MyAttack = SPINSTRATS.FOLLOW;
+                _myAttack = ColorStrats.FOLLOW;
             }
-            else if (_nextAttack > _realFollowPercentage && _nextAttack <= (_realFollowPercentage + _realSpinAttackPercentage))
+            else if (_nextAttack > _realFollowPercentage && _nextAttack <= (_realFollowPercentage + _realBouncePercentage))
             {
-                //Debug.Log("spin Chosen");
+                //Debug.Log("Bounce Chosen");
+
+                c0 = transform.position;
+                c2 = _playerRef.transform.position;
+                c1 = ((c0 + c2) / 2) + (Vector3.up * _bounceHeight);
 
                 _enemyAgent.enabled = false;
                 _startAttackTime = Time.time;
-                _startSpawnTime = Time.time;
-                _MyAttack = SPINSTRATS.SPIN;
-            }
-            else
-            {
-                //Debug.Log("pinball Chosen");
-                _tellPinballing = true;
-                _enemyAgent.enabled = false;
-                _startAttackTime = Time.time;
-                _MyAttack = SPINSTRATS.PINBALL;
+                _myAttack = ColorStrats.BOUNCE;
             }
         }
     }
@@ -451,7 +443,7 @@ public class SpinBossGlhost : BossEnemy
         {
             _enemyAgent.SetDestination(transform.position);
 
-            _MyAttack = SPINSTRATS.DOWNTIME;
+            _myAttack = ColorStrats.DOWNTIME;
             _startAttackTime = Time.time;
         }
 
@@ -464,7 +456,7 @@ public class SpinBossGlhost : BossEnemy
 
             if (_debug)
             {
-                Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (RayDir * _bossCollisionDetectDistance), Color.red);
+                Debug.DrawRay(transform.position + (Vector3.up * _vertDetectOffset), RayDir * _bossCollisionDetectDistance, Color.red);
             }
 
             _calcAngle += _detectionAngle / _numOfCasts;
@@ -482,97 +474,57 @@ public class SpinBossGlhost : BossEnemy
     }
 
     //Attack
-    //Boss will spin in place
-    //Boss will spawn and shoot ghosts out in random directions
-    private void SpinInPlace()
+    //Boss will jump into the air and slam down onto the players position
+    //will do it any number of times
+    private void BounceAttack()
     {
-        _currAttackTime = (Time.time - _startAttackTime) / _realSpinAttackDuration;
-        _currSpawnTime = (Time.time - _startSpawnTime) / _realSpawnDelayDuration;
-
-        if (!_speaker.isPlaying)
-            _speaker.PlayOneShot(bossSpin, volSFX);
-        // _myAnimations.Play("Spin");
-
-        for (int i = 0; i <= _numOfCasts; i++)
-        {
-            float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
-            float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
-
-            Vector3 RayDir = (transform.forward * Zpos) + (transform.right * Xpos);
-
-            if (_debug)
-            {
-                Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (RayDir * _bossCollisionDetectDistance), Color.red);
-            }
-
-            _calcAngle += _detectionAngle / _numOfCasts;
-
-            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
-            {
-                if (hit.collider.GetComponent<PlayerController>())
-                {
-                    hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
-                }
-            }
-        }
-
-        _calcAngle = _startAngle;
-
-        transform.Rotate(Vector3.up, _realSpinningSpeed);
+        _currAttackTime = (Time.time - _startAttackTime) / _realBouncingAirtime;
         //Debug.Log("spinning");
+
+        Vector3 c01, c12, c012;
+
+        c01 = (1 - _currAttackTime) * c0 + _currAttackTime * c1;
+        c12 = (1 - _currAttackTime) * c1 + _currAttackTime * c2;
+
+        c012 = (1 - _currAttackTime) * c01 + _currAttackTime * c12;
+
+        transform.position = c012;
 
         if (_currAttackTime >= 1)
         {
             //Debug.Log("spinning Done");
-            _invincible = false;
-            _enemyAgent.enabled = true;
-            _MyAttack = SPINSTRATS.STUNNED;
-            _startAttackTime = Time.time;
-        }
-
-        if (_currSpawnTime >= 1)
-        {
-            _currSpawnTime = 1;
-            GameObject _newEnemy = Instantiate<GameObject>(_enemyToSpawn, transform.position, transform.rotation);
-            _newEnemy.GetComponent<BaseEnemy>().Init(_myRoom, Mechanic.BOSS);
-            _startSpawnTime = Time.time;
-        }
-    }
-
-    //Attack
-    //Boss will spin
-    //Boss will shoot out towards the player and richochet off of walls for a duration
-    private void PlaySomePinball()
-    {
-        if (_tellPinballing)
-        {
-
-            if (!_speaker.isPlaying)
-                _speaker.PlayOneShot(bossSpin, volSFX);
-
-            _currAttackTime = (Time.time - _startAttackTime) / _realPinballTellDuration;
-            //_myAnimations.Play("Spin");
-
-            if (_currAttackTime >= 1)
+            if (_currBounces >= _realNumOfBounces)
             {
-                _currAttackTime = 1;
-                _tellPinballing = false;
-                _moveDir = (_playerRef.transform.position - transform.position).normalized;
-                _moveDir.y = 0;
+                int _randomColor = Random.Range(0, _ColorsLeft.Count);
+                _myColor = _ColorsLeft[_randomColor];
+                _myMaterial.color = _myColor;
+                _mySkinRenderer.materials[1] = _myMaterial;
+
+                SpawnGlhosts(_bounceSpawnAngle, _bounceSpawnAngleOffset);
+                _enemyAgent.enabled = true;
+                _currBounces = 0;
+                _myAttack = ColorStrats.STUNNED;
                 _startAttackTime = Time.time;
             }
+            else
+            {
+                if (!_speaker.isPlaying)
+                    _speaker.PlayOneShot(bossBounce, volSFX);
 
-            _currSpinningSpeed = _realSpinningSpeed * _currAttackTime;
+                _calcAngle = _startAngle;
 
-            transform.Rotate(Vector3.up, _currSpinningSpeed);
+                _currBounces++;
+
+                c0 = transform.position;
+                c2 = _playerRef.transform.position;
+                c1 = ((c0 + c2) / 2) + (Vector3.up * _bounceHeight);
+
+                _startAttackTime = Time.time;
+            }
         }
         else
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _realPinballAttackDuration;
-
-            //Debug.Log("pinballing");
-
-            for (int i = 0; i <= _pinballNumOfCasts; i++)
+            for (int i = 0; i <= _numOfCasts; i++)
             {
                 float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
                 float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
@@ -581,10 +533,10 @@ public class SpinBossGlhost : BossEnemy
 
                 if (_debug)
                 {
-                    Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (RayDir * _bossCollisionDetectDistance), Color.red);
+                    Debug.DrawRay(transform.position + (Vector3.up * _vertDetectOffset), RayDir * _bossCollisionDetectDistance, Color.red);
                 }
 
-                _calcAngle += _pinballDetectionAngle / _pinballNumOfCasts;
+                _calcAngle += _detectionAngle / _numOfCasts;
 
                 if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
                 {
@@ -594,60 +546,89 @@ public class SpinBossGlhost : BossEnemy
                     }
                 }
             }
+        }
+    }
 
-            if (_debug)
-            {
-                Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (_moveDir * _bossCollisionDetectDistance), Color.blue);
-            }
 
-            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), _moveDir, out hit, _bossCollisionDetectDistance + 1f))
-            {
-                Vector3 checkDir = _moveDir;
-                GameObject thingHit = hit.collider.gameObject;
+    //spawn the glhosts that can damage him
+    private void SpawnGlhosts(float _spawnAngle, float _angleOffset)
+    {
+        if (!_speaker.isPlaying)
+                _speaker.PlayOneShot(ghostSpawn, volSFX);
 
-                //Debug.Log("reflected");
-                if (thingHit.GetComponent<BossWall>()|| thingHit.GetComponent<DoorMovement>())
-                {
-                    _moveDir = Vector3.Reflect(checkDir, hit.normal);
-                }
-            }
+        _calcAngle = _spawnAngle;
+        _currColors = new List<Color>();
 
-            _calcAngle = 0;
+        for (int i = 0; i < _ColorsLeft.Count; i = 0)
+        {
+            float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad);
+            float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad);
 
-            transform.Rotate(Vector3.up, _realSpinningSpeed);
-            transform.position += _moveDir * _realSpeedWhilePinballing * Time.deltaTime;
+            Vector3 SpawnDir = (transform.forward * Zpos) + (transform.right * Xpos);
 
-            if (_currAttackTime >= 1)
-            {
-                _invincible = false;
-                _enemyAgent.enabled = true;
-                _MyAttack = SPINSTRATS.STUNNED;
-                _startAttackTime = Time.time;
-                return;
-            }
+            _calcAngle += _angleOffset / _ColorsLeft.Count + 1;
+
+            int _rando = Random.Range(0, _ColorsLeft.Count);
+
+            GameObject _newGlhost = Instantiate<GameObject>(_colorBossMinion, transform.position, transform.rotation, null);
+            _newGlhost.GetComponent<MiniColorMinion>().SetColor = _ColorsLeft[_rando];
+            _newGlhost.GetComponent<MiniColorMinion>().GetStartDirection = SpawnDir;
+            _currColors.Add(_ColorsLeft[_rando]);
+            _ColorsLeft.Remove(_ColorsLeft[_rando]);
+            _newGlhost.GetComponent<MiniColorMinion>().Init(_myRoom, Mechanic.BOSS);
         }
 
-
+        _ColorsLeft = _currColors;
     }
 
     //once the boss is done with their attack
     //will do nothing for an amount of time
     private void Stunned()
     {
-        dazedParticle.SetActive(true);
         _currAttackTime = (Time.time - _startAttackTime) / _realStunnedDuration;
 
-        if (!_speaker.isPlaying)
-            _speaker.PlayOneShot(bossDazed, volSFX);
         //Debug.Log("stunned");
 
         if (_currAttackTime >= 1)
         {
-            dazedParticle.SetActive(false);
-            _MyAttack = SPINSTRATS.DOWNTIME;
+            if (!_speaker.isPlaying)
+                _speaker.PlayOneShot(bossDazed, volSFX);
+
+            _myColor = _basicColor;
+            _myMaterial.color = _myColor;
+            _mySkinRenderer.materials[1] = _myMaterial;
+
+            for (int i = 0; i < _myRoom.GetCurrEnemyList.Count; i++)
+            {
+                _myRoom.GetCurrEnemyList[i].GetComponent<MiniColorMinion>().StartBackToBoss();
+            }
+            _myAttack = ColorStrats.EATGLHOSTS;
+        }
+    }
+
+    //called once the boss is done being stunned and will suck up any remaining glhosts
+    private void WaitingForFood()
+    {
+        if (_myRoom.GetCurrEnemyList.Count == 0)
+        {
+            _myAttack = ColorStrats.DOWNTIME;
             _startAttackTime = Time.time;
         }
+    }
 
+    //called by ghlosts once they get hit into me
+    //checks to see if the ghlost has the same color
+    public bool CheckForColor(float _damageTaken, Color _incColor)
+    {
+        if (_incColor == _myColor)
+        {
+            GotHit(_damageTaken);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     //called when boss gets hit and takes damage
@@ -673,6 +654,10 @@ public class SpinBossGlhost : BossEnemy
     //called once the boss is defeated
     protected override void Die()
     {
+
+        _speaker.Stop();
+        _speaker.PlayOneShot(bossDeath, volSFX);
+
         _myRoom.CheckForEnd();
 
         _enemyAgent.enabled = false;
@@ -685,7 +670,6 @@ public class SpinBossGlhost : BossEnemy
         cam1.y = _cameraRef.transform.position.y;
         _cameraRef.AmFollowingPlayer = false;
 
-        _speaker.PlayOneShot(bossDeath, volSFX);
 
         _startAttackTime = Time.time;
         _cameraInPosition = false;
@@ -719,8 +703,7 @@ public class SpinBossGlhost : BossEnemy
         {
             _currAttackTime = (Time.time - _startAttackTime) / _deathDuration;
             //Debug.Log("showing death");
-
-
+            
             if (_currAttackTime > 1)
             {
                 _currAttackTime = 1;
@@ -773,28 +756,29 @@ public class SpinBossGlhost : BossEnemy
         {
             gameObject.SetActive(true);
             _mySkinRenderer.enabled = true;
-            _myColor.a = 1;
-            _myMaterial.color = _myColor;
+            _basicColor.a = 1;
+            _myMaterial.color = _basicColor;
             _mySkinRenderer.materials[1] = _myMaterial;
 
             _enemyAgent.enabled = false;
             //Debug.Log("Boss Reset");
             transform.position = _startPos;
             transform.rotation = _startRot;
-            _enemiesToCrush.SetActive(true);
-            for (int i = 0; i < _GlhostsUnderMe.Count; i++)
+            _colorIntroGlhosts.SetActive(true);
+            for (int i = 0; i < _introGlhostList.Count; i++)
             {
-                _GlhostsUnderMe[i].ResetCutscene();
+                _introGlhostList[i].ResetCutscene();
             }
+
             _currBossHealth = _actualMaxHealth;
             _laggedBossHealthBar.fillAmount = 1;
             _actualBossHealthBar.fillAmount = 1;
 
             _bossBar.SetActive(false);
             _cameraInPosition = false;
-            _fallFinished = false;
-            _turnToPlayerFinished = false;
-            _glhostsCrushed = false;
+            _glhostsDone = false;
+            _eatingFinished = false;
+            _jumpingFinished = false;
 
             _endingPlaying = false;
             _laggingHealth = false;
@@ -804,8 +788,10 @@ public class SpinBossGlhost : BossEnemy
             _invincible = false;
 
             _myAI = BossAI.NONE;
-            _MyAttack = SPINSTRATS.FOLLOW;
+            _myAttack = ColorStrats.FOLLOW;
             _init = false;
         }
     }
+
+    public Color GetColor { get { return _myColor; } }
 }

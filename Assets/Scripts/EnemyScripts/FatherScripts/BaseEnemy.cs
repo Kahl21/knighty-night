@@ -7,6 +7,7 @@ public class BaseEnemy : MonoBehaviour {
 
     protected NavMeshAgent _myAgent;
     protected RaycastHit hit;
+
     [Header("Base Glhost Variables")]
     [SerializeField]
     protected float _glhostDamage = .5f;
@@ -17,6 +18,7 @@ public class BaseEnemy : MonoBehaviour {
     protected float _currTime;
     protected float _startTime;
     protected bool _dead = false;
+    protected bool _actualDead = false;
     protected bool _hit = false;
     protected bool _canMove = true;
     protected Vector3 _deathDirection;
@@ -27,11 +29,14 @@ public class BaseEnemy : MonoBehaviour {
     
     [SerializeField]
     protected float _spookDistance;
+    [SerializeField]
+    protected float _spookyOffset;
     protected GameObject _myBody;
     protected SkinnedMeshRenderer _myRenderer;
     protected Material _mySpookiness;
     protected Color _spookColor;
     protected Color _myColor;
+
     [Header("Colored Glhost Extra Variables")]
     [SerializeField]
     protected float _cheatingDistance;
@@ -45,8 +50,15 @@ public class BaseEnemy : MonoBehaviour {
     protected DungeonMechanic _mySpawner;
     protected Mechanic _myMechanic;
 
-	// Use this for initialization
-	public virtual void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
+    protected GameObject _Audio;
+    protected AudioManager _audioManager;
+    protected float volSFX;
+    protected AudioSource _speaker;
+
+    public AudioClip ghostDeath;
+
+    // Use this for initialization
+    public virtual void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
         _myAgent = GetComponent<NavMeshAgent>();
         _mySpawner = _spawner;
@@ -67,40 +79,75 @@ public class BaseEnemy : MonoBehaviour {
         _myRenderer.materials[1] = _mySpookiness;
 
         _myAnimations = GetComponent<Animator>();
-        _myAnimations.Play("Moving", 0);
+        _myAnimations.Play("Movement", 0);
+
+        _Audio = GameObject.Find("AudioManager");
+        _audioManager = _Audio.GetComponent<AudioManager>();
+        volSFX = _audioManager.volSFX;
     }
 
     // Update is called once per frame
     protected virtual void Update ()
     {
 
-	}
+    }
 
     //moves the enemy toward the enemy
     protected virtual void Move()
     {
-       
+        if (Vector3.Distance(transform.position, _target.transform.position) <= _damageRange)
+        {
+            _myAgent.SetDestination(transform.position);
+        }
+        else
+        {
+            _myAgent.SetDestination(_target.transform.position);
+        }
+
+        if (Vector3.Distance(transform.position, _target.transform.position) < _spookDistance)
+        {
+            ChangeSpookiness();
+        }
     }
 
     //checks to see if the enemy has hit the player
     //deals damage to the player
     protected virtual void CheckForHit()
     {
-        
+        if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out hit, _damageRange))
+        {
+            GameObject thingHit = hit.collider.gameObject;
+            if (thingHit.GetComponent<PlayerController>())
+            {
+                thingHit.GetComponent<PlayerController>().TakeDamage(_glhostDamage);
+            }
+        }
     }
 
     //changes the transparency of the enemy material
     //changes depending on how close th enemy is to the player
     protected virtual void ChangeSpookiness()
     {
-       
+        _spookColor.a = (_spookDistance - Vector3.Distance(transform.position, _target.transform.position)) / _spookyOffset;
+        _mySpookiness.color = _spookColor;
+        _myRenderer.materials[1] = _mySpookiness;
     }
 
     //called when the enemy gets hit
     //deals damage to the enemy
     public virtual void GotHit(Vector3 _flyDir, float _knockBackForce)
     {
-        
+        if (!_hit)
+        {
+            _hit = true;
+            _myAgent.enabled = false;
+            _knockBack = _knockBackForce;
+            _deathDirection = _flyDir;
+            _deathDirection.y = 0;
+
+            _startTime = Time.time;
+            _dead = true;
+        }
     }
 
     //called while the ghost is dying;
@@ -119,7 +166,23 @@ public class BaseEnemy : MonoBehaviour {
     //Called when a room is completed
     public virtual void Stop()
     {
-       
+        _canMove = false;
+        if (!_dead && _myAgent.enabled)
+        {
+            _myAgent.SetDestination(transform.position);
+        }
+        _mySpawner.RemoveMe(this);
+
+        Destroy(gameObject);
+    }
+
+    protected virtual void Dead()
+    {
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(ghostDeath, volSFX);
+        _actualDead = true;
+        _myAnimations.Play("Death");
+        Destroy(gameObject, 1f);
     }
 
     //various Getters and Setters

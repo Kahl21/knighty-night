@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ColorMinion : BasicGlhost {
+public class MiniColorMinion : BasicGlhost {
 
     protected bool _goingToBoss;
 
@@ -21,13 +21,13 @@ public class ColorMinion : BasicGlhost {
 
     protected Vector3 c0, c1;
     protected Vector3 _spawnDir;
-    protected ColorBossGlhost _myBoss;
+    protected MiniBossColor _myBoss;
     protected CapsuleCollider _myCapCollider;
 
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
         base.Init(_spawner, _incomingMech);
-        _myBoss = _mySpawner.GetBigBoy.GetComponent<ColorBossGlhost>();
+        _myBoss = _mySpawner.GetBigBoy.GetComponent<MiniBossColor>();
 
         _mySpookiness.color = _myColor;
         _mySpookiness = _myRenderer.materials[1];
@@ -45,7 +45,7 @@ public class ColorMinion : BasicGlhost {
 
     protected override void Update()
     {
-        if(_init)
+        if (_init)
         {
             if (!_menuRef.GameIsPaused)
             {
@@ -87,14 +87,14 @@ public class ColorMinion : BasicGlhost {
 
     void InitialSpawnMove()
     {
-        if(Vector3.Distance(transform.position, _myBoss.transform.position) <= _maxSpawnDistance)
+        if (Vector3.Distance(transform.position, _myBoss.transform.position) <= _maxSpawnDistance)
         {
             Debug.Log("moving");
             transform.position += _spawnDir * _spawnSpeed * Time.deltaTime;
 
-            if(Physics.Raycast(transform.position + Vector3.up, _spawnDir, out hit, _collisionCheckDist))
+            if (Physics.Raycast(transform.position + Vector3.up, _spawnDir, out hit, _collisionCheckDist))
             {
-                if(!hit.collider.GetComponent<BossEnemy>() && !hit.collider.GetComponent<BaseEnemy>())
+                if (!hit.collider.GetComponent<BossEnemy>() && !hit.collider.GetComponent<BaseEnemy>())
                 {
                     _hit = false;
                 }
@@ -122,7 +122,7 @@ public class ColorMinion : BasicGlhost {
     {
         _currBackToBossTime = (Time.time - _startBackToBossTime) / _timeToGetBackToBoss;
 
-        if(_currBackToBossTime >= 1)
+        if (_currBackToBossTime >= 1)
         {
             _currBackToBossTime = 1;
 
@@ -145,9 +145,9 @@ public class ColorMinion : BasicGlhost {
             {
                 hit.collider.GetComponent<PlayerController>().TakeDamage(_glhostDamage);
             }
-            else if (hit.collider.GetComponent<ColorBossGlhost>())
+            else if (hit.collider.GetComponent<MiniBossColor>())
             {
-                if(_myBoss.CheckForColor(_glhostDamage, _myColor))
+                if (_myBoss.CheckForColor(_glhostDamage, _myColor))
                 {
                     _mySpawner.RemoveMe(this);
                     Destroy(gameObject);
@@ -169,3 +169,4 @@ public class ColorMinion : BasicGlhost {
 
     public Vector3 GetStartDirection { get { return _spawnDir; } set { _spawnDir = value; } }
 }
+

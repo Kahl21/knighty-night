@@ -152,6 +152,14 @@ public class ColorBossGlhost : BossEnemy {
     float _hardChargeUpBackwardsSpeed;
 
 
+    [Header("Sound Options")]
+    public AudioClip bossDeath;
+    public AudioClip bossDazed;
+    public AudioClip bossBounce;
+    public AudioClip bossCharge;
+    public AudioClip ghostSpawn;
+
+
     ColorStrats _myAttack = ColorStrats.FOLLOW;
 
     //intro cutscene function
@@ -189,7 +197,7 @@ public class ColorBossGlhost : BossEnemy {
                 {
                     _myColor = hit.collider.GetComponent<ColorIntroGlhost>().GotEaten();
                     _myMaterial.color = _myColor;
-                    _myRenderer.materials[1] = _myMaterial; 
+                    _mySkinRenderer.materials[1] = _myMaterial; 
                     if(CheckForIntroEatingDone())
                     {
                         if (_colorIntroGlhosts.activeInHierarchy)
@@ -227,7 +235,7 @@ public class ColorBossGlhost : BossEnemy {
                 transform.LookAt(transform.position + Vector3.back);
 
                 _myMaterial.color = _basicColor;
-                _myRenderer.materials[1] = _myMaterial;
+                _mySkinRenderer.materials[1] = _myMaterial;
 
                 _jumpingFinished = true;
             }
@@ -289,9 +297,10 @@ public class ColorBossGlhost : BossEnemy {
         {
             if (!_introGlhostList[i].AmEaten)
             {
-                //Debug.Log("returned");
+                Debug.Log("not Eaten");
                 return false;
             }
+            Debug.Log("Am Eaten");
         }
         return true;
     }
@@ -303,7 +312,7 @@ public class ColorBossGlhost : BossEnemy {
         {
             base.Init();
             _myMaterial.color = _basicColor;
-            _myRenderer.materials[1] = _myMaterial;
+            _mySkinRenderer.materials[1] = _myMaterial;
 
             _realColorsForMinions = new List<Color>();
             _ColorsLeft = new List<Color>();
@@ -361,6 +370,8 @@ public class ColorBossGlhost : BossEnemy {
 
         cam1.x = _midpoint/_introGlhostList.Count;
         _cameraRef.AmFollowingPlayer = false;
+
+        _speaker = this.transform.GetComponent<AudioSource>();
 
         _totalPercentage = _realFollowPercentage + _realBouncePercentage + _realChargePercentage;
 
@@ -543,7 +554,7 @@ public class ColorBossGlhost : BossEnemy {
                 int _randomColor = Random.Range(0, _ColorsLeft.Count);
                 _myColor = _ColorsLeft[_randomColor];
                 _myMaterial.color = _myColor;
-                _myRenderer.materials[1] = _myMaterial;
+                _mySkinRenderer.materials[1] = _myMaterial;
 
                 SpawnGlhosts(_bounceSpawnAngle, _bounceSpawnAngleOffset);
                 _enemyAgent.enabled = true;
@@ -556,6 +567,9 @@ public class ColorBossGlhost : BossEnemy {
                 _calcAngle = _startAngle;
 
                 _currBounces++;
+
+                _speaker.PlayOneShot(bossBounce, volSFX);
+
 
                 c0 = transform.position;
                 c2 = _playerRef.transform.position;
@@ -598,6 +612,8 @@ public class ColorBossGlhost : BossEnemy {
     {
         if (_tellCharging)
         {
+            _speaker.PlayOneShot(bossCharge, volSFX);
+
             _currAttackTime = (Time.time - _startAttackTime) / _realChargeUpDuration;
 
             if (_currAttackTime >= 1)
@@ -647,7 +663,7 @@ public class ColorBossGlhost : BossEnemy {
                         int _randomColor = Random.Range(0, _ColorsLeft.Count);
                         _myColor = _ColorsLeft[_randomColor];
                         _myMaterial.color = _myColor;
-                        _myRenderer.materials[1] = _myMaterial;
+                        _mySkinRenderer.materials[1] = _myMaterial;
 
                         SpawnGlhosts(_chargeSpawnAngle, _chargeSpawnAngleOffset);
 
@@ -677,6 +693,9 @@ public class ColorBossGlhost : BossEnemy {
         _calcAngle = _spawnAngle;
         _currColors = new List<Color>();
 
+        _speaker.PlayOneShot(ghostSpawn, volSFX);
+
+
         for (int i = 0; i < _ColorsLeft.Count; i=0)
         {
             float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad);
@@ -704,6 +723,7 @@ public class ColorBossGlhost : BossEnemy {
     private void Stunned()
     {
         _currAttackTime = (Time.time - _startAttackTime) / _realStunnedDuration;
+        _speaker.PlayOneShot(bossDazed, volSFX);
 
         //Debug.Log("stunned");
 
@@ -711,7 +731,7 @@ public class ColorBossGlhost : BossEnemy {
         {
             _myColor = _basicColor;
             _myMaterial.color = _myColor;
-            _myRenderer.materials[1] = _myMaterial;
+            _mySkinRenderer.materials[1] = _myMaterial;
 
             for (int i = 0; i < _myRoom.GetCurrEnemyList.Count; i++)
             {
@@ -781,6 +801,8 @@ public class ColorBossGlhost : BossEnemy {
         cam1.y = _cameraRef.transform.position.y;
         _cameraRef.AmFollowingPlayer = false;
 
+        _speaker.PlayOneShot(bossDeath, volSFX);
+
 
         _startAttackTime = Time.time;
         _cameraInPosition = false;
@@ -823,7 +845,7 @@ public class ColorBossGlhost : BossEnemy {
                 cam0 = _cameraRef.transform.position;
                 cam1 = _ogCamPos;
 
-                _myRenderer.enabled = false;
+                _mySkinRenderer.enabled = false;
 
                 _startAttackTime = Time.time;
                 _showingDeath = true;
@@ -831,8 +853,8 @@ public class ColorBossGlhost : BossEnemy {
 
             _myColor.a = 1 - _currAttackTime;
             _myMaterial.color = _myColor;
-            _myRenderer.materials[1] = _myMaterial;
-            _myRenderer.materials[0] = _myMaterial;
+            _mySkinRenderer.materials[1] = _myMaterial;
+            _mySkinRenderer.materials[0] = _myMaterial;
         }
         else
         {
@@ -856,7 +878,6 @@ public class ColorBossGlhost : BossEnemy {
                 _endingPlaying = false;
 
                 //Debug.Log("dead");
-                _myRoom.EndAll();
                 gameObject.SetActive(false);
             }
         }
@@ -868,10 +889,10 @@ public class ColorBossGlhost : BossEnemy {
         if (_init)
         {
             gameObject.SetActive(true);
-            _myRenderer.enabled = true;
+            _mySkinRenderer.enabled = true;
             _basicColor.a = 1;
             _myMaterial.color = _basicColor;
-            _myRenderer.materials[1] = _myMaterial;
+            _mySkinRenderer.materials[1] = _myMaterial;
 
             _enemyAgent.enabled = false;
             //Debug.Log("Boss Reset");

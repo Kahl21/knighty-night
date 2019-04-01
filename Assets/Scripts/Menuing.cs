@@ -10,6 +10,23 @@ public enum MenuOrient
     HORIZ
 }
 
+public enum WhichUIMenu
+{
+    MAINMENU,
+    OPTIONS,
+    PLAYER,
+    PAUSE,
+    WIN,
+    LOAD,
+    VIDEO,
+    AUDIO,
+    RESOLUTION,
+    MASTER,
+    MUSIC,
+    SFX,
+    AREYOUSURE
+}
+
 public class Menuing : MonoBehaviour {
 
     private static Menuing _instance;
@@ -35,6 +52,7 @@ public class Menuing : MonoBehaviour {
             }
         }
     }
+
 
     [Header("Base Menu Variables")]
     [SerializeField]
@@ -77,6 +95,21 @@ public class Menuing : MonoBehaviour {
     private float fadeTime = 1f;
     private float fadeUpdateTime = .01f;
 
+    //Video Settings
+    bool isFullscreen;
+    public Text currenResolution;
+    public Text currentWindow;
+
+
+    //Audio Settings
+    GameObject _Audio;
+    AudioManager _audioManager;
+    public Text currentMaster;
+    public Text currentMusic;
+    public Text currentSFX;
+    public Text changedMaster;
+    public Text changedMusic;
+    public Text changedSFX;
 
     // Use this for initialization
     void Awake ()
@@ -92,12 +125,14 @@ public class Menuing : MonoBehaviour {
             Destroy(gameObject);
         }
 
+
+
         _menus = new List<GameObject>();
         for (int i = 0; i < transform.childCount; i++)
         {
             _menus.Add(transform.GetChild(i).gameObject);
         }
-        _BossBar = _menus[2].transform.GetChild(3).gameObject;
+        _BossBar = _menus[(int)WhichUIMenu.PLAYER].transform.GetChild(3).gameObject;
         _BossBar.SetActive(false);
 
         _creditsStartPos = _credits.transform.localPosition;
@@ -108,12 +143,27 @@ public class Menuing : MonoBehaviour {
         _playerRef = PlayerController.Instance;
         _playerRef.SetMenus = _menus;
 
-        SetMenu(4);
+        SetMenu(WhichUIMenu.WIN);
 
-        _playerRef.SetWinImage = _menus[4].transform.GetChild(1).gameObject;
-        _playerRef.SetLoseImage = _menus[4].transform.GetChild(2).gameObject;
+        _playerRef.SetWinImage = _menus[(int)WhichUIMenu.WIN].transform.GetChild(1).gameObject;
+        _playerRef.SetLoseImage = _menus[(int)WhichUIMenu.WIN].transform.GetChild(2).gameObject;
 
-        SetMenu(0);
+        if (Screen.fullScreen == true)
+        {
+            currentWindow.text = "Fullscreen";
+        }
+
+        if (Screen.fullScreen == false)
+        {
+            currentWindow.text = "Windowed";
+        }
+
+        _Audio = GameObject.Find("AudioManager");
+        _audioManager = _Audio.GetComponent<AudioManager>();
+        currenResolution.text = Screen.width + " x " + Screen.height;
+
+
+        SetMenu((int)WhichUIMenu.MAINMENU);
 
     }
 
@@ -129,33 +179,39 @@ public class Menuing : MonoBehaviour {
         {
             RollCredits();
         }
+        changedMaster.text = _audioManager.volMaster.ToString();
+        changedMusic.text = _audioManager.volMusic.ToString();
+        changedSFX.text = _audioManager.volSFX.ToString();
+        currentMaster.text = changedMaster.text;
+        currentMusic.text = changedMusic.text;
+        currentSFX.text = changedSFX.text;
     }
 
-    public void SetMenu(int _whichMenu)
+    public void SetMenu(WhichUIMenu _whichMenu)
     {
         for (int i = 0; i < transform.childCount; i++)
         {
             _menus[i].SetActive(false);
         }
-        _menus[_whichMenu].SetActive(true);
-        _menus[5].SetActive(true);
+        _menus[(int)_whichMenu].SetActive(true);
+        _menus[(int)WhichUIMenu.LOAD].SetActive(true);
 
-        if (_whichMenu != 2)
+        if (_whichMenu != WhichUIMenu.PLAYER)
         {
-            SetButtons(_whichMenu);
+            SetButtons((int)_whichMenu);
             currSelectableButtons[currSelected].Select();
         }
     }
 
     private void SetButtons(int _menuNum)
     {
-        if(_menuNum != 4)
+        if(_menuNum == (int)WhichUIMenu.WIN || _menuNum == (int)WhichUIMenu.MASTER || _menuNum == (int)WhichUIMenu.MUSIC || _menuNum == (int)WhichUIMenu.SFX)
         {
-            _playerRef.SetOrientation = MenuOrient.VERT;
+            _playerRef.SetOrientation = MenuOrient.HORIZ;
         }
         else
         {
-            _playerRef.SetOrientation = MenuOrient.HORIZ;
+            _playerRef.SetOrientation = MenuOrient.VERT;
         }
         currSelectableButtons = new List<Selectable>();
         for (int i = 0; i < _menus[_menuNum].transform.childCount; i++)
@@ -172,14 +228,14 @@ public class Menuing : MonoBehaviour {
     {
         if(_paused)
         {
-            SetMenu(2);
+            SetMenu(WhichUIMenu.PLAYER);
             Time.timeScale = 1;
             _playerRef.InMenu = false;
             _paused = false;
         }
         else
         {
-            SetMenu(3);
+            SetMenu(WhichUIMenu.PAUSE);
             Time.timeScale = 0;
             _playerRef.InMenu = true;
             _paused = true;
@@ -193,52 +249,45 @@ public class Menuing : MonoBehaviour {
         Time.timeScale = 1;
         _paused = false;
 
+        _playerRef.GetCurrCheckpoint = 0;
+        _playerRef.DoesHaveCheckpoint = false;
         _playerRef.InMenu = false;
         _playerRef.ResetPlayer();
-        SetMenu(2);
+        SetMenu(WhichUIMenu.PLAYER);
     }
 
     public void NextLevel()
     {
 
-        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
         if (isLoading == false)
         {
-            _menus[5].SetActive(true);
+            _menus[(int)WhichUIMenu.VIDEO].SetActive(true);
             StartCoroutine(LoadNewScene());
             
         }
 
         _managerRef.SetGameReset = _playerRef.ResetPlayer;
+        _playerRef.GetCurrCheckpoint = 0;
+        _playerRef.DoesHaveCheckpoint = false;
         _playerRef.InMenu = false;
         Time.timeScale = 1;
         _paused = false;
-        SetMenu(2);
+        SetMenu(WhichUIMenu.PLAYER);
     }
 
     public void RetryLevel()
     {
-        SetMenu(2);
+        SetMenu(WhichUIMenu.PLAYER);
         _playerRef.InMenu = false;
         Time.timeScale = 1;
         _paused = false;
-        _managerRef.ResetGame();
-    }
-
-    public void RestartGame()
-    {
-        SceneManager.LoadScene(1);
-        SetMenu(2);
-        _playerRef.InMenu = false;
-        Time.timeScale = 1;
-        _paused = false;
-        _managerRef.SetGameReset = _playerRef.ResetPlayer;
         _managerRef.ResetGame();
     }
 
     public void BackToMainMenu()
     {
-        SceneManager.LoadScene(0);
+        //SceneManager.LoadScene(0);
+        StartCoroutine(LoadSpecificScene(0));
         Time.timeScale = 1;
         _paused = false;
 
@@ -252,17 +301,49 @@ public class Menuing : MonoBehaviour {
         _playerRef.GetPlayerAnimator.Play("Nothing", 0);
 
         _BossBar.SetActive(false);
-        SetMenu(0);
+        SetMenu(WhichUIMenu.MAINMENU);
     }
 
     public void ToOptions()
     {
-        SetMenu(1);
+        SetMenu(WhichUIMenu.OPTIONS);
     }
+
+    public void ToVideo()
+    {
+        SetMenu(WhichUIMenu.VIDEO);
+    }
+
+    public void ToAudio()
+    {
+        SetMenu(WhichUIMenu.AUDIO);
+    }
+
+    public void ToMaster()
+    {
+        SetMenu(WhichUIMenu.MASTER);
+    }
+
+    public void ToMusic()
+    {
+        SetMenu(WhichUIMenu.MUSIC);
+    }
+
+    public void ToSFX()
+    {
+        SetMenu(WhichUIMenu.SFX);
+    }
+
+    public void ToAreYouSure()
+    {
+        SetMenu(WhichUIMenu.AREYOUSURE);
+    }
+
+
 
     public void MenuBack()
     {
-        SetMenu(0);
+        SetMenu(WhichUIMenu.MAINMENU);
     }
 
     public void EndGame()
@@ -372,6 +453,194 @@ public class Menuing : MonoBehaviour {
 
     }
 
+
+    //video Settings
+    private void ChangeResolution(int width, int height, bool fullscreen)
+    {
+        Screen.SetResolution(width, height, fullscreen);
+        
+    }
+
+    public void ChangeWindow()
+    {
+        if(Screen.fullScreen == true)
+        {
+            Screen.fullScreen = false;
+            isFullscreen = false;
+            currentWindow.text = "Windowed";
+        }
+        else
+        {
+            Screen.fullScreen = true;
+            isFullscreen = true;
+            currentWindow.text = "FullScreen";
+
+        }
+    }
+
+    public void ChooseResolution()
+    {
+        SetMenu(WhichUIMenu.RESOLUTION);
+
+    }
+
+    public void Resolution1920x1080 ()
+    {
+        ChangeResolution(1920, 1080, isFullscreen);
+        currenResolution.text = "1920 x 1080";
+        SetMenu(WhichUIMenu.VIDEO);
+    }
+
+    public void Resolution1920x1200()
+    {
+        ChangeResolution(1920, 1200, isFullscreen);
+        currenResolution.text = "1920 x 1200";
+        SetMenu(WhichUIMenu.VIDEO);
+    }
+
+    public void Resolution1600x900()
+    {
+        ChangeResolution(1600, 900, isFullscreen);
+        currenResolution.text = "1600 x 600";
+        SetMenu(WhichUIMenu.VIDEO);
+    }
+
+    public void Resolution1440x900()
+    {
+        ChangeResolution(1440, 900, isFullscreen);
+        currenResolution.text = "1440 x 600";
+        SetMenu(WhichUIMenu.VIDEO);
+    }
+
+    public void Resolution1366x768()
+    {
+        ChangeResolution(1366, 768, isFullscreen);
+        currenResolution.text = "1366 x 768";
+        SetMenu(WhichUIMenu.VIDEO);
+    }
+
+    public void Resolution1280x1024()
+    {
+        ChangeResolution(1280, 1024, isFullscreen);
+        currenResolution.text = "1280 x 1024";
+        SetMenu(WhichUIMenu.VIDEO);
+    }
+
+    public void Resolution1280x768()
+    {
+        ChangeResolution(1280, 768, isFullscreen);
+        currenResolution.text = "1280 x 768";
+        SetMenu(WhichUIMenu.VIDEO);
+    }
+
+    public void Resolution1024x768()
+    {
+        ChangeResolution(1024, 768, isFullscreen);
+        currenResolution.text = "1024 x 768";
+        SetMenu(WhichUIMenu.VIDEO);
+    }
+
+    public void Resolution800x600()
+    {
+        ChangeResolution(800, 600, isFullscreen);
+        currenResolution.text = "800 x 600";
+        SetMenu(WhichUIMenu.VIDEO);
+    }
+
+
+
+
+
+
+    //audio Settings
+    public void MuteAll()
+    {
+        _audioManager.MasterVolume(0);
+    }
+
+    public void MuteSFX()
+    {
+        _audioManager.SFXVolume(0);
+    }
+
+    public void MuteMusic()
+    {
+        _audioManager.MusicVolume(0);
+
+    }
+
+    private void ChangeMasterVolume(float vol)
+    {
+        _audioManager.MasterVolume(vol);
+    }
+
+    private void ChangeSFXVolume(float vol)
+    {
+        _audioManager.SFXVolume(vol);
+    }
+
+    private void ChangeMusicVolume(float vol)
+    {
+        _audioManager.MusicVolume(vol);
+
+    }
+
+    public void MasterUp()
+    {
+        float currentVol = _audioManager.volMaster;
+        if (currentVol < 10)
+            ChangeMasterVolume(currentVol+1);
+        changedMaster.text = _audioManager.volMaster.ToString();
+    }
+
+    public void MasterDown()
+    {
+        float currentVol = _audioManager.volMaster;
+        if (currentVol > 0)
+            ChangeMasterVolume(currentVol-1);
+        changedMaster.text = _audioManager.volMaster.ToString();
+    }
+
+    public void MusicUp()
+    {
+        float currentVol = _audioManager.volMusic;
+        if (currentVol < 10)
+            ChangeMusicVolume(currentVol+1);
+        changedMusic.text = _audioManager.volMusic.ToString();
+    }
+
+    public void MusicDown()
+    {
+        float currentVol = _audioManager.volMusic;
+        if (currentVol > 0)
+            ChangeMusicVolume(currentVol-1);
+        changedMusic.text = _audioManager.volMusic.ToString();
+    }
+
+    public void SFXUp()
+    {
+        float currentVol = _audioManager.volSFX;
+        if (currentVol < 10)
+            ChangeSFXVolume(currentVol+1);
+        changedSFX.text = _audioManager.volSFX.ToString();
+    }
+
+    public void SFXDown()
+    {
+        float currentVol = _audioManager.volSFX;
+        if (currentVol > 0)
+            ChangeSFXVolume(currentVol-1);
+        changedSFX.text = _audioManager.volSFX.ToString();
+    }
+
+
+
+
+
+
+
+
+
     IEnumerator LoadNewScene()
     {
         _fadeScreen.color = transparentColor;
@@ -383,6 +652,31 @@ public class Menuing : MonoBehaviour {
 
         //yield return new WaitForSeconds(3f);
         while(time < fadeTime)
+        {
+            yield return new WaitForSeconds(fadeUpdateTime);
+
+            wantedColor = Color.Lerp(transparentColor, blackColor, time);
+            _fadeScreen.color = wantedColor;
+            time += fadeUpdateTime;
+        }
+        _loadScreen.color = fullColor;
+        yield return new WaitForSeconds(2f);
+        _loadScreen.color = transparentColor;
+        asyncLoad.allowSceneActivation = true;
+        isLoading = false;
+    }
+
+    IEnumerator LoadSpecificScene(int scene)
+    {
+        _fadeScreen.color = transparentColor;
+        float time = 0;
+        Color wantedColor = _fadeScreen.color;
+        isLoading = true;
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(scene);
+        asyncLoad.allowSceneActivation = false;
+
+        //yield return new WaitForSeconds(3f);
+        while (time < fadeTime)
         {
             yield return new WaitForSeconds(fadeUpdateTime);
 
