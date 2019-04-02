@@ -71,6 +71,10 @@ public class PM_Manager : MonoBehaviour
     Transform[] _swarmSpawnPoints;
     [SerializeField]
     GameObject _swordPowerUp;
+    [SerializeField]
+    Color _powerupSwordColor;
+    [SerializeField]
+    Color _initialSwordMat;
     float[] _spawnTimers;
 
     float _startTimer;
@@ -89,6 +93,7 @@ public class PM_Manager : MonoBehaviour
         _ghostsInScene = new List<GameObject>();
         _playerRef = PlayerController.Instance;
         _spawnTimers = new float[_swarmSpawnPoints.Length];
+        _initialSwordMat = _playerRef.gameObject.transform.GetChild(0).transform.GetChild(5).GetComponent<SkinnedMeshRenderer>().material.color;
 
         _targetPoints = new List<GameObject>();
 
@@ -242,8 +247,13 @@ public class PM_Manager : MonoBehaviour
         }
         else
         {
+            if (_playerRef.gameObject.transform.GetChild(0).transform.GetChild(5).GetComponent<SkinnedMeshRenderer>().material.color != _powerupSwordColor)
+            {
+                _playerRef.gameObject.transform.GetChild(0).transform.GetChild(5).GetComponent<SkinnedMeshRenderer>().material.color = _powerupSwordColor;
+            }
             if (_ghostsInScene.Count == 0)
             {
+                _playerRef.gameObject.transform.GetChild(0).transform.GetChild(5).GetComponent<SkinnedMeshRenderer>().material.color = _initialSwordMat;
                 Debug.Log("Level Complete");
             }
         }
