@@ -795,6 +795,10 @@ public class PlayerController : MonoBehaviour
 
                             }
                         }
+                        else if(thingHit.GetComponent<CathedralProjectile>())
+                        {
+                            thingHit.GetComponent<CathedralProjectile>().HitProjectile(transform.forward, _swordSwingKnockback);
+                        }
                         else if (thingHit.GetComponent<TrapLever>())
                         {
                             thingHit.GetComponent<TrapLever>().StartRotation();

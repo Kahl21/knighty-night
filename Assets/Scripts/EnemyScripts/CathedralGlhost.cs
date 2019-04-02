@@ -19,6 +19,7 @@ public class CathedralGlhost : BasicGlhost {
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
         base.Init(_spawner, _incomingMech);
+        _myAnimations.Play("Idle", 0);
         _myProjectiles = new List<CathedralProjectile>();
     }
 
@@ -49,8 +50,10 @@ public class CathedralGlhost : BasicGlhost {
     //moves the enemy toward the enemy
     protected override void Move()
     {
+
         if (Vector3.Distance(transform.position, _target.transform.position) <= _damageRange)
         {
+            _myAnimations.Play("Idle", 0);
             _myAgent.SetDestination(transform.position);
             transform.LookAt(_target.transform.position);
             _myAgent.enabled = false;
@@ -61,6 +64,7 @@ public class CathedralGlhost : BasicGlhost {
         }
         else
         {
+            _myAnimations.Play("Movement", 0);
             _myAgent.SetDestination(_target.transform.position);
         }
 
@@ -78,6 +82,7 @@ public class CathedralGlhost : BasicGlhost {
 
     protected virtual void FireProjectile()
     {
+        //_myAnimations.Play("Shoot", 0);
         _currProjSpawn = (Time.time - _startTime) / _projectileSpawnWaitTime;
 
         if(_currProjSpawn >=1)
@@ -93,17 +98,27 @@ public class CathedralGlhost : BasicGlhost {
 
     protected override void Die()
     {
-        if(_myProjectiles.Count >0)
+        if(_myProjectiles.Count > 0)
         {
-            for (int i = 0; i < _myProjectiles.Count; i++)
+            for (int i = 0; i < _myProjectiles.Count; i=0)
             {
                 _myProjectiles[i].Stop();
             }
         }
 
-        _mySpawner.RemoveMe(this);
-        _mySpawner.CheckForEnd();
-        Destroy(gameObject);
+        base.Die();
+        if (Physics.Raycast(transform.position + Vector3.up, _deathDirection, out hit, _collisionCheckDist))
+        {
+            if (!hit.collider.GetComponent<BaseEnemy>() && !hit.collider.GetComponent<PlayerController>())
+            {
+                _myCollider.enabled = false;
+                _mySpawner.RemoveMe(this);
+                _mySpawner.CheckForEnd();
+
+                Dead();
+            }
+        }
+        transform.position += _deathDirection * _knockBack * Time.deltaTime;
     }
 
     public virtual void RemoveProj(CathedralProjectile _projToRemove)

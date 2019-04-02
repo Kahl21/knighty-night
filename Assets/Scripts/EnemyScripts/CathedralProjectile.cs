@@ -89,12 +89,12 @@ public class CathedralProjectile : MonoBehaviour {
 
     //called when the enemy gets hit
     //deals damage to the enemy
-    public void HitProjectile(Vector3 _flyDir)
+    public void HitProjectile(Vector3 flyDir, float kockBackForce)
     {
         if (!_hit)
         {
             _hit = true;
-            _deathDirection = _flyDir;
+            _deathDirection = flyDir;
             _deathDirection.y = 0;
             _startTime = Time.time;
             _dead = true;
@@ -132,6 +132,7 @@ public class CathedralProjectile : MonoBehaviour {
         }
         catch
         {
+            _myPillar.GetComponent<CathedralGlhost>().RemoveProj(this);
             Destroy(gameObject);
         }
 
@@ -167,6 +168,7 @@ public class CathedralProjectile : MonoBehaviour {
 
     public void Stop()
     {
+        _myPillar.GetComponent<CathedralGlhost>().RemoveProj(this);
         Destroy(gameObject);
     }
 
