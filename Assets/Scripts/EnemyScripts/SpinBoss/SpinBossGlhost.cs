@@ -582,7 +582,7 @@ public class SpinBossGlhost : BossEnemy
                 GameObject thingHit = hit.collider.gameObject;
 
                 //Debug.Log("reflected");
-                if (!thingHit.GetComponent<BaseEnemy>() && !thingHit.GetComponent<BossEnemy>() && !thingHit.GetComponent<PlayerController>())
+                if (thingHit.GetComponent<BossWall>()|| thingHit.GetComponent<DoorMovement>())
                 {
                     _moveDir = Vector3.Reflect(checkDir, hit.normal);
                 }
@@ -597,7 +597,6 @@ public class SpinBossGlhost : BossEnemy
             {
                 _invincible = false;
                 _enemyAgent.enabled = true;
-                checkIfOffMap();
                 _MyAttack = SPINSTRATS.STUNNED;
                 _startAttackTime = Time.time;
                 return;
@@ -733,7 +732,6 @@ public class SpinBossGlhost : BossEnemy
                 _endingPlaying = false;
 
                 //Debug.Log("dead");
-                _myRoom.EndAll();
                 gameObject.SetActive(false);
             }
         }
@@ -779,17 +777,6 @@ public class SpinBossGlhost : BossEnemy
             _myAI = BossAI.NONE;
             _MyAttack = SPINSTRATS.FOLLOW;
             _init = false;
-        }
-    }
-
-    private void checkIfOffMap()
-    {
-        if (Vector3.Distance(_startPos, transform.position) >= _maxDistanceOut)
-        {
-            transform.position = _startPos;
-            
-            _myAI = BossAI.INTRO;
-            _fallFinished = false;
         }
     }
 }

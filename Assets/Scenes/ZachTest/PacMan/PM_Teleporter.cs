@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PM_Teleporter : MonoBehaviour {
-
+public class PM_Teleporter : MonoBehaviour
+{
+    [SerializeField]
+    bool _leftRight;
+    [SerializeField]
+    bool _upDown;
 	// Use this for initialization
 	void Start ()
     {
@@ -21,7 +25,15 @@ public class PM_Teleporter : MonoBehaviour {
     {
         if (other.GetComponent<PlayerController>().transform || other.GetComponent<PM_BasicGhlost>())
         {
-            transform.parent.GetComponent<PM_Manager>().teleportObject(other.gameObject, this.gameObject);
+            //if (_upDown)
+            //{
+
+            //}
+            //else if (_leftRight)
+            //{
+                transform.parent.GetComponent<PM_Manager>().teleportObject(other.gameObject, this.gameObject);
+            //}
+            
         }
     }
     

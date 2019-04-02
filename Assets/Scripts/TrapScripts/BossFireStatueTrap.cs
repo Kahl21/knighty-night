@@ -17,18 +17,18 @@ public class BossFireStatueTrap : BaseTrap {
     }
 
     [Header("Fire Statue Variables")]
-    public float _fireDamage;
+    float _fireDamage;
     [HideInInspector]
     float _beginningDelay;
     [SerializeField]
-    public float _fireDelay;
+    float _fireDelay;
     [SerializeField]
     float _fireIncDuration;
     [SerializeField]
-    public float _burningDuration;
+    float _burningDuration;
     [SerializeField]
-    public float _fireDistance;
-    public float _startDelay;
+    float _fireDistance;
+    float _startDelay;
     float _currDelay;
 
     [Header("Detection Variables")]
@@ -36,13 +36,13 @@ public class BossFireStatueTrap : BaseTrap {
     bool _debugDamageArea;
     [SerializeField]
     float _spaceBetweenRays;
-    [HideInInspector]
-    public float _maxDetectDistance;
+    
+    float _maxDetectDistance;
     float _currDetectDistance;
     RaycastHit hit;
     ParticleSystem _myFire;
-    public GameObject bossEntity;
-    public bool _XAttack = false;
+    GameObject bossEntity;
+    bool _XAttack = false;
 
     FireState _mystate = FireState.NONE;
 
@@ -187,7 +187,14 @@ public class BossFireStatueTrap : BaseTrap {
             
             _startDelay = Time.time;
 
-            bossEntity.GetComponent<TrapBossGlhost>().trapComplete = true;
+            if(bossEntity.GetComponent<TrapBossGlhost>())
+            {
+                bossEntity.GetComponent<TrapBossGlhost>().IsNotPossessing = true;
+            }
+            else if(bossEntity.GetComponent<MiniTrapBossGlhost>())
+            {
+                bossEntity.GetComponent<MiniTrapBossGlhost>().IsPossessing = true;
+            }
 
             _mystate = FireState.FLAMEBURNOUT;
         }
@@ -263,4 +270,14 @@ public class BossFireStatueTrap : BaseTrap {
     {
         _mystate = FireState.NONE;
     }
+
+    public bool GetXAttack { get { return _XAttack; } set { _XAttack = value; } }
+    public GameObject GetBossEntity { get { return bossEntity; } set { bossEntity = value; } }
+    public float GetFireDelay { get { return _fireDelay; } set { _fireDelay = value; } }
+    public float GetFireDistance { get { return _fireDistance; } set { _fireDistance = value; } }
+    public float GetMaxDetectDistance { get { return _maxDetectDistance; } set { _maxDetectDistance = value; } }
+    public float GetStartDelay { get { return _startDelay; } set { _startDelay = value; } }
+    public float GetBurningDuration { get { return _burningDuration; } set { _burningDuration = value; } }
+    public float GetFireDamage { get { return _fireDamage; } set { _fireDamage = value; } }
+
 }

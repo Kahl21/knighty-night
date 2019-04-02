@@ -16,6 +16,7 @@ public class Collectable : MonoBehaviour
 
     public void AddToScore()
     {
+        Debug.Log("Add to score");
         _pmGameManager.AddToScore(this.gameObject);
         Destroy(this.gameObject);
     }

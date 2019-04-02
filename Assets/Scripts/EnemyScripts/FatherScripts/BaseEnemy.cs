@@ -18,6 +18,7 @@ public class BaseEnemy : MonoBehaviour {
     protected float _currTime;
     protected float _startTime;
     protected bool _dead = false;
+    protected bool _actualDead = false;
     protected bool _hit = false;
     protected bool _canMove = true;
     protected Vector3 _deathDirection;
@@ -47,11 +48,10 @@ public class BaseEnemy : MonoBehaviour {
     protected Menuing _menuRef;
     protected PlayerController _target;
     protected DungeonMechanic _mySpawner;
-    [SerializeField]
     protected Mechanic _myMechanic;
 
-	// Use this for initialization
-	public virtual void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
+    // Use this for initialization
+    public virtual void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
         _myAgent = GetComponent<NavMeshAgent>();
         _mySpawner = _spawner;
@@ -72,7 +72,7 @@ public class BaseEnemy : MonoBehaviour {
         _myRenderer.materials[1] = _mySpookiness;
 
         _myAnimations = GetComponent<Animator>();
-        _myAnimations.Play("Moving", 0);
+        _myAnimations.Play("Movement", 0);
     }
 
     // Update is called once per frame
@@ -163,6 +163,13 @@ public class BaseEnemy : MonoBehaviour {
         _mySpawner.RemoveMe(this);
 
         Destroy(gameObject);
+    }
+
+    protected virtual void Dead()
+    {
+        _actualDead = true;
+        _myAnimations.Play("Death");
+        Destroy(gameObject, 1f);
     }
 
     //various Getters and Setters
