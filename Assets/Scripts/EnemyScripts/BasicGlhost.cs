@@ -200,7 +200,19 @@ public class BasicGlhost : BaseEnemy
 
                     transform.position += _newDeathDirection * _knockBack * Time.deltaTime;
                     break;
-                case Mechanic.BOSS:
+                case Mechanic.CHASE:
+                    base.Die();
+                    if (Physics.Raycast(transform.position + Vector3.up, _deathDirection, out hit, _collisionCheckDist))
+                    {
+                        if (!hit.collider.GetComponent<BaseEnemy>() && !hit.collider.GetComponent<PlayerController>())
+                        {
+                            _myCollider.enabled = false;
+                            _mySpawner.RemoveMe(this);
+
+                            Dead();
+                        }
+                    }
+                    transform.position += _deathDirection * _knockBack * Time.deltaTime;
                     break;
                 default:
                     break;

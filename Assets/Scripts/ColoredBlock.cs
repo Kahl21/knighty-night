@@ -5,19 +5,19 @@ using UnityEngine;
 public class ColoredBlock : MonoBehaviour {
 
     [SerializeField]
-    Color _myColor;
+    protected Color _myColor;
 
-    DungeonMechanic _spawner;
-    Light _mySpotlight;
+    protected DungeonMechanic _spawner;
+    protected Light _mySpotlight;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         GetComponent<MeshRenderer>().material.color = _myColor;
         _mySpotlight = transform.GetChild(0).GetComponent<Light>();
         _mySpotlight.color = _myColor;
     }
 
-    public void CorrectMatch()
+    public virtual void CorrectMatch()
     {
         gameObject.SetActive(false);
         _spawner.CheckForEnd();

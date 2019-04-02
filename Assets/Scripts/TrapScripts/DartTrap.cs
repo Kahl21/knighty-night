@@ -215,7 +215,7 @@ public class DartTrap : BaseTrap {
             Destroy(_currDart);
         }
         transform.position = _startPos;
-
+        _possessed = false;
         _myState = DartState.NONE;
     }
 

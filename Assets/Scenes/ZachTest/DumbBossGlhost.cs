@@ -9,7 +9,8 @@ public class DumbBossGlhost : BaseEnemy
     public enum DUMBSTATE
     {
         NONE,
-        ABSORBING
+        ABSORBING,
+        DIE
     }
 
     [Header("Dumb Ghlost Variables")]
@@ -49,6 +50,12 @@ public class DumbBossGlhost : BaseEnemy
         _startTime = Time.time;
     }
 
+    public void InitColor(Color incColor)
+    {
+        _mySpookiness.color = incColor;
+        _mySpookiness = _myRenderer.materials[1];
+    }
+
     // Update is called once per frame
     protected override void Update()
     {
@@ -78,11 +85,16 @@ public class DumbBossGlhost : BaseEnemy
                                 Move();
                                 CheckForHit();
                                 break;
+
+                            case DUMBSTATE.DIE:
+                                Move();
+                                CheckForHit();
+                                break;
                         }
                         break;
 
                     case Mechanic.COLOR:
-                        ColorMove();
+                        Move();
                         CheckForHit();
                         break;
 
@@ -165,16 +177,32 @@ public class DumbBossGlhost : BaseEnemy
             }
             else if(thingHit.GetComponent<ShootingBoss>())
             {
-                thingHit.GetComponent<ShootingBoss>().HitByGhlost(gameObject, 0f);
+                if (_myMechanic == Mechanic.COLOR)
+                {
+                    if (thingHit.GetComponent<ShootingBoss>().CheckForColor(0, _myColor) == true)
+                    {
+                        _shooterRef.removeGhlostFromScene(gameObject);
+                        Destroy(gameObject);
+                    }
+                    else
+                    {
+                        thingHit.GetComponent<ShootingBoss>().HitByGhlost(gameObject, 0f);
+                    }
+                }
+                else
+                {
+                    thingHit.GetComponent<ShootingBoss>().HitByGhlost(gameObject, 0f);
+                }
+
             }
             else if(!thingHit.GetComponent<PlayerController>() && !thingHit.GetComponent<DumbBossGlhost>() && !thingHit.GetComponent<ShootingBoss>())
             {
-                if (_myMechanic == Mechanic.NONE)
+                if (_myMechanic == Mechanic.NONE || _myMechanic == Mechanic.COLOR || _myDumbState == DUMBSTATE.DIE)
                 {
                     _shooterRef.removeGhlostFromScene(gameObject);
                     Destroy(gameObject);
                 }
-                else if(_myMechanic == Mechanic.CHASE || _myMechanic == Mechanic.COLOR)
+                else if(_myMechanic == Mechanic.CHASE)
                 {
                     _canMove = false;
                     moveSpeed = 0;
@@ -251,7 +279,6 @@ public class DumbBossGlhost : BaseEnemy
     public float SetDamageToPlayer { set { _DamageToPlayer = value; } }
     public float SetMaxTravelTime { set { _maxTravelTime = value; } }
     public GhlostBossShooter SetShooterRef { set { _shooterRef = value; } }
-    public Color SetMyColor { set { _mySpookiness.color = value; } }
-    public Mechanic GetMyMechanic { get { return _myMechanic; } }
+    public Mechanic GetMyMechanic { get { return _myMechanic; } set { _myMechanic = value; } }
     public DUMBSTATE setMyState { set { _myDumbState = value; } }
 }

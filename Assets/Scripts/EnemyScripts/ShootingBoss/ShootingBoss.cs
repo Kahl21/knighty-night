@@ -20,17 +20,14 @@ public class ShootingBoss : BossEnemy
     
 
     [Header("Shooting Boss Variables")]
-    //[SerializeField]
-    float _timeBetweenAttacks;
-    float _realTimeBetweenAttacks;
     [SerializeField]
-    float _stunnedTime;
+    float _stunnedTime;                                             //Time Boss is stunned in between attacks
     [SerializeField]
-    float _vertDetectOffset;
+    float _vertDetectOffset;                                        //Offset for raycasts above the ground
     [SerializeField]
-    float _startAngle;
+    float _startAngle;                                              //Starting Angle for following
     [SerializeField]
-    float _detectionAngle;
+    float _detectionAngle;                                          
     float _calcAngle;
     [SerializeField]
     float _maxDistanceOut;
@@ -43,13 +40,13 @@ public class ShootingBoss : BossEnemy
 
     [Header("Base Spawned Enemies")]
     [SerializeField]
-    float _damageToBoss;
+    float _damageToBoss;                                            //Damage to boss from reflected ghlosts
     [SerializeField]
-    float _damageToPlayer;
+    float _damageToPlayer;                                          //Damage to player from reflected ghlosts
 
     [Header("Follow Player Varibales")]
     [SerializeField]
-    float _followDuration;
+    float _followDuration;                                          //Duration the boss follows player
     float _realFollowDuration;
 
     [Header("Hard Follow Player Varibales")]
@@ -59,41 +56,47 @@ public class ShootingBoss : BossEnemy
     float _hardTimeBetweenAttacks;
 
     [Header("Color Attack Variables")]
-    
+    [SerializeField]
+    float _colorDamageToBoss;                                       //Damage to boss from same colored ghlosts
 
     [Header("Special Attack Variables")]
     [SerializeField]
-    float _absorbAttackPercentage;
+    float _absorbAttackPercentage;                                  //How often the absorb happens
     [SerializeField]
-    float _normalAtttackPercentage;
+    float _normalAtttackPercentage;                                 //The rest of the percentage
 
     [Header("Absorb Attack Variables")]
     [SerializeField]
-    float _absorbSpeed;
+    float _absorbDelay;                                             //Delay the boss waits before absorbing the ghlosts
     [SerializeField]
-    float _rotateSpeed;
+    float _absorbSpeed;                                             //How fast ghlosts are absorbed
     [SerializeField]
-    float _shootingFollowOffset;
+    float _rotateSpeed;                                             //How fas the boss rotates while absorbing
     [SerializeField]
-    float _shootRate;
+    float _shootingFollowOffset;                                    //How much the boss lags behind the player movement while shooting
     [SerializeField]
-    float _rotationAngle = 0;
-    int _ghlostsShot = 0;
-    bool _invinciblesAddad = false;
+    float _shootRate;                                               //How often the boss shoots them out
+
+
+    float _rotationAngle = 0;                                       //Current angle of rotation
+
+    int _ghlostsShot = 0;                                           //Count of shot ghlosts
+    bool _invinciblesAddad = false;                                 //Check for determining if all invincible ghlosts have been counted
     [SerializeField]
-    List<GameObject> _absorbingGhlosts;
+    List<GameObject> _absorbingGhlosts;                             //List of ghlosts to absorb
     [SerializeField]
-    List<GameObject> _absorbedGhlosts;
-    //[SerializeField]
-    //float _normalAtttackPercentage;
+    List<GameObject> _absorbedGhlosts;                              //List of absorbed ghlosts
+    bool _specialPulseAttack = false;                               //Check for determing if the absorb attack should go throguh
 
     Vector3 _ogCamPos;
     bool _cameraInPosition;
     float _startTimer;
     float _currentTime;
-    GhlostBossShooter _attachedShooter;
+    GhlostBossShooter _attachedShooter;                             //Quick reference for the attached shooter
     [HideInInspector]
-    public bool _attackInProgress = false;
+    public bool _attackInProgress = false;                          //Way for the shooter to tell the boss that an attack is in progress
+
+    //Old variables for animations and such.
     float _startAttackTime;
     float _currAttackTime;
 
@@ -138,12 +141,12 @@ public class ShootingBoss : BossEnemy
 
             if (!_managerRef.HardModeOn)
             {
-                _realTimeBetweenAttacks = _timeBetweenAttacks;
+                //_realTimeBetweenAttacks = _timeBetweenAttacks;
                 _realFollowDuration = _followDuration;
             }
             else
             {
-                _realTimeBetweenAttacks = _hardTimeBetweenAttacks;
+                //_realTimeBetweenAttacks = _hardTimeBetweenAttacks;
                 _realFollowDuration = _hardFollowDuration;
             }
         }
@@ -236,12 +239,23 @@ public class ShootingBoss : BossEnemy
         }
     }
 
+    //Called while the shooter attached to him is doing an attack.
+    //While there is an attacking going, nothing happens.
     private void Attacking()
     {
         if (_attachedShooter.attackInProgress != true)
         {
-            _MyState = SHOOTERSTATES.CHECKFORABSORB;
-            _startTimer = Time.time;
+            if (_specialPulseAttack == true)                                //Checks to see if he should absorb
+            {
+                _MyState = SHOOTERSTATES.CHECKFORABSORB;                    //Starts the absorb attack
+                _specialPulseAttack = false;
+                _startTimer = Time.time;
+            }
+            else
+            {
+                _MyState = SHOOTERSTATES.STUNNED;                           //No secondary attack so he is stunned
+                _startTimer = Time.time;
+            }
         }
     }
 
@@ -255,100 +269,109 @@ public class ShootingBoss : BossEnemy
         }
     }
 
-    private void CheckForCanAbsorb()
+    //Check to see if it time to absorb the ghlosts
+    //Will do it after a set amount of time
+    private void CheckForCanAbsorb()                            
     {
-        for (int ghlost = 0; ghlost < _attachedShooter.GetGhlostsInScene.Count; ghlost++)
+        float timeTaken = Time.time - _startTimer;
+        if (timeTaken > _absorbDelay)                                       //After the absorb delay start absorbing
         {
-            if (_attachedShooter.GetGhlostsInScene[ghlost].GetComponent<DumbBossGlhost>().GetSpeed != 0)
-            {
-                return;
-            }
+            _absorbingGhlosts = new List<GameObject>();                     //Reset lists of ghlosts
+            _absorbedGhlosts = new List<GameObject>();
+            _invinciblesAddad = false;
+            _startTimer = Time.time;
+            _MyState = SHOOTERSTATES.ABSORB;                                //Start Absorbing - AbsorbAtk();
         }
-        _invinciblesAddad = false;
-        _MyState = SHOOTERSTATES.ABSORB;
+        
     }
 
+    /*Absorb Attack
+    * Boss spins while the ghlosts are sucked up to him.
+    * As they touch him, they are deactivated and added to a list and compared to a list of total
+    * invincible ghlosts in the scene.
+    * When they are equal, it starts the shooting phase
+    */
     private void AbsorbAtk()
     {
         _rotationAngle += 1 * _rotateSpeed * Time.deltaTime;
         transform.eulerAngles = new Vector3(0, transform.eulerAngles.y+ _rotationAngle, 0);
         if (_invinciblesAddad == false)
         {
-            for (int index = 0; index < _attachedShooter.GetGhlostsInScene.Count; index++)
+            for (int index = 0; index < _attachedShooter.GetGhlostsInScene.Count; index++)      //Counts the invincible ghlosts in the scene
             {
                 if (_attachedShooter.GetGhlostsInScene[index].GetComponent<DumbBossGlhost>().GetMyMechanic == Mechanic.CHASE)
                 {
                     DumbBossGlhost ghlostRef = _attachedShooter.GetGhlostsInScene[index].GetComponent<DumbBossGlhost>();
                     ghlostRef.GetSpeed = _absorbSpeed;
-                    ghlostRef.setMove(transform.eulerAngles);
-                    _absorbingGhlosts.Add(_attachedShooter.GetGhlostsInScene[index]);
+                    ghlostRef.setMove(transform.eulerAngles);                           //Rotates ghlosts towards boss and moves them towards him
+                    _absorbingGhlosts.Add(_attachedShooter.GetGhlostsInScene[index]);   //Adds each ghlosts to a list
                 }
             }
-            /*
-            Debug.DrawRay(transform.position + (Vector3.up * 1f), (transform.forward * 100f), Color.green);
-            if (Physics.Raycast(transform.position + (Vector3.up * 1f), transform.forward, out hit, 100f))
-            {
-                
-                //transform.eulerAngles += new Vector3(0, angle, 0);
-                if (hit.collider.GetComponent<DumbBossGlhost>())
-                {
-                    if (hit.collider.GetComponent<DumbBossGlhost>().GetMyMechanic == Mechanic.CHASE)
-                    {
-                        for (int i = 0; i < _absorbingGhlo`sts.Count; i++)
-                        {
-                            if (hit.collider.gameObject == _absorbingGhlosts[i])
-                            {
-                                return;
-                            }
-                        }
-                        DumbBossGlhost ghlostRef = hit.collider.GetComponent<DumbBossGlhost>();
-                        ghlostRef.GetSpeed = _absorbSpeed;
-                        ghlostRef.setMove(transform.eulerAngles);
-                        _absorbingGhlosts.Add(ghlostRef.gameObject);
-                    }
-                }
-
-            }
-            */
             _invinciblesAddad = true;
         }
-        else if(_absorbingGhlosts.Count != _absorbedGhlosts.Count)
-        {
-            _rotationAngle += 1 + _rotateSpeed * Time.deltaTime;
+        else if(_absorbingGhlosts.Count != _absorbedGhlosts.Count)          //While not all of the ghlosts are in the scene
+        {                                                                   
+            _rotationAngle += 1 + _rotateSpeed * Time.deltaTime;            //The boss spins at a designated speed
             transform.eulerAngles = new Vector3(0, _rotationAngle, 0);
         }
-        else if (_absorbingGhlosts.Count == _absorbedGhlosts.Count)
+        else if (_absorbingGhlosts.Count == _absorbedGhlosts.Count)         //After all ghlosts are absorbed
         {
-            _ghlostsShot = 0;
-            _MyState = SHOOTERSTATES.SHOOT;
-            _startTimer = Time.time;
+            _ghlostsShot = 0;                                               //Resets how many ghlosts have been shot
+            _MyState = SHOOTERSTATES.SHOOT;                                 //Starts shooting - ShootAtPlayer();
+            _startTimer = Time.time;                                        //Resets timer
         }
     }
 
+
+    /*Shoots ghlosts back at player
+     * The boss shoots all the previously absorbed ghlosts out at the player
+     * They come out at wierd angles because they are not instatiated but take from their previous position
+     * When he shoots them all, the boss is stunned
+     */
     private void ShootAtPlayer()
     {
-        if (_ghlostsShot < _absorbedGhlosts.Count)
+        if (_ghlostsShot < _absorbedGhlosts.Count)                          //Checks to see if all of the absorbed ghlosts have been shot out
         {
             float timeTaken = Time.time - _startTimer;
-            gameObject.transform.LookAt(_playerRef.transform);
+            gameObject.transform.LookAt(_playerRef.transform);              //Boss looks at player
 
             //Spawns a new glhost based on the spawnrate
-            if (timeTaken >= _shootRate * _ghlostsShot)
+            if (timeTaken >= _shootRate * _ghlostsShot)                     //Shoots at a rate specified
             {
                 DumbBossGlhost ghlostRef = _absorbedGhlosts[_ghlostsShot].GetComponent<DumbBossGlhost>();
-                ghlostRef.gameObject.SetActive(true);
-                ghlostRef.setMove(_playerRef.transform.position);
-                _ghlostsShot++;
+                ghlostRef.transform.rotation = transform.rotation;          //Shot ghlost's rotation is set to the bosses
+                ghlostRef.gameObject.SetActive(true);                       //Enable the shot ghlost
+                ghlostRef.ShootMe(_playerRef.transform.rotation);           //Shoots the ghlost out
+                ghlostRef.setMyState = DumbBossGlhost.DUMBSTATE.DIE;        //makes it so the invincible ghlost can die against a wall
+                _ghlostsShot++;                                             //Adds to the tally of ghlosts shot
             }
             Debug.Log("Shooting Ghlosts");
         }
         else
         {
-            _MyState = SHOOTERSTATES.STUNNED;
+            _startTimer = Time.time;
+            _MyState = SHOOTERSTATES.STUNNED;                               //Stuns the boss - Stunned();
         }
         
     }
 
+    /*Changes the color of the boss
+     * The boss changes color after every attack and can be hit for more damage by ghlosts of the same color
+     * Random color is chosen by the colors that the LDer's choose for the colored ghlosts
+     */
+    private void changeColor()                                            
+    {
+        Debug.Log("Change Color");
+        List<Color> possibleColors = _attachedShooter.GetGhlostColors;  //Grabs the list of potential colored ghlosts from the shooter
+        int _rando = Random.Range(0, possibleColors.Count);             
+        _myColor = possibleColors[_rando];                              //Sets his color for color detection
+        _myMaterial.color = _myColor;                                   //Sets his material color
+        _myRenderer.materials[1] = _myMaterial;
+    }
+
+    /*Follow the player
+     * Same as all other bosses
+     */
     private void FollowPlayer()
     {
         _enemyAgent.SetDestination(_playerRef.transform.position);
@@ -359,7 +382,7 @@ public class ShootingBoss : BossEnemy
         if (timeTaken > _realFollowDuration)
         {
             _enemyAgent.SetDestination(transform.position);
-
+            changeColor();
             _attachedShooter.newAttack = true;
             _attachedShooter.attackInProgress = true;
             _MyState = SHOOTERSTATES.ATTACKING;
@@ -391,13 +414,15 @@ public class ShootingBoss : BossEnemy
         _calcAngle = _startAngle;
     }
 
-    //called by ghlosts once they get hit into me
-    //checks to see if the ghlost has the same color
+    /*Checks for color
+    * called by ghlosts once they get hit into me
+    * checks to see if the ghlost has the same color
+    */
     public bool CheckForColor(float _damageTaken, Color _incColor)
     {
         if (_incColor == _myColor)
         {
-            GotHit(_damageTaken);
+            GotHit(_colorDamageToBoss);
             return true;
         }
         else
@@ -426,6 +451,11 @@ public class ShootingBoss : BossEnemy
         }
     }
 
+    /*
+     * Checks to see when the boss has been hit by a ghlost
+     * If the ghlost hits him and the boss is absorbing, he adds them to a list and deactivates them
+     * If any ghlost hits him he takes damage from them and checks to see if he died
+     */
     public void HitByGhlost(GameObject objectHitting, float _damageHit)
     {
         if (objectHitting.GetComponent<DumbBossGlhost>() && (_MyState == SHOOTERSTATES.ABSORB))
@@ -558,22 +588,13 @@ public class ShootingBoss : BossEnemy
             Debug.Log("Boss Reset");
             transform.position = _startPos;
             transform.rotation = _startRot;
-            /*
-            _enemiesToCrush.SetActive(true);
-            for (int i = 0; i < _GlhostsUnderMe.Count; i++)
-            {
-                _GlhostsUnderMe[i].ResetCutscene();
-            }
-            */
+
             _currBossHealth = _actualMaxHealth;
             _laggedBossHealthBar.fillAmount = 1;
             _actualBossHealthBar.fillAmount = 1;
 
             _bossBar.SetActive(false);
             _cameraInPosition = false;
-            //_fallFinished = false;
-            //_turnToPlayerFinished = false;
-            //_glhostsCrushed = false;
 
             _endingPlaying = false;
             _laggingHealth = false;
@@ -591,5 +612,5 @@ public class ShootingBoss : BossEnemy
     public float GetDamageToBoss { get { return _damageToBoss; } }
     public float GetDamageToPlayer { get { return _damageToPlayer; } }
     public PlayerController GetPlayerRef { get { return _playerRef; } }
-    //public bool GetIfSpecialGhlosts { get { return _specialGhlosts; } }
+    public bool SetSpecialPulseAttack { get { return _specialPulseAttack; } set { _specialPulseAttack = value; } }
 }

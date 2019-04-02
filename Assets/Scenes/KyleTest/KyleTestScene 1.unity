@@ -324,7 +324,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_SensorSize: {x: 36, y: 24}
   m_LensShift: {x: 0, y: 0}
@@ -464,6 +464,7 @@ MonoBehaviour:
   _spawnPoints: []
   _LeversToEndRoom: []
   _healObject: {fileID: 0}
+  nextCheckpoint: 0
 --- !u!65 &565867861
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1086,12 +1087,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4004582769678618, guid: e61a04ff14a464e41a6573d3853fdd26,
     type: 2}
   m_PrefabInternal: {fileID: 892347469}
---- !u!114 &892347471 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114942358292338678, guid: e61a04ff14a464e41a6573d3853fdd26,
-    type: 2}
-  m_PrefabInternal: {fileID: 892347469}
-  m_Script: {fileID: 11500000, guid: 1a8831a69d0115a41b8eb14dd9cb8889, type: 3}
 --- !u!1001 &940631161
 Prefab:
   m_ObjectHideFlags: 0
@@ -1207,7 +1202,7 @@ Prefab:
     - target: {fileID: 114942358292338678, guid: e61a04ff14a464e41a6573d3853fdd26,
         type: 2}
       propertyPath: _roomMechanic
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114942358292338678, guid: e61a04ff14a464e41a6573d3853fdd26,
         type: 2}
@@ -1218,7 +1213,7 @@ Prefab:
         type: 2}
       propertyPath: _secondaryMechanic
       value: 
-      objectReference: {fileID: 892347471}
+      objectReference: {fileID: 0}
     - target: {fileID: 114942358292338678, guid: e61a04ff14a464e41a6573d3853fdd26,
         type: 2}
       propertyPath: _spawnPoints.Array.data[0]
@@ -1248,11 +1243,26 @@ Prefab:
         type: 2}
       propertyPath: _enemyPreFab
       value: 
-      objectReference: {fileID: 1698123324289944, guid: 17cc51f0de132ba42a8b1e34172d35fb,
+      objectReference: {fileID: 1676507669898506, guid: 7e9bb116fedfa8746886859de94405c0,
         type: 2}
     - target: {fileID: 1288966346453848, guid: e61a04ff14a464e41a6573d3853fdd26, type: 2}
       propertyPath: m_StaticEditorFlags
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 114942358292338678, guid: e61a04ff14a464e41a6573d3853fdd26,
+        type: 2}
+      propertyPath: _startSpawnDelay
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114942358292338678, guid: e61a04ff14a464e41a6573d3853fdd26,
+        type: 2}
+      propertyPath: _delayBetweenSpawns
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114942358292338678, guid: e61a04ff14a464e41a6573d3853fdd26,
+        type: 2}
+      propertyPath: _howManyGlhostsToKill
+      value: 15
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e61a04ff14a464e41a6573d3853fdd26, type: 2}

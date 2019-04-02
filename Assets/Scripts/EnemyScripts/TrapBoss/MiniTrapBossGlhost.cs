@@ -162,8 +162,7 @@ public class MiniTrapBossGlhost : BossEnemy
                     {
                         _GlhostsUnderMe[i].ParentYouself();
                     }
-                    _enemiesToCrush.
-                    (false);
+                    _enemiesToCrush.SetActive(false);
                 }
 
                 _startAttackTime = Time.time;
@@ -425,65 +424,35 @@ public class MiniTrapBossGlhost : BossEnemy
     //Detects when he gets to the targeted tower and starts the quad fire attack on the pillar.
     private void QuadFireBeams()
     {
-        for (int i = 0; i <= _numOfCasts; i++)
+        if (_enemyAgent.hasPath == false)
         {
-            float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
-            float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
-
-            Vector3 RayDir = (transform.forward * Zpos) + (transform.right * Xpos);
-
-            if (_debug)
+            //Moves all the variables from the boss to each fire trap gameobject
+            for (int z = 0; z < 4; z++)
             {
-                Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (RayDir * _bossCollisionDetectDistance), Color.red);
-            }
 
-            _calcAngle += _detectionAngle / _numOfCasts;
+                BossFireStatueTrap possessedTrap = currentTrap.GetComponent<Transform>().GetChild(z).GetComponent<BossFireStatueTrap>();
 
-            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
-            {
-                if (hit.collider.GetComponent<PlayerController>())
+                if (_xAttack)
                 {
-                    hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
-                }
-            }
-        }
-
-        _calcAngle = _startAngle;
-
-        if (Physics.Raycast(transform.position + Vector3.up, this.transform.forward, out hitObj, _detectDistance))
-        {
-
-            GameObject hitObject = hitObj.collider.gameObject;
-
-            if (hitObject == currentTrap)
-            {
-                //Moves all the variables from the boss to each fire trap gameobject
-                for (int z = 0; z < 4; z++)
-                {
-
-                    BossFireStatueTrap possessedTrap = hitObject.GetComponent<Transform>().GetChild(z).GetComponent<BossFireStatueTrap>();
-
-                    if (_xAttack)
-                    {
-                        possessedTrap.transform.eulerAngles += new Vector3(0, 45f, 0);
-                        possessedTrap.GetXAttack = true;
-                    }
-
-
-                    possessedTrap.GetBossEntity = this.gameObject;
-                    possessedTrap.GetFireDelay = _realQuadFireStartDelay;
-                    possessedTrap.GetFireDistance = _realQuadShootDist;
-                    possessedTrap.GetMaxDetectDistance = _realQuadDetectDist;
-                    possessedTrap.GetStartDelay = _quadStartDelay;
-                    possessedTrap.GetBurningDuration = _realQuadBurnDuration;
-                    possessedTrap.GetFireDamage = _realQuadTrapDamage;
-                    possessedTrap.StartingDelay();
-                    trapComplete = false;
+                    possessedTrap.transform.eulerAngles += new Vector3(0, 45f, 0);
+                    possessedTrap.GetXAttack = true;
                 }
 
-                    _MyAttack = TRAPSTRATS.INSIDETRAP;
+
+                possessedTrap.GetBossEntity = this.gameObject;
+                possessedTrap.GetFireDelay = _realQuadFireStartDelay;
+                possessedTrap.GetFireDistance = _realQuadShootDist;
+                possessedTrap.GetMaxDetectDistance = _realQuadDetectDist;
+                possessedTrap.GetStartDelay = _quadStartDelay;
+                possessedTrap.GetBurningDuration = _realQuadBurnDuration;
+                possessedTrap.GetFireDamage = _realQuadTrapDamage;
+                possessedTrap.StartingDelay();
+                trapComplete = false;
             }
+
+                _MyAttack = TRAPSTRATS.INSIDETRAP;
         }
+        
     }
 
     //called when boss gets hit and takes damage

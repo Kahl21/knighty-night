@@ -113,8 +113,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1164556738789036}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.06540215, y: -2.3678578e-17, z: 28.199097}
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.00000058114523}
+  m_LocalPosition: {x: -18.63, y: 0.14996815, z: 243.17}
   m_LocalScale: {x: 0.032052, y: 0.032052, z: 0.032052}
   m_Children:
   - {fileID: 4603920181093476}
@@ -123,7 +123,7 @@ Transform:
   - {fileID: 4323384991055776}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180.00002, z: 0}
 --- !u!4 &4603920181093476
 Transform:
   m_ObjectHideFlags: 1
@@ -157,7 +157,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1965786611528328}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -46, y: 0, z: -361}
+  m_LocalPosition: {x: -46, y: 0, z: 546}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4580672866343944}
@@ -328,53 +328,57 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1a8bb1f0bfc7b248ad54c65954bfa8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _bossName: 
-  _bossSubTitle: 
+  _bossName: Professor Gilbert
+  _bossSubTitle: Inventor Of Glow
   _healthLagDuration: 1
   _healthUpdateDuration: 1
   _playerIntroPos: {fileID: 1965786611528328}
   _cameraIntroDuration: 1
   _deathDuration: 3
-  _maxBossHealth: 15
+  _maxBossHealth: 17
   _bossDamage: 1
   _bossDefaultSpeed: 2
   _bossCollisionDetectDistance: 1
   _InvincibleDuration: 1
   _maxHardBossHealth: 20
   _bossHardDefaultSpeed: 2.5
-  _timeBetweenAttacks: 1.5
   _vertDetectOffset: 0.4
   _startAngle: 45
   _detectionAngle: 90
-  _maxDistanceOut: 2
-  _debug: 0
-  _detectDistance: 1.5
-  _xAttackPercentage: 0
-  _quadFirePercentage: 0
-  _followDuration: 0
-  _quadTrapDamage: 0
-  _quadShootDist: 0
-  _quadDetectDist: 0
-  _quadFireStartDelay: 0
-  _quadBurnDuration: 0
+  _debug: 1
+  _spikeFollowSpeed: 5.5
+  _spikePossessTime: 7
+  _spikeAttackDelay: 0.5
+  _spikeAttackSpeed: 10
+  _spikeRetreatSpeed: 3
   _dartShooterMoveSpeed: 5
   _dartPossessTime: 10
   _dartSpawnDelay: 0.2
-  _dartFireDelay: 0.3
-  _hardTimeBetweenAttacks: 0
+  _dartFireDelay: 0.2
+  _xAttackPercentage: 50
+  _quadFirePercentage: 50
+  _quadTrapDamage: 1
+  _quadShootDist: 1.75
+  _quadDetectDist: 9.5
+  _quadFireStartDelay: 1
+  _quadBurnDuration: 5
   _hardStunnedDuration: 0
   _hardXAttackPercentage: 0
   _hardQuadFirePercentage: 0
+  _hardSpikeFollowSpeed: 0
+  _hardSpikePossessTime: 0
+  _hardSpikeAttackDelay: 0
+  _hardSpikeAttackSpeed: 0
+  _hardSpikeRetreatSpeed: 0
+  _hardDartShooterMoveSpeed: 0
+  _hardDartPossessTime: 0
+  _hardDartFireDelay: 0
+  _hardDartSpawnDelay: 0
   _hardQuadTrapDamage: 0
   _hardQuadShootDist: 0
   _hardQuadDetectDist: 0
   _hardQuadFireStartDelay: 0
   _hardQuadBurnDuration: 0
-  _hardFollowDuration: 0
-  _hardDartShooterMoveSpeed: 0
-  _hardDartPossessTime: 0
-  _hardDartFireDelay: 0
-  _hardDartSpawnDelay: 0
 --- !u!136 &136209426405389820
 CapsuleCollider:
   m_ObjectHideFlags: 1

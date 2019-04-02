@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-
     private static PlayerController _instance;
     public static PlayerController Instance
     {
@@ -37,7 +36,7 @@ public class PlayerController : MonoBehaviour
         NONE,
         WALKING,
         ATTACKING,
-        WAVESPECIAL,
+        WAVESPECIAL
 
         //ETC
     }
@@ -78,6 +77,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     float _playerHealth;
     float _maxHealthValue;
+    List<HealthTracker> _hearts;
     [SerializeField]
     float _playerDamage;
     [SerializeField]
@@ -146,14 +146,14 @@ public class PlayerController : MonoBehaviour
 
     Interactions _whatImDoing = Interactions.NONE;
     MenuOrient _menuOrient = MenuOrient.VERT;
-
-
+    
     //Johns Checkpoint Variables
     bool reachCheckpoint;
     Vector3 checkpointPos;
     float currentCheckpoint;
 
-    public List<GameObject> baseRoomList;
+    [SerializeField]
+    List<GameObject> baseRoomList;
 
     // Use this for initialization
     void Awake()
@@ -179,6 +179,7 @@ public class PlayerController : MonoBehaviour
 
         _myRenderer = transform.GetChild(0).gameObject;
         _myAnimations = GetComponent<Animator>();
+        _hearts = new List<HealthTracker>();
 
         reachCheckpoint = false;
     }
@@ -193,6 +194,11 @@ public class PlayerController : MonoBehaviour
         _currSpecialAmount = 0;
 
         _healthBar = _gameMenus[2].transform.GetChild(0).gameObject;
+        for (int i = 0; i < _healthBar.transform.childCount; i++)
+        {
+            _hearts.Add(_healthBar.transform.GetChild(i).GetComponent<HealthTracker>());
+            _hearts[i].RegainHealth(_maxHealthValue);
+        }
         _specialBar = _gameMenus[2].transform.GetChild(1).gameObject;
         _specialBar.GetComponent<Image>().fillAmount = 0;
         currentCheckpoint = 0;
@@ -202,7 +208,10 @@ public class PlayerController : MonoBehaviour
     public void ResetPlayer()
     {
         _playerHealth = _maxHealthValue;
-        _healthBar.GetComponent<Image>().fillAmount = _playerHealth / _maxHealthValue;
+        for (int i = 0; i < _hearts.Count; i++)
+        {
+            _hearts[i].ResetHealth();
+        }
 
         _currSpecialAmount = 0;
         _specialBar.GetComponent<Image>().fillAmount = _currSpecialAmount / _MaxSpecialAmount;
@@ -267,7 +276,7 @@ public class PlayerController : MonoBehaviour
             CheckForPause();                                //check for pause function
             if (_movingHealth)                              //if moving health is true
             {
-                LerpHealthBar();                            //lerp health bar function
+                LerpHealthBar();          //lerp health bar function
             }
 
             if (_movingSpecial)                              //if moving special
@@ -349,6 +358,10 @@ public class PlayerController : MonoBehaviour
             {
                 _playerHealth = _maxHealthValue;                    //player health is equal to the max possible health
             }
+            
+            h1 = _playerHealth;                                     //h1 equals player health
+            _startHealthTime = Time.time;                           //start health time is equal to current time
+            _movingHealth = true;                                   //moving health is true
         }
         else
         {
@@ -357,11 +370,30 @@ public class PlayerController : MonoBehaviour
             {
                 _playerHealth = 0;                                  //if the players health ends up below zero, make the player health zero
             }
-        }
 
-        h1 = _playerHealth;                                         //h1 equals player health
-        _startHealthTime = Time.time;                               //start health time is equal to current time
-        _movingHealth = true;                                       //moving health is true
+            if (_playerHealth >= 2)
+            {
+                _hearts[2].DepleteHealth(_playerHealth);
+            }
+            else if (_playerHealth >= 1)
+            {
+                _hearts[2].EmptyHealth();
+                _hearts[1].DepleteHealth(_playerHealth);
+            }
+            else if (_playerHealth > 0)
+            {
+                _hearts[2].EmptyHealth();
+                _hearts[1].EmptyHealth();
+                _hearts[0].DepleteHealth(_playerHealth);
+            }
+            else
+            {
+                for (int i = 0; i < _hearts.Count; i++)
+                {
+                    _hearts[i].EmptyHealth();
+                }
+            }
+        }
 
     }
 
@@ -369,10 +401,6 @@ public class PlayerController : MonoBehaviour
     private void LerpHealthBar()
     {
         _currLerpHealth = (Time.time - _startHealthTime) / _healthBarLerpDuration;          //current lerp health is equal to current time minus start health time then divided by lerp health duration
-
-        float h01;                                                                          //float h01
-
-        h01 = (1 - _currLerpHealth) * h0 + _currLerpHealth * h1;                            //h01 equals 1 minus current lerp health times 0 plus current lerp health times h1
 
         if (_currLerpHealth >= 1)                                                           //if current lerp health is greater than one
         {
@@ -382,7 +410,23 @@ public class PlayerController : MonoBehaviour
             _healing = false;                                                               //healing is false
         }
 
-        _healthBar.GetComponent<Image>().fillAmount = h01 / _maxHealthValue;                //the healthbar image is filled h01 divided by max health value
+        float h01;                                                                          //float h01
+
+        h01 = (1 - _currLerpHealth) * h0 + _currLerpHealth * h1;                            //h01 equals 1 minus current lerp health times 0 plus current lerp health times h1
+        
+        if (h01 > 2)
+        {
+            _hearts[2].RegainHealth(h01);
+        }
+        else if (h01 > 1)
+        {
+            _hearts[1].RegainHealth(h01);
+        }
+        else if (h01 > 0)
+        {
+            _hearts[0].RegainHealth(h01);
+        }
+        
     }
 
     //increments Special bar if the player is hits and enemy or uses special
@@ -523,6 +567,10 @@ public class PlayerController : MonoBehaviour
                 thingHit.GetComponent<DungeonMechanic>().Init();                                        //initialize the mechanic
                 addRoom(thingHit);
             }
+            else if(thingHit.GetComponent<DoorMovement>() || thingHit.GetComponent<BossWall>())
+            {
+                _move = Vector3.zero;
+            }
             else if (thingHit.GetComponent<BaseEnemy>())                                                //else if the player hit a base enemy
             {
                 TakeDamage(thingHit.GetComponent<BaseEnemy>().GetDamage);                               //have the player take damage
@@ -530,6 +578,10 @@ public class PlayerController : MonoBehaviour
             else if (thingHit.GetComponent<BossEnemy>())                                                //else if the player hit a boss
             {
                 TakeDamage(thingHit.GetComponent<BossEnemy>().GetDamage);                               //have the player take damage
+            }
+            else if(thingHit.GetComponent<MazeCheckpoint>())                                            //else if the player hits a maze checkpoint
+            {
+                thingHit.GetComponent<MazeCheckpoint>().CheckPointHit();                                //activate the checkpoint
             }
             else if (!thingHit.GetComponent<HealingGrace>() || !thingHit.GetComponent<SpikeTrap>())      //else if the player did not hit any of the above and it isnt a spike trap or healing spot
             {
@@ -585,52 +637,52 @@ public class PlayerController : MonoBehaviour
             }
             else if (thingHit.GetComponent<SpikeTrap>())                                                         //if the playe hit a spike trap
             {
-                thingHit.GetComponent<SpikeTrap>().StartTell();
+                thingHit.GetComponent<SpikeTrap>().StartTell();                                                 //activate the spike trap
             }
-            else if (thingHit.GetComponent<HazardFloor>())
+            else if (thingHit.GetComponent<HazardFloor>())                                                      //if the player walks over a hazard
             {
-                TakeDamage(thingHit.GetComponent<HazardFloor>().GetHazardDamage);
+                TakeDamage(thingHit.GetComponent<HazardFloor>().GetHazardDamage);                               //player takes damage equal tot eh amount specified on the hazard
             }
         }
 
-        if (_doingSomething)
+        if (_doingSomething)                                                                                    //if the player is doing any action while moving
         {
-            _currPlayerSpeed = _speedWhileSwinging;
+            _currPlayerSpeed = _speedWhileSwinging;                                                             //slow them do
         }
-        else
+        else                                                                                                    //else
         {
-            _currPlayerSpeed = _playerSpeed;
+            _currPlayerSpeed = _playerSpeed;                                                                    //have normal move speed
         }
 
-        transform.position += _move * _currPlayerSpeed * Time.deltaTime;
+        transform.position += _move * _currPlayerSpeed * Time.deltaTime;                                        //Move the player 
     }
 
 
     //checks player input of left stick to rotate player
     private void LookAround()
     {
-        _look = new Vector3(Input.GetAxis("HorizLook"), 0, -Input.GetAxis("VertLook"));
+        _look = new Vector3(Input.GetAxis("HorizLook"), 0, -Input.GetAxis("VertLook"));                         //checks the horizontal and vertical stick input
 
-        if (_look.magnitude > 0.5f)
+        if (_look.magnitude > 0.5f)                                                                             //if the stick input is outside the dead zone
         {
-            _currLook = _look;
+            _currLook = _look;                                                                                  //change where the player is looking
         }
 
-        transform.rotation = Quaternion.LookRotation(_currLook, Vector3.up);
+        transform.rotation = Quaternion.LookRotation(_currLook, Vector3.up);                                    //rotate the player to look at where the stick is pointing
     }
 
     //checks to see if the player has swung the sword
     //checks to see if the player has used their special
     private void CheckForActionInput()
     {
-        _swing = Input.GetAxis("SwordSwing");
-        if (_swing < 0)
+        _swing = Input.GetAxis("SwordSwing");                                                                   //checks to see if the right or left trigger is pressed
+        if (_swing < 0)                                                                                         //if the right trigger is pressed
         {
-            ImaStartSwinging();
+            ImaStartSwinging();                                                                                 //start the player swing
         }
-        else if (_swing > 0)
+        else if (_swing > 0)                                                                                    //else if the left trigger is pressed
         {
-            SpecialUsed();
+            SpecialUsed();                                                                                      //use the special attack
         }
     }
 
@@ -638,34 +690,34 @@ public class PlayerController : MonoBehaviour
     private void ImaStartSwinging()
     {
         //Debug.Log("Start the swing");
-        _doingSomething = true;
-        _whatImDoing = Interactions.ATTACKING;
-        _calcAngle = 0;
-        _myAnimations.Play("SwordSwing", 0);
-        _SwingStartTime = Time.time;
-        AudioManager.instance.Swing();
+        _doingSomething = true;                                                                                 //player is set to do something
+        _whatImDoing = Interactions.ATTACKING;                                                                  //player is basic attacking
+        _calcAngle = 0;                                                                                         //reset the detection angle for the swing
+        _myAnimations.Play("SwordSwing", 0);                                                                    //play the sword swing animation
+        _SwingStartTime = Time.time;                                                                            //start the time for the swing
+        AudioManager.instance.Swing();                                                                          //play the basic swing sound
     }
 
     //resets the player attack
     public void ResetSword()
     {
-        _doingSomething = false;
-        _whatImDoing = Interactions.NONE;
+        _doingSomething = false;                                                                                //player is not doing something
+        _whatImDoing = Interactions.NONE;                                                                       //player is only moving
     }
 
     //called right before the player uses their special
     //checks to see if the player has full special meter before using
     private void SpecialUsed()
     {
-        if (_currSpecialAmount >= _MaxSpecialAmount)
+        if (_currSpecialAmount >= _MaxSpecialAmount)                                                                                //if the player special meter is full
         {
-            _myAnimations.Play("SwordSwing", 0);
-            IncSpecialMeter(_MaxSpecialAmount, false);
-            _doingSomething = true;
-            Instantiate<GameObject>(BWPrefab, transform.position + transform.forward + Vector3.up, transform.rotation);
-            _SwingStartTime = Time.time;
-            _whatImDoing = Interactions.WAVESPECIAL;
-            AudioManager.instance.FireAttack();
+            _myAnimations.Play("SwordSwing", 0);                                                                                    //play the sword swing animation
+            IncSpecialMeter(_MaxSpecialAmount, false);                                                                              //empty the special meter
+            _doingSomething = true;                                                                                                 //player is set to do something
+            Instantiate<GameObject>(BWPrefab, transform.position + transform.forward + Vector3.up, transform.rotation);             //creates an instance of the special attack prefab
+            _SwingStartTime = Time.time;                                                                                            //start the time for the swing
+            _whatImDoing = Interactions.WAVESPECIAL;                                                                                //player is using the special slash
+            AudioManager.instance.FireAttack();                                                                                     //play the sound of the fire slash
         }
     }
 
@@ -704,10 +756,24 @@ public class PlayerController : MonoBehaviour
 
                         if (thingHit.GetComponent<BaseEnemy>())
                         {
-                            if (!thingHit.GetComponent<BaseEnemy>().AmHit)
+                            try
                             {
-                                thingHit.GetComponent<BaseEnemy>().GotHit(transform.forward, _swordSwingKnockback);
-                                IncSpecialMeter(_specialInc, true);
+                                if(!thingHit.GetComponent<GraveyardGlhost>().AmInvincible)
+                                {
+                                    if (!thingHit.GetComponent<BaseEnemy>().AmHit)
+                                    {
+                                        thingHit.GetComponent<BaseEnemy>().GotHit(transform.forward, _swordSwingKnockback);
+                                        IncSpecialMeter(_specialInc, true);
+                                    }
+                                }
+                            }
+                            catch
+                            {
+                                if (!thingHit.GetComponent<BaseEnemy>().AmHit)
+                                {
+                                    thingHit.GetComponent<BaseEnemy>().GotHit(transform.forward, _swordSwingKnockback);
+                                    IncSpecialMeter(_specialInc, true);
+                                }
                             }
                         }
                         else if (thingHit.GetComponent<BossEnemy>())
@@ -867,4 +933,7 @@ public class PlayerController : MonoBehaviour
 
     public GameObject SetWinImage { set { _winImage = value; } }
     public GameObject SetLoseImage { set { _loseImage = value; } }
+
+    public float GetCurrCheckpoint { get { return currentCheckpoint; } set { currentCheckpoint = value; } }
+    public bool DoesHaveCheckpoint { get { return reachCheckpoint; } set { reachCheckpoint = value; } }
 }
