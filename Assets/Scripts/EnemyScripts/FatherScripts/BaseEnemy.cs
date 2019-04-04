@@ -44,6 +44,8 @@ public class BaseEnemy : MonoBehaviour {
     protected float _cheatingSensitivity;
     protected GameObject _myPillar;
     protected Animator _myAnimations;
+    protected bool _attacking;
+    protected bool _idling;
 
     protected Menuing _menuRef;
     protected PlayerController _target;

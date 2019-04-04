@@ -43,10 +43,6 @@ public class BasicGlhost : BaseEnemy
     {
         if (Vector3.Distance(transform.position, _target.transform.position) <= _damageRange)
         {
-            if(_myAnimations.IsInTransition(0))
-            {
-                _myAnimations.Play("Attack");
-            }
             
             //this is where you match the animation speed with the ghost speed
             //_myAnimations.speed = 10;
@@ -54,11 +50,6 @@ public class BasicGlhost : BaseEnemy
         }
         else
         {
-            //animation breaker
-            if (_myAnimations.IsInTransition(0))
-            {
-                _myAnimations.Play("Movement");
-            }
             _myAgent.SetDestination(_target.transform.position);
         }
 
@@ -193,7 +184,8 @@ public class BasicGlhost : BaseEnemy
                             _myAgent.enabled = true;
                             _hit = false;
                             _dead = false;
-                            _myAnimations.Play("Moving");
+                            _attacking = false;
+                            _idling = false;
                         }
 
                     }

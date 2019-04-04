@@ -53,7 +53,12 @@ public class CathedralGlhost : BasicGlhost {
 
         if (Vector3.Distance(transform.position, _target.transform.position) <= _damageRange)
         {
-            _myAnimations.Play("Idle", 0);
+            if(!_idling)
+            {
+                _myAnimations.Play("Idle", 0);
+                _idling = true;
+                _attacking = false;
+            }
             _myAgent.SetDestination(transform.position);
             transform.LookAt(_target.transform.position);
             _myAgent.enabled = false;
@@ -64,7 +69,12 @@ public class CathedralGlhost : BasicGlhost {
         }
         else
         {
-            _myAnimations.Play("Movement", 0);
+            if(!_attacking)
+            {
+                _myAnimations.Play("Movement", 0);
+                _attacking = true;
+                _idling = false;
+            }
             _myAgent.SetDestination(_target.transform.position);
         }
 
