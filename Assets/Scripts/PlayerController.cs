@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -283,11 +283,13 @@ public class PlayerController : MonoBehaviour
             {
                 LerpSpecialBar();                           //lerp special bar function
             }
+            if(SceneManager.GetActiveScene().buildIndex != 0)
             CheckForMovement();                             //check for movement function
 
             if (!_doingSomething)                           //if not doing something
             {
-                LookAround();                               //look around function
+                if (SceneManager.GetActiveScene().buildIndex != 0)
+                    LookAround();                               //look around function
                 CheckForActionInput();                      //check for action input
             }
             else
