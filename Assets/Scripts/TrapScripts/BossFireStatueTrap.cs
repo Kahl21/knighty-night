@@ -41,6 +41,7 @@ public class BossFireStatueTrap : BaseTrap {
     float _currDetectDistance;
     RaycastHit hit;
     ParticleSystem _myFire;
+    ParticleSystem _mySmoke;
     GameObject bossEntity;
     bool _XAttack = false;
 
@@ -49,10 +50,21 @@ public class BossFireStatueTrap : BaseTrap {
     //Start Function
     protected override void Start()
     {
+        SetLifetime();
+    }
+
+    void SetLifetime()
+    {
         _myFire = transform.GetChild(0).transform.GetComponent<ParticleSystem>();
         var main = _myFire.main;
         main.startLifetime = _fireDistance;
         _myFire.Stop();
+
+        _mySmoke = transform.GetChild(1).transform.GetComponent<ParticleSystem>();
+        main = _mySmoke.main;
+        main.startLifetime = _fireDelay;
+        main.duration = _fireDelay;
+        _mySmoke.Stop();
     }
 
     //Initilizes trap
@@ -108,7 +120,10 @@ public class BossFireStatueTrap : BaseTrap {
         {
             _currDelay = 1;
 
+            SetLifetime();
+
             _startDelay = Time.time;
+            _mySmoke.Play();
             _mystate = FireState.FLAMEDELAY;
         }
     }
@@ -123,6 +138,7 @@ public class BossFireStatueTrap : BaseTrap {
             _currDelay = 1;
 
             _myFire.Play();
+            _mySmoke.Stop();
             _startDelay = Time.time;
             Debug.Log("Shoot Fire");
             _mystate = FireState.FLAMEON;

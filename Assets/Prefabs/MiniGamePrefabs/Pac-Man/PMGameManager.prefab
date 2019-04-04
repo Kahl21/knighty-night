@@ -1,0 +1,97 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1607780483858066}
+  m_IsPrefabAsset: 1
+--- !u!1 &1607780483858066
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4068318391744840}
+  - component: {fileID: 114078434751177070}
+  m_Layer: 0
+  m_Name: PMGameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4068318391744840
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1607780483858066}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114078434751177070
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1607780483858066}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33a374cf280affe438e09a9dca0bedaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _teleporters:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _targetPointContainer: {fileID: 0}
+  _targetPoints: []
+  _spawnPoints:
+  - {fileID: 0}
+  _ghostsInScene: []
+  _ghostPrefab: {fileID: 1264810325070876, guid: e0e1a4c49bdc742429b9dd71b207d09f,
+    type: 2}
+  _coinLayoutPrefab: {fileID: 0}
+  _ghostSpawnDelay: 2.5
+  _maxInitialGhostsInScene: 6
+  _coinValue: 1
+  _currentScore: 0
+  _scoreText: {fileID: 0}
+  _initialScoreNeeded: 30
+  _coloredPillars:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _colorSpawnPoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _coloredGhlostPrefab: {fileID: 1490335119693906, guid: 936bc1775c038544c9f353f06bad1610,
+    type: 2}
+  _travelRadius: 6
+  _finalGhostSpawnDelay: 0.4
+  _finalMaxGhostsInScene: 150
+  _swarmSpawnPoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _swordPowerUp: {fileID: 0}
+  _powerupSwordColor: {r: 1, g: 0.8816934, b: 0, a: 0}
+  _initialSwordMat: {r: 0, g: 0, b: 0, a: 0}
