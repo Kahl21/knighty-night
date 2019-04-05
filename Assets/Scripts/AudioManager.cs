@@ -40,6 +40,8 @@ public class AudioManager : MonoBehaviour {
     [SerializeField]
     AudioClip RoomCompleteClip;
 
+    [SerializeField]
+    AudioClip ButtonPressedClip;
 
 
     //Ghost SFX
@@ -185,6 +187,11 @@ public class AudioManager : MonoBehaviour {
     public virtual void GhostColorCorrect()
     {
             SFXPlayer.PlayOneShot(ColorGhostCorrectClip, volSFX);
+    }
+
+    public virtual void ButtonPressed()
+    {
+        SFXPlayer.PlayOneShot(ButtonPressedClip, volSFX);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////

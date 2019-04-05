@@ -1339,7 +1339,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff26db721962cdf4a8edcdfa9a767d2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  profile: {fileID: 11400000, guid: fc5bfc35d9c066045af78f7dc443ea3a, type: 2}
 --- !u!1 &459213667
 GameObject:
   m_ObjectHideFlags: 0
@@ -1617,6 +1616,11 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114259013705830678, guid: ba64178319ee24542ab9f46e3aaf6d10,
+        type: 2}
+      propertyPath: pressed
+      value: 
+      objectReference: {fileID: 8300000, guid: 38f2420e83ffc9c459245af69288d6e2, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ba64178319ee24542ab9f46e3aaf6d10, type: 2}
   m_IsPrefabAsset: 0

@@ -110,7 +110,6 @@ public class Menuing : MonoBehaviour {
     public Text changedMaster;
     public Text changedMusic;
     public Text changedSFX;
-
     // Use this for initialization
     void Awake ()
     {
@@ -205,7 +204,7 @@ public class Menuing : MonoBehaviour {
 
     private void SetButtons(int _menuNum)
     {
-        if(_menuNum == (int)WhichUIMenu.WIN || _menuNum == (int)WhichUIMenu.MASTER || _menuNum == (int)WhichUIMenu.MUSIC || _menuNum == (int)WhichUIMenu.SFX)
+        if(_menuNum == (int)WhichUIMenu.WIN || _menuNum == (int)WhichUIMenu.MASTER || _menuNum == (int)WhichUIMenu.MUSIC || _menuNum == (int)WhichUIMenu.SFX || _menuNum == (int)WhichUIMenu.AREYOUSURE)
         {
             _playerRef.SetOrientation = MenuOrient.HORIZ;
         }
@@ -226,7 +225,8 @@ public class Menuing : MonoBehaviour {
 
     public void Pause()
     {
-        if(_paused)
+        AudioManager.instance.ButtonPressed();
+        if (_paused)
         {
             SetMenu(WhichUIMenu.PLAYER);
             Time.timeScale = 1;
@@ -244,7 +244,7 @@ public class Menuing : MonoBehaviour {
 
     public void StartGame()
     {
-        //SceneManager.LoadScene(1);
+        AudioManager.instance.ButtonPressed();
         StartCoroutine(LoadNewScene());
         Time.timeScale = 1;
         _paused = false;
@@ -277,6 +277,7 @@ public class Menuing : MonoBehaviour {
 
     public void RetryLevel()
     {
+        AudioManager.instance.ButtonPressed();
         SetMenu(WhichUIMenu.PLAYER);
         _playerRef.InMenu = false;
         Time.timeScale = 1;
@@ -286,6 +287,7 @@ public class Menuing : MonoBehaviour {
 
     public void BackToMainMenu()
     {
+        AudioManager.instance.ButtonPressed();
         //SceneManager.LoadScene(0);
         StartCoroutine(LoadSpecificScene(0));
         Time.timeScale = 1;
@@ -306,36 +308,43 @@ public class Menuing : MonoBehaviour {
 
     public void ToOptions()
     {
+        AudioManager.instance.ButtonPressed();
         SetMenu(WhichUIMenu.OPTIONS);
     }
 
     public void ToVideo()
     {
+        AudioManager.instance.ButtonPressed();
         SetMenu(WhichUIMenu.VIDEO);
     }
 
     public void ToAudio()
     {
+        AudioManager.instance.ButtonPressed();
         SetMenu(WhichUIMenu.AUDIO);
     }
 
     public void ToMaster()
     {
+        AudioManager.instance.ButtonPressed();
         SetMenu(WhichUIMenu.MASTER);
     }
 
     public void ToMusic()
     {
+        AudioManager.instance.ButtonPressed();
         SetMenu(WhichUIMenu.MUSIC);
     }
 
     public void ToSFX()
     {
+        AudioManager.instance.ButtonPressed();
         SetMenu(WhichUIMenu.SFX);
     }
 
     public void ToAreYouSure()
     {
+        AudioManager.instance.ButtonPressed();
         SetMenu(WhichUIMenu.AREYOUSURE);
     }
 
@@ -343,11 +352,13 @@ public class Menuing : MonoBehaviour {
 
     public void MenuBack()
     {
+        AudioManager.instance.ButtonPressed();
         SetMenu(WhichUIMenu.MAINMENU);
     }
 
     public void EndGame()
     {
+        AudioManager.instance.ButtonPressed();
         Application.Quit();
     }
 
@@ -445,11 +456,18 @@ public class Menuing : MonoBehaviour {
 
     public void Fading()
     {
+        
        if(!isLoading && _fadeScreen.color != transparentColor)
         {
+            StopCoroutine(FadeOut());
             StartCoroutine(FadeIn());
         }
 
+       if(isLoading && _fadeScreen.color != blackColor)
+        {
+            StopCoroutine(FadeIn());
+            StartCoroutine(FadeOut());
+        }
 
     }
 
@@ -457,13 +475,15 @@ public class Menuing : MonoBehaviour {
     //video Settings
     private void ChangeResolution(int width, int height, bool fullscreen)
     {
+        AudioManager.instance.ButtonPressed();
         Screen.SetResolution(width, height, fullscreen);
         
     }
 
     public void ChangeWindow()
     {
-        if(Screen.fullScreen == true)
+        AudioManager.instance.ButtonPressed();
+        if (Screen.fullScreen == true)
         {
             Screen.fullScreen = false;
             isFullscreen = false;
@@ -480,12 +500,14 @@ public class Menuing : MonoBehaviour {
 
     public void ChooseResolution()
     {
+        AudioManager.instance.ButtonPressed();
         SetMenu(WhichUIMenu.RESOLUTION);
 
     }
 
     public void Resolution1920x1080 ()
     {
+        AudioManager.instance.ButtonPressed();
         ChangeResolution(1920, 1080, isFullscreen);
         currenResolution.text = "1920 x 1080";
         SetMenu(WhichUIMenu.VIDEO);
@@ -493,6 +515,7 @@ public class Menuing : MonoBehaviour {
 
     public void Resolution1920x1200()
     {
+        AudioManager.instance.ButtonPressed();
         ChangeResolution(1920, 1200, isFullscreen);
         currenResolution.text = "1920 x 1200";
         SetMenu(WhichUIMenu.VIDEO);
@@ -500,6 +523,7 @@ public class Menuing : MonoBehaviour {
 
     public void Resolution1600x900()
     {
+        AudioManager.instance.ButtonPressed();
         ChangeResolution(1600, 900, isFullscreen);
         currenResolution.text = "1600 x 600";
         SetMenu(WhichUIMenu.VIDEO);
@@ -507,6 +531,7 @@ public class Menuing : MonoBehaviour {
 
     public void Resolution1440x900()
     {
+        AudioManager.instance.ButtonPressed();
         ChangeResolution(1440, 900, isFullscreen);
         currenResolution.text = "1440 x 600";
         SetMenu(WhichUIMenu.VIDEO);
@@ -514,6 +539,7 @@ public class Menuing : MonoBehaviour {
 
     public void Resolution1366x768()
     {
+        AudioManager.instance.ButtonPressed();
         ChangeResolution(1366, 768, isFullscreen);
         currenResolution.text = "1366 x 768";
         SetMenu(WhichUIMenu.VIDEO);
@@ -521,6 +547,7 @@ public class Menuing : MonoBehaviour {
 
     public void Resolution1280x1024()
     {
+        AudioManager.instance.ButtonPressed();
         ChangeResolution(1280, 1024, isFullscreen);
         currenResolution.text = "1280 x 1024";
         SetMenu(WhichUIMenu.VIDEO);
@@ -528,6 +555,7 @@ public class Menuing : MonoBehaviour {
 
     public void Resolution1280x768()
     {
+        AudioManager.instance.ButtonPressed();
         ChangeResolution(1280, 768, isFullscreen);
         currenResolution.text = "1280 x 768";
         SetMenu(WhichUIMenu.VIDEO);
@@ -535,6 +563,7 @@ public class Menuing : MonoBehaviour {
 
     public void Resolution1024x768()
     {
+        AudioManager.instance.ButtonPressed();
         ChangeResolution(1024, 768, isFullscreen);
         currenResolution.text = "1024 x 768";
         SetMenu(WhichUIMenu.VIDEO);
@@ -542,6 +571,7 @@ public class Menuing : MonoBehaviour {
 
     public void Resolution800x600()
     {
+        AudioManager.instance.ButtonPressed();
         ChangeResolution(800, 600, isFullscreen);
         currenResolution.text = "800 x 600";
         SetMenu(WhichUIMenu.VIDEO);
@@ -555,38 +585,45 @@ public class Menuing : MonoBehaviour {
     //audio Settings
     public void MuteAll()
     {
+        AudioManager.instance.ButtonPressed();
         _audioManager.MasterVolume(0);
     }
 
     public void MuteSFX()
     {
+        AudioManager.instance.ButtonPressed();
         _audioManager.SFXVolume(0);
     }
 
     public void MuteMusic()
     {
+        AudioManager.instance.ButtonPressed();
         _audioManager.MusicVolume(0);
 
     }
 
     private void ChangeMasterVolume(float vol)
     {
+        AudioManager.instance.ButtonPressed();
         _audioManager.MasterVolume(vol);
     }
 
     private void ChangeSFXVolume(float vol)
     {
+        AudioManager.instance.ButtonPressed();
         _audioManager.SFXVolume(vol);
     }
 
     private void ChangeMusicVolume(float vol)
     {
+        AudioManager.instance.ButtonPressed();
         _audioManager.MusicVolume(vol);
 
     }
 
     public void MasterUp()
     {
+        AudioManager.instance.ButtonPressed();
         float currentVol = _audioManager.volMaster;
         if (currentVol < 10)
             ChangeMasterVolume(currentVol+1);
@@ -595,6 +632,7 @@ public class Menuing : MonoBehaviour {
 
     public void MasterDown()
     {
+        AudioManager.instance.ButtonPressed();
         float currentVol = _audioManager.volMaster;
         if (currentVol > 0)
             ChangeMasterVolume(currentVol-1);
@@ -603,6 +641,7 @@ public class Menuing : MonoBehaviour {
 
     public void MusicUp()
     {
+        AudioManager.instance.ButtonPressed();
         float currentVol = _audioManager.volMusic;
         if (currentVol < 10)
             ChangeMusicVolume(currentVol+1);
@@ -611,6 +650,7 @@ public class Menuing : MonoBehaviour {
 
     public void MusicDown()
     {
+        AudioManager.instance.ButtonPressed();
         float currentVol = _audioManager.volMusic;
         if (currentVol > 0)
             ChangeMusicVolume(currentVol-1);
@@ -619,6 +659,7 @@ public class Menuing : MonoBehaviour {
 
     public void SFXUp()
     {
+        AudioManager.instance.ButtonPressed();
         float currentVol = _audioManager.volSFX;
         if (currentVol < 10)
             ChangeSFXVolume(currentVol+1);
@@ -627,6 +668,7 @@ public class Menuing : MonoBehaviour {
 
     public void SFXDown()
     {
+        AudioManager.instance.ButtonPressed();
         float currentVol = _audioManager.volSFX;
         if (currentVol > 0)
             ChangeSFXVolume(currentVol-1);
@@ -643,22 +685,14 @@ public class Menuing : MonoBehaviour {
 
     IEnumerator LoadNewScene()
     {
-        _fadeScreen.color = transparentColor;
         float time = 0;
         Color wantedColor = _fadeScreen.color;
         isLoading = true;
         AsyncOperation asyncLoad  = SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex + 1);
         asyncLoad.allowSceneActivation = false;
+        
+        yield return new WaitForSeconds(2f);
 
-        //yield return new WaitForSeconds(3f);
-        while(time < fadeTime)
-        {
-            yield return new WaitForSeconds(fadeUpdateTime);
-
-            wantedColor = Color.Lerp(transparentColor, blackColor, time);
-            _fadeScreen.color = wantedColor;
-            time += fadeUpdateTime;
-        }
         _loadScreen.color = fullColor;
         yield return new WaitForSeconds(2f);
         _loadScreen.color = transparentColor;
@@ -668,14 +702,12 @@ public class Menuing : MonoBehaviour {
 
     IEnumerator LoadSpecificScene(int scene)
     {
-        _fadeScreen.color = transparentColor;
         float time = 0;
         Color wantedColor = _fadeScreen.color;
         isLoading = true;
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(scene);
         asyncLoad.allowSceneActivation = false;
 
-        //yield return new WaitForSeconds(3f);
         while (time < fadeTime)
         {
             yield return new WaitForSeconds(fadeUpdateTime);
@@ -693,14 +725,46 @@ public class Menuing : MonoBehaviour {
 
     IEnumerator FadeIn()
     {
-        float time = 0;
+        
+        float time;
+        if (!_paused)
+            time = 0;
+        else
+            time = fadeTime;
         Color wantedColor = _fadeScreen.color;
-
+        
         while (time < fadeTime)
         {
             yield return new WaitForSeconds(fadeUpdateTime);
 
             wantedColor = Color.Lerp(blackColor, transparentColor, time);
+            _fadeScreen.color = wantedColor;
+            time += fadeUpdateTime;
+
+            if(isLoading)
+            {
+                _fadeScreen.color = transparentColor;
+                time = fadeTime + 1;
+            }
+        }
+    }
+
+    IEnumerator FadeOut()
+    {
+        float time;
+        if (!_paused)
+            time = 0;
+        else
+            time = fadeTime;
+        _fadeScreen.color = transparentColor;
+        //Color wantedColor = _fadeScreen.color;
+        Color wantedColor = transparentColor;
+
+        while (time < fadeTime)
+        {
+            yield return new WaitForSeconds(fadeUpdateTime);
+
+            wantedColor = Color.Lerp(transparentColor, blackColor, time);
             _fadeScreen.color = wantedColor;
             time += fadeUpdateTime;
         }
