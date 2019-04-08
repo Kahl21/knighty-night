@@ -144,6 +144,15 @@ public class SpinBossGlhost : BossEnemy
     [SerializeField]
     float _hardPinballAttackDuration;
 
+    [Header("Sound Variables")]
+    public AudioClip bossSpin;
+    public AudioClip bossDazed;
+    public AudioClip bossDeath;
+
+
+    GameObject dazedParticle;
+
+
     SPINSTRATS _MyAttack = SPINSTRATS.FOLLOW;
 
     //intro cutscene function
@@ -311,6 +320,12 @@ public class SpinBossGlhost : BossEnemy
         cam1.y = _cameraRef.transform.position.y;
         _cameraRef.AmFollowingPlayer = false;
 
+
+        _speaker = this.transform.GetComponent<AudioSource>();
+        dazedParticle = this.transform.GetChild(5).gameObject;
+        dazedParticle.SetActive(false);
+
+
         _totalPercentage = _realFollowPercentage + _realSpinAttackPercentage + _realPinballAttackPercentage;
 
         _startAttackTime = Time.time;
@@ -474,6 +489,10 @@ public class SpinBossGlhost : BossEnemy
         _currAttackTime = (Time.time - _startAttackTime) / _realSpinAttackDuration;
         _currSpawnTime = (Time.time - _startSpawnTime) / _realSpawnDelayDuration;
 
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(bossSpin, volSFX);
+        // _myAnimations.Play("Spin");
+
         for (int i = 0; i <= _numOfCasts; i++)
         {
             float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
@@ -527,7 +546,12 @@ public class SpinBossGlhost : BossEnemy
     {
         if (_tellPinballing)
         {
+
+            if (!_speaker.isPlaying)
+                _speaker.PlayOneShot(bossSpin, volSFX);
+
             _currAttackTime = (Time.time - _startAttackTime) / _realPinballTellDuration;
+            //_myAnimations.Play("Spin");
 
             if (_currAttackTime >= 1)
             {
@@ -610,12 +634,16 @@ public class SpinBossGlhost : BossEnemy
     //will do nothing for an amount of time
     private void Stunned()
     {
+        dazedParticle.SetActive(true);
         _currAttackTime = (Time.time - _startAttackTime) / _realStunnedDuration;
 
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(bossDazed, volSFX);
         //Debug.Log("stunned");
 
         if (_currAttackTime >= 1)
         {
+            dazedParticle.SetActive(false);
             _MyAttack = SPINSTRATS.DOWNTIME;
             _startAttackTime = Time.time;
         }
@@ -657,6 +685,7 @@ public class SpinBossGlhost : BossEnemy
         cam1.y = _cameraRef.transform.position.y;
         _cameraRef.AmFollowingPlayer = false;
 
+        _speaker.PlayOneShot(bossDeath, volSFX);
 
         _startAttackTime = Time.time;
         _cameraInPosition = false;
@@ -699,7 +728,7 @@ public class SpinBossGlhost : BossEnemy
                 cam0 = _cameraRef.transform.position;
                 cam1 = _ogCamPos;
 
-                _myRenderer.enabled = false;
+                _mySkinRenderer.enabled = false;
 
                 _startAttackTime = Time.time;
                 _showingDeath = true;
@@ -707,8 +736,8 @@ public class SpinBossGlhost : BossEnemy
 
             _myColor.a = 1 - _currAttackTime;
             _myMaterial.color = _myColor;
-            _myRenderer.materials[1] = _myMaterial;
-            _myRenderer.materials[0] = _myMaterial;
+            _mySkinRenderer.materials[1] = _myMaterial;
+            _mySkinRenderer.materials[0] = _myMaterial;
         }
         else
         {
@@ -743,10 +772,10 @@ public class SpinBossGlhost : BossEnemy
         if (_init)
         {
             gameObject.SetActive(true);
-            _myRenderer.enabled = true;
+            _mySkinRenderer.enabled = true;
             _myColor.a = 1;
             _myMaterial.color = _myColor;
-            _myRenderer.materials[1] = _myMaterial;
+            _mySkinRenderer.materials[1] = _myMaterial;
 
             _enemyAgent.enabled = false;
             //Debug.Log("Boss Reset");

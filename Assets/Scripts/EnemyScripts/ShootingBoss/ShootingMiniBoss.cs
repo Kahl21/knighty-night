@@ -360,7 +360,7 @@ public class ShootingMiniBoss : BossEnemy
                 cam0 = _cameraRef.transform.position;
                 cam1 = _ogCamPos;
 
-                _myRenderer.enabled = false;
+                _mySkinRenderer.enabled = false;
 
                 _startAttackTime = Time.time;
                 _showingDeath = true;
@@ -368,8 +368,8 @@ public class ShootingMiniBoss : BossEnemy
 
             _myColor.a = 1 - _currAttackTime;
             _myMaterial.color = _myColor;
-            _myRenderer.materials[1] = _myMaterial;
-            _myRenderer.materials[0] = _myMaterial;
+            _mySkinRenderer.materials[1] = _myMaterial;
+            _mySkinRenderer.materials[0] = _myMaterial;
         }
         else
         {
@@ -406,10 +406,10 @@ public class ShootingMiniBoss : BossEnemy
         {
             _attachedShooter.MyReset();
             gameObject.SetActive(true);
-            _myRenderer.enabled = true;
+            _mySkinRenderer.enabled = true;
             _myColor.a = 1;
             _myMaterial.color = _myColor;
-            _myRenderer.materials[1] = _myMaterial;
+            _mySkinRenderer.materials[1] = _myMaterial;
 
             _enemyAgent.enabled = false;
             Debug.Log("Boss Reset");

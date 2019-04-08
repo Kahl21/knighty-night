@@ -9,6 +9,7 @@ public class PM_BasicGhlost : BaseEnemy
     {
         NONE,
         CHASING,
+        INVINCIBLE,
         MOVING,
         FINDTARGET,
         DIE
@@ -35,56 +36,62 @@ public class PM_BasicGhlost : BaseEnemy
     {
         //if (!_menuRef.GameIsPaused)
         //{
-            if (!_dead)
+        if (!_dead)
+        {
+            if (_canMove)
             {
-                if (_canMove)
+                switch (_myState)
                 {
-                    switch (_myState)
-                    {
-                        case BASICSTATES.NONE:
-                            break;
+                    case BASICSTATES.NONE:
+                        break;
 
-                        case BASICSTATES.MOVING:
+                    case BASICSTATES.MOVING:
                         Move();
                         CheckForHit();
-                            break;
+                        break;
 
-                        case BASICSTATES.CHASING:
-                            FollowPlayer();
-                            break;
+                    case BASICSTATES.INVINCIBLE:
+                        Move();
+                        CheckForHit();
+                        break;
 
-                        case BASICSTATES.FINDTARGET:
-                            findNewTarget();
-                            break;
+                    case BASICSTATES.CHASING:
+                        Move();
+                        break;
 
-                        case BASICSTATES.DIE:
-                            break;
-                    }
-                    //Move();
-                    //CheckForHit();
+                    case BASICSTATES.FINDTARGET:
+                        findNewTarget();
+                        break;
+
+                    case BASICSTATES.DIE:
+                        break;
                 }
+                //Move();
+                //CheckForHit();
             }
-            else
-            {
-                Die();
-            }
+        }
+        else
+        {
+            Die();
+        }
         //}
     }
 
     // Use this for initialization
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
-        
+
         _mySpookiness.color = _spookColor;
         _myRenderer.materials[1] = _mySpookiness;
 
-        
+
     }
 
     public void BasicInit(PM_Manager managerInstance)
     {
         _myAgent = GetComponent<NavMeshAgent>();
         _myAgent.enabled = true;
+        //_myAgent.radius = 0.001f;
         _target = PlayerController.Instance;
         _menuRef = Menuing.Instance;
 
@@ -97,68 +104,33 @@ public class PM_BasicGhlost : BaseEnemy
         _startTime = Time.time;
 
         random = Random.Range(0, _managerInstance.GetTargetPoints.Count - 1);
+        //GetComponent<NavMeshAgent>().radius = 0.00001f;
         _staticTarget = _managerInstance.GetTargetPoints[random];
         _myAgent.SetDestination(_staticTarget.transform.position);
-        _myState = BASICSTATES.MOVING;
+        
+        _myState = BASICSTATES.INVINCIBLE;
     }
 
     protected override void Move()
     {
-        if (_myState == BASICSTATES.CHASING)
+        if (_managerInstance.PlayerHasSpecialSword == true)
         {
-            _myAgent.SetDestination(_target.transform.position);
+            //Disable Particle effects and turn white
+            transform.GetChild(4).gameObject.SetActive(false);
+            _myAgent.SetDestination(PlayerController.Instance.GetComponent<Transform>().position);
+            _myState = BASICSTATES.CHASING;
         }
         else
         {
-
+            if (_myAgent.hasPath == false)
+            {
+                Debug.Log("No Path");
+                _myState = BASICSTATES.FINDTARGET;
+            }
         }
 
-        if (_myAgent.hasPath == false)
-        {
-            Debug.Log("No Path");
-            _myState = BASICSTATES.FINDTARGET;
-        }
         //BasicMovement();
         //transform.position += moveDirection * moveSpeed * Time.deltaTime;
-    }
-
-    //This is used for the ghlosts primary movement.
-    //The ghlosts will go down a walkway until they get the opportunity to turn more than one direction
-    //If this happens he will choose a random direction to travel down.
-    void BasicMovement()
-    {
-        _currTime = Time.time - _startTime;
-        if (_currTime >= _checkDirectionDelay)
-        {
-            List<Vector3> openDirections = CheckForOpenings();
-            Vector3[] openSides = new Vector3[3];
-
-            if (openDirections.Count == 1)
-            {
-                RaycastHit thingHit;
-                if (Physics.Raycast(transform.position, openDirections[0], out thingHit))
-                {
-                    moveDirection = openDirections[0];
-                    transform.LookAt(openDirections[0] * 2);
-                }
-
-            }
-            else if (openDirections.Count > 1)
-            {
-                int direction;
-                direction = Random.Range(0, openDirections.Count - 1);
-                Debug.Log(openDirections[direction]);
-                RaycastHit thingHit;
-                //Debug.DrawLine(transform.position + Vector3.up, openDirections[direction]);
-                if (Physics.Raycast(transform.position + Vector3.up, openDirections[direction], out thingHit))
-                {
-                    moveDirection = openDirections[direction];
-                    transform.LookAt(openDirections[direction] *2);
-                }
-            }
-            _startTime = Time.time;
-        }
-        
     }
 
     void findNewTarget()
@@ -171,7 +143,7 @@ public class PM_BasicGhlost : BaseEnemy
         }
 
         _myAgent.SetDestination(_staticTarget.transform.localPosition);
-        _myState = BASICSTATES.MOVING;
+        _myState = BASICSTATES.INVINCIBLE;
     }
 
     //This is used for the ghlosts secondary movement.
@@ -193,57 +165,51 @@ public class PM_BasicGhlost : BaseEnemy
             {
                 thingHit.GetComponent<PlayerController>().TakeDamage(_glhostDamage);
             }
-            else if(thingHit == _staticTarget)
+            else if (thingHit == _staticTarget)
             {
                 //_myState = BASICSTATES.FINDTARGET;
             }
         }
     }
 
-    //Shoots out 3 raycasts: left, right, and center, that check for openings one each side
-    //0 = Front
-    //1 = Left
-    //2 = Right
-    List<Vector3> CheckForOpenings()
+    //function to be called when the player hits them
+    //sets the ghost to the "Dead" state
+    public override void GotHit(Vector3 _flyDir, float _knockBackForce)
     {
-        List<Vector3> openSides = new List<Vector3>();
-        RaycastHit[] hits = new RaycastHit[3];
         
-        Debug.DrawRay(transform.position + Vector3.up, transform.forward * _checkForOpeningDistance);
-        Debug.DrawRay(transform.position + Vector3.up, transform.right * -1 * _checkForOpeningDistance);
-        Debug.DrawRay(transform.position + Vector3.up, transform.right * _checkForOpeningDistance);
-        if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out hits[0], _checkForOpeningDistance))
+        if (!_hit && (_myState == BASICSTATES.CHASING || _myState == BASICSTATES.MOVING || _myState == BASICSTATES.NONE))
         {
-            
-        }
-        else
-        {
-            openSides.Add(transform.forward);
-        }
-        if (Physics.Raycast(transform.position + Vector3.up, transform.right * -1, out hits[1], _checkForOpeningDistance))
-        {
+            Debug.Log("Glhost Got Hit");
+            _hit = true;
+            _myAgent.enabled = false;
+            _knockBack = _knockBackForce;
+            _deathDirection = _flyDir;
+            _deathDirection.y = 0;
 
+            _startTime = Time.time;
+            _dead = true;
         }
-        else
-        {
-            openSides.Add(transform.right * -1);
-        }
-        if (Physics.Raycast(transform.position + Vector3.up, transform.right, out hits[2], _checkForOpeningDistance))
-        {
-            
-        }
-        else
-        {
-            openSides.Add(transform.right);
-        }
-        Debug.Log(openSides.Count);
-        return openSides;
     }
 
     //makes the ghost die in a certain way
     protected override void Die()
     {
         //Debug.DrawLine(transform.position, transform.position + _deathDirection*_collisionCheckDist);
+
+        if (Physics.Raycast(transform.position + Vector3.up, _deathDirection, out hit, .4f))
+        {
+            if (_myState == BASICSTATES.INVINCIBLE)
+            {
+
+            }
+            else if (!hit.collider.GetComponent<BaseEnemy>() && !hit.collider.GetComponent<PlayerController>())
+            {
+                //_shooterRef.removeGhlostFromScene(gameObject);
+                _managerInstance.AddToScore(gameObject);
+                Destroy(gameObject);
+            }
+        }
+        transform.position += _deathDirection * _knockBack * Time.deltaTime;
     }
 
     public bool SetDeath { set { _dead = value; } }

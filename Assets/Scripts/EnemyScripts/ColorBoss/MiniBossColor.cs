@@ -117,6 +117,12 @@ public class MiniBossColor : BossEnemy
     [SerializeField]
     float _hardBounceAirtime;
 
+    [Header("Sound Objects")]
+    public AudioClip bossDeath;
+    public AudioClip bossDazed;
+    public AudioClip bossBounce;
+    public AudioClip ghostSpawn;
+
 
     ColorStrats _myAttack = ColorStrats.FOLLOW;
 
@@ -155,7 +161,7 @@ public class MiniBossColor : BossEnemy
                 {
                     _myColor = hit.collider.GetComponent<ColorIntroGlhost>().GotEaten();
                     _myMaterial.color = _myColor;
-                    _myRenderer.materials[1] = _myMaterial;
+                    _mySkinRenderer.materials[1] = _myMaterial;
                     if (CheckForIntroEatingDone())
                     {
                         if (_colorIntroGlhosts.activeInHierarchy)
@@ -193,7 +199,7 @@ public class MiniBossColor : BossEnemy
                 transform.LookAt(transform.position + Vector3.back);
 
                 _myMaterial.color = _basicColor;
-                _myRenderer.materials[1] = _myMaterial;
+                _mySkinRenderer.materials[1] = _myMaterial;
 
                 _jumpingFinished = true;
             }
@@ -269,7 +275,7 @@ public class MiniBossColor : BossEnemy
         {
             base.Init();
             _myMaterial.color = _basicColor;
-            _myRenderer.materials[1] = _myMaterial;
+            _mySkinRenderer.materials[1] = _myMaterial;
 
             _realColorsForMinions = new List<Color>();
             _ColorsLeft = new List<Color>();
@@ -316,6 +322,8 @@ public class MiniBossColor : BossEnemy
         {
             _midpoint += _introGlhostList[i].transform.position.x;
         }
+
+        _speaker = this.transform.GetComponent<AudioSource>();
 
         cam1.x = _midpoint / _introGlhostList.Count;
         _cameraRef.AmFollowingPlayer = false;
@@ -490,7 +498,7 @@ public class MiniBossColor : BossEnemy
                 int _randomColor = Random.Range(0, _ColorsLeft.Count);
                 _myColor = _ColorsLeft[_randomColor];
                 _myMaterial.color = _myColor;
-                _myRenderer.materials[1] = _myMaterial;
+                _mySkinRenderer.materials[1] = _myMaterial;
 
                 SpawnGlhosts(_bounceSpawnAngle, _bounceSpawnAngleOffset);
                 _enemyAgent.enabled = true;
@@ -500,6 +508,9 @@ public class MiniBossColor : BossEnemy
             }
             else
             {
+                if (!_speaker.isPlaying)
+                    _speaker.PlayOneShot(bossBounce, volSFX);
+
                 _calcAngle = _startAngle;
 
                 _currBounces++;
@@ -542,6 +553,9 @@ public class MiniBossColor : BossEnemy
     //spawn the glhosts that can damage him
     private void SpawnGlhosts(float _spawnAngle, float _angleOffset)
     {
+        if (!_speaker.isPlaying)
+                _speaker.PlayOneShot(ghostSpawn, volSFX);
+
         _calcAngle = _spawnAngle;
         _currColors = new List<Color>();
 
@@ -577,9 +591,12 @@ public class MiniBossColor : BossEnemy
 
         if (_currAttackTime >= 1)
         {
+            if (!_speaker.isPlaying)
+                _speaker.PlayOneShot(bossDazed, volSFX);
+
             _myColor = _basicColor;
             _myMaterial.color = _myColor;
-            _myRenderer.materials[1] = _myMaterial;
+            _mySkinRenderer.materials[1] = _myMaterial;
 
             for (int i = 0; i < _myRoom.GetCurrEnemyList.Count; i++)
             {
@@ -637,6 +654,10 @@ public class MiniBossColor : BossEnemy
     //called once the boss is defeated
     protected override void Die()
     {
+
+        _speaker.Stop();
+        _speaker.PlayOneShot(bossDeath, volSFX);
+
         _myRoom.CheckForEnd();
 
         _enemyAgent.enabled = false;
@@ -690,7 +711,7 @@ public class MiniBossColor : BossEnemy
                 cam0 = _cameraRef.transform.position;
                 cam1 = _ogCamPos;
 
-                _myRenderer.enabled = false;
+                _mySkinRenderer.enabled = false;
 
                 _startAttackTime = Time.time;
                 _showingDeath = true;
@@ -698,8 +719,8 @@ public class MiniBossColor : BossEnemy
 
             _myColor.a = 1 - _currAttackTime;
             _myMaterial.color = _myColor;
-            _myRenderer.materials[1] = _myMaterial;
-            _myRenderer.materials[0] = _myMaterial;
+            _mySkinRenderer.materials[1] = _myMaterial;
+            _mySkinRenderer.materials[0] = _myMaterial;
         }
         else
         {
@@ -734,10 +755,10 @@ public class MiniBossColor : BossEnemy
         if (_init)
         {
             gameObject.SetActive(true);
-            _myRenderer.enabled = true;
+            _mySkinRenderer.enabled = true;
             _basicColor.a = 1;
             _myMaterial.color = _basicColor;
-            _myRenderer.materials[1] = _myMaterial;
+            _mySkinRenderer.materials[1] = _myMaterial;
 
             _enemyAgent.enabled = false;
             //Debug.Log("Boss Reset");

@@ -567,7 +567,7 @@ public class PlayerController : MonoBehaviour
                 thingHit.GetComponent<DungeonMechanic>().Init();                                        //initialize the mechanic
                 addRoom(thingHit);
             }
-            else if(thingHit.GetComponent<DoorMovement>() || thingHit.GetComponent<BossWall>())
+            else if (thingHit.GetComponent<DoorMovement>() || thingHit.GetComponent<BossWall>())
             {
                 _move = Vector3.zero;
             }
@@ -579,15 +579,24 @@ public class PlayerController : MonoBehaviour
             {
                 TakeDamage(thingHit.GetComponent<BossEnemy>().GetDamage);                               //have the player take damage
             }
-            else if(thingHit.GetComponent<MazeCheckpoint>())                                            //else if the player hits a maze checkpoint
+            else if (thingHit.GetComponent<MazeCheckpoint>())                                            //else if the player hits a maze checkpoint
             {
                 thingHit.GetComponent<MazeCheckpoint>().CheckPointHit();                                //activate the checkpoint
+            }
+            else if (thingHit.GetComponent<PM_Teleporter>())                                            //else if the player hits a teleporter
+            {
+                thingHit.GetComponent<PM_Teleporter>().TriggerTeleport(gameObject.GetComponent<Collider>()); //Teleport the player across the arena
+            }
+            else if (thingHit.GetComponent<Collectable>())                                              //else if the player hits a collectabel
+            {
+                Debug.Log("Hit Coin");
+                thingHit.GetComponent<Collectable>().AddToScore();                                      //Add to the score, Pacman only
             }
             else if (!thingHit.GetComponent<HealingGrace>() || !thingHit.GetComponent<SpikeTrap>())      //else if the player did not hit any of the above and it isnt a spike trap or healing spot
             {
                 _move = Vector3.zero;                                                                   //you should probably stop cause i got not clue what you hit homeboy
             }
-
+            
         }
 
         if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out hit, _collisionDetectDist))      //creates a raycast infront of the player
@@ -795,9 +804,9 @@ public class PlayerController : MonoBehaviour
 
                             }
                         }
-                        else if(thingHit.GetComponent<CathedralProjectile>())
+                        else if (thingHit.GetComponent<CathedralProjectile>())
                         {
-                            thingHit.GetComponent<CathedralProjectile>().HitProjectile(transform.forward, _swordSwingKnockback);
+                            thingHit.GetComponent<CathedralProjectile>().HitProjectile(transform.forward,_swordSwingKnockback);
                         }
                         else if (thingHit.GetComponent<TrapLever>())
                         {
