@@ -118,6 +118,8 @@ public class AudioManager : MonoBehaviour {
     public virtual void MasterVolume(float value) //NOTE: This may not be in the final menu depending how lazy I feel ¯\_(ツ)_/¯
     {
         volMaster = value;
+        volMusic = value;
+        volSFX = value;
         RestartMusic();
     }
 
@@ -233,6 +235,7 @@ public class AudioManager : MonoBehaviour {
     public virtual void RestartMusic()
     {
         MusicPlayer.Stop();
-        ChooseMusic();
+        if(volMusic>0)
+            ChooseMusic();
     }
 }

@@ -27,6 +27,8 @@ public enum WhichUIMenu
     AREYOUSURE
 }
 
+
+
 public class Menuing : MonoBehaviour {
 
     private static Menuing _instance;
@@ -110,6 +112,9 @@ public class Menuing : MonoBehaviour {
     public Text changedMaster;
     public Text changedMusic;
     public Text changedSFX;
+
+
+    WhichUIMenu whichUI = new WhichUIMenu();
     // Use this for initialization
     void Awake ()
     {
@@ -131,7 +136,7 @@ public class Menuing : MonoBehaviour {
         {
             _menus.Add(transform.GetChild(i).gameObject);
         }
-        _BossBar = _menus[(int)WhichUIMenu.PLAYER].transform.GetChild(3).gameObject;
+        _BossBar = _menus[(int)WhichUIMenu.PLAYER].transform.GetChild(2).gameObject;
         _BossBar.SetActive(false);
 
         _creditsStartPos = _credits.transform.localPosition;
@@ -184,10 +189,16 @@ public class Menuing : MonoBehaviour {
         currentMaster.text = changedMaster.text;
         currentMusic.text = changedMusic.text;
         currentSFX.text = changedSFX.text;
+
+
+
+        CheckBack();
+        
     }
 
     public void SetMenu(WhichUIMenu _whichMenu)
     {
+        
         for (int i = 0; i < transform.childCount; i++)
         {
             _menus[i].SetActive(false);
@@ -200,6 +211,7 @@ public class Menuing : MonoBehaviour {
             SetButtons((int)_whichMenu);
             currSelectableButtons[currSelected].Select();
         }
+        whichUI = _whichMenu;
     }
 
     private void SetButtons(int _menuNum)
@@ -352,8 +364,13 @@ public class Menuing : MonoBehaviour {
 
     public void MenuBack()
     {
+        if(SceneManager.GetActiveScene().buildIndex ==0)
         AudioManager.instance.ButtonPressed();
-        SetMenu(WhichUIMenu.MAINMENU);
+
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+            SetMenu(WhichUIMenu.MAINMENU);
+        else
+            SetMenu(WhichUIMenu.PAUSE);
     }
 
     public void EndGame()
@@ -675,9 +692,60 @@ public class Menuing : MonoBehaviour {
         changedSFX.text = _audioManager.volSFX.ToString();
     }
 
+    private void CheckBack()                //B button settings
+    {
+        
+        Scene m_Scene;
+
+        m_Scene = SceneManager.GetActiveScene();
 
 
+        if (Input.GetKeyDown("joystick button 1"))
+        {
+            switch (whichUI)
+            {
+                case WhichUIMenu.AUDIO:
+                    ToOptions();
+                    break;
+                case WhichUIMenu.VIDEO:
+                    ToOptions();
+                    break;
+                case WhichUIMenu.OPTIONS:
+                    if (m_Scene.buildIndex == 0)
+                        MenuBack();
+                    else
+                        SetMenu(WhichUIMenu.PAUSE);
+                    break;
+                case WhichUIMenu.PAUSE:
+                    Pause();
+                    break;
+                case WhichUIMenu.RESOLUTION:
+                    ToVideo();
+                    break;
+                case WhichUIMenu.MASTER:
+                    ToMusic();
+                    break;
+                case WhichUIMenu.MUSIC:
+                    ToMusic();
+                    break;
+                case WhichUIMenu.SFX:
+                    ToMusic();
+                    break;
+                case WhichUIMenu.AREYOUSURE:
+                    SetMenu(WhichUIMenu.PAUSE);
+                    break;
 
+            }
+        }
+        
+    }
+
+
+   /* 
+    MASTER,
+    MUSIC,
+    SFX,
+    AREYOUSURE*/
 
 
 

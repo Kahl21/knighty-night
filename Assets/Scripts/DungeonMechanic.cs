@@ -113,6 +113,7 @@ public class DungeonMechanic : MonoBehaviour {
 
         if(_doors.Count > 0 && _roomMechanic != Mechanic.CHASE)     //if there are any doors and the mechanic is not a chase room
         {
+            
             for (int i = 0; i < _doors.Count; i++)
             {
                 _doors[i].Init();                           //initalize all doors
