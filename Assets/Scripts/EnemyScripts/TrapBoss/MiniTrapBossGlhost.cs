@@ -409,12 +409,12 @@ public class MiniTrapBossGlhost : BossEnemy
     //When the trap finishes its attack he will be reinabled and find a new trap
     private void possessTrap()
     {
-        gameObject.GetComponent<MeshRenderer>().enabled = false;
+        _mySkinRenderer.enabled = false;
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
         if (trapComplete)
         {
             _xAttack = false;
-            gameObject.GetComponent<MeshRenderer>().enabled = true;
+            _mySkinRenderer.enabled = true;
             gameObject.GetComponent<CapsuleCollider>().enabled = true;
             _MyAttack = TRAPSTRATS.FINDTRAP;
         }
@@ -532,7 +532,7 @@ public class MiniTrapBossGlhost : BossEnemy
                 cam0 = _cameraRef.transform.position;
                 cam1 = _ogCamPos;
 
-                _myRenderer.enabled = false;
+                _mySkinRenderer.enabled = false;
 
                 _startAttackTime = Time.time;
                 _showingDeath = true;
@@ -540,8 +540,8 @@ public class MiniTrapBossGlhost : BossEnemy
 
             _myColor.a = 1 - _currAttackTime;
             _myMaterial.color = _myColor;
-            _myRenderer.materials[1] = _myMaterial;
-            _myRenderer.materials[0] = _myMaterial;
+            _mySkinRenderer.materials[1] = _myMaterial;
+            _mySkinRenderer.materials[0] = _myMaterial;
         }
         else
         {
@@ -576,10 +576,10 @@ public class MiniTrapBossGlhost : BossEnemy
         if (_init)
         {
             gameObject.SetActive(true);
-            _myRenderer.enabled = true;
+            _mySkinRenderer.enabled = true;
             _myColor.a = 1;
             _myMaterial.color = _myColor;
-            _myRenderer.materials[1] = _myMaterial;
+            _mySkinRenderer.materials[1] = _myMaterial;
 
             _enemyAgent.enabled = false;
             //Debug.Log("Boss Reset");

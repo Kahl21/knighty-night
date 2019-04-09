@@ -26,6 +26,8 @@ public class BaseEnemy : MonoBehaviour {
     protected float _collisionCheckDist;
     protected float _knockBack;
     protected bool _init;
+    protected bool _idling;
+    protected bool _attacking;
     
     [SerializeField]
     protected float _spookDistance;
@@ -50,6 +52,13 @@ public class BaseEnemy : MonoBehaviour {
     protected DungeonMechanic _mySpawner;
     protected Mechanic _myMechanic;
 
+    protected GameObject _Audio;
+    protected AudioManager _audioManager;
+    protected float volSFX;
+    protected AudioSource _speaker;
+
+    public AudioClip ghostDeath;
+
     // Use this for initialization
     public virtual void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
@@ -73,6 +82,10 @@ public class BaseEnemy : MonoBehaviour {
 
         _myAnimations = GetComponent<Animator>();
         _myAnimations.Play("Movement", 0);
+
+        _Audio = GameObject.Find("AudioManager");
+        _audioManager = _Audio.GetComponent<AudioManager>();
+        volSFX = _audioManager.volSFX;
     }
 
     // Update is called once per frame
@@ -167,6 +180,8 @@ public class BaseEnemy : MonoBehaviour {
 
     protected virtual void Dead()
     {
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(ghostDeath, volSFX);
         _actualDead = true;
         _myAnimations.Play("Death");
         Destroy(gameObject, 1f);

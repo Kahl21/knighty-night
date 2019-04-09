@@ -13,6 +13,7 @@ public class CathedralProjectile : MonoBehaviour {
     float _damageRange;
     [SerializeField]
     float _projectileSpeed;
+    float _projKnockback;
     [SerializeField]
     float _deathTimer;
     float _currTime;
@@ -83,18 +84,20 @@ public class CathedralProjectile : MonoBehaviour {
             if (thingHit.GetComponent<PlayerController>())
             {
                 thingHit.GetComponent<PlayerController>().TakeDamage(_projectileDamage);
+                Stop();
             }
         }
     }
 
     //called when the enemy gets hit
     //deals damage to the enemy
-    public void HitProjectile(Vector3 _flyDir)
+    public void HitProjectile(Vector3 flyDir, float knockBackForce)
     {
         if (!_hit)
         {
             _hit = true;
-            _deathDirection = _flyDir;
+            _projKnockback = knockBackForce;
+            _deathDirection = flyDir;
             _deathDirection.y = 0;
             _startTime = Time.time;
             _dead = true;
@@ -132,7 +135,7 @@ public class CathedralProjectile : MonoBehaviour {
         }
         catch
         {
-            Destroy(gameObject);
+            Stop();
         }
 
         if (_debugProjectile)
@@ -145,12 +148,11 @@ public class CathedralProjectile : MonoBehaviour {
             if (hit.collider.GetComponent<CathedralGlhost>())
             {
                 _myPillar.GetComponent<CathedralGlhost>().RemoveProj(this);
-                hit.collider.GetComponent<BaseEnemy>().GotHit(_newDeathDirection, 0f);
+                hit.collider.GetComponent<BaseEnemy>().GotHit(_newDeathDirection, _projKnockback);
             }
             else if (!hit.collider.GetComponent<BaseEnemy>() || !hit.collider.GetComponent<PlayerController>())
             {
-                _myPillar.GetComponent<CathedralGlhost>().RemoveProj(this);
-                Destroy(gameObject);
+                Stop();
             }
         }
 
@@ -160,13 +162,13 @@ public class CathedralProjectile : MonoBehaviour {
 
         if (_currTime >= 1)
         {
-            _myPillar.GetComponent<CathedralGlhost>().RemoveProj(this);
-            Destroy(gameObject);
+            Stop();
         }
     }
 
     public void Stop()
     {
+        _myPillar.GetComponent<CathedralGlhost>().RemoveProj(this);
         Destroy(gameObject);
     }
 

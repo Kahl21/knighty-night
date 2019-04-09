@@ -18,6 +18,10 @@ public class GraveyardGlhost : BasicGlhost {
 
     [Header("Chase Ghlost Variables")]
     [SerializeField]
+    protected float _changedDamage;
+    [SerializeField]
+    protected float _changedSpeed;
+    [SerializeField]
     protected bool _alwaysInvincible;
     [SerializeField]
     protected bool _doesNotChangeSpookieness;
@@ -153,6 +157,8 @@ public class GraveyardGlhost : BasicGlhost {
         {
             _invincible = false;
             _particle.SetActive(false);
+            _glhostDamage = _changedDamage;
+            _myAgent.speed = _changedSpeed;
             _spookColor = _startingColor;
             _mySpookiness.color = _spookColor;
             _myRenderer.materials[1] = _mySpookiness;

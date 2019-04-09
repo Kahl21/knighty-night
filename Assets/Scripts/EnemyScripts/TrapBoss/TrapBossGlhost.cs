@@ -515,7 +515,7 @@ public class TrapBossGlhost : BossEnemy
     //When the trap finishes its attack he will be reinabled and find a new trap
     private void PossessTrap()
     {
-        gameObject.GetComponent<MeshRenderer>().enabled = false;
+        _mySkinRenderer.enabled = false;
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
 
         Vector3 possessPosition = currentTrap.transform.localPosition;
@@ -525,7 +525,7 @@ public class TrapBossGlhost : BossEnemy
         if (trapComplete)
         {
             _xAttack = false;
-            gameObject.GetComponent<MeshRenderer>().enabled = true;
+            _mySkinRenderer.enabled = true;
             gameObject.GetComponent<CapsuleCollider>().enabled = true;
             _enemyAgent.SetDestination(transform.position);
             _MyAttack = TRAPSTRATS.FINDTRAP;
@@ -702,7 +702,7 @@ public class TrapBossGlhost : BossEnemy
                 cam0 = _cameraRef.transform.position;
                 cam1 = _ogCamPos;
 
-                _myRenderer.enabled = false;
+                _mySkinRenderer.enabled = false;
 
                 _startAttackTime = Time.time;
                 _showingDeath = true;
@@ -710,8 +710,8 @@ public class TrapBossGlhost : BossEnemy
 
             _myColor.a = 1 - _currAttackTime;
             _myMaterial.color = _myColor;
-            _myRenderer.materials[1] = _myMaterial;
-            _myRenderer.materials[0] = _myMaterial;
+            _mySkinRenderer.materials[1] = _myMaterial;
+            _mySkinRenderer.materials[0] = _myMaterial;
         }
         else
         {
@@ -746,10 +746,10 @@ public class TrapBossGlhost : BossEnemy
         if (_init)
         {
             gameObject.SetActive(true);
-            _myRenderer.enabled = true;
+            _mySkinRenderer.enabled = true;
             _myColor.a = 1;
             _myMaterial.color = _myColor;
-            _myRenderer.materials[1] = _myMaterial;
+            _mySkinRenderer.materials[1] = _myMaterial;
 
             _enemyAgent.enabled = false;
             //Debug.Log("Boss Reset");

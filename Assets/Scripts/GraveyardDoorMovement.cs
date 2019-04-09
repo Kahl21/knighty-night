@@ -10,14 +10,9 @@ public class GraveyardDoorMovement : DoorMovement
 
     [SerializeField]
     float _rotationAmount;
-    [SerializeField]
     Vector3 _leftRot;
-    [SerializeField]
     Vector3 _rightRot;
-    [SerializeField]
     Vector3 _leftGoTo;
-    [SerializeField]
-    Vector3 _rightGoTo;
 
     // Use this for initialization
     protected override void Awake()
@@ -30,7 +25,6 @@ public class GraveyardDoorMovement : DoorMovement
         rightDoor = this.transform.GetChild(0).gameObject;
         rightDoor.transform.parent = null;
         _rightRot = rightDoor.transform.localEulerAngles;
-        _rightGoTo = _rightRot;
         _rightRot.y -= _rotationAmount;
     }
 
