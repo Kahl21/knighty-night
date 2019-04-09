@@ -19,12 +19,7 @@ public class DoorMovement : MonoBehaviour {
     protected Color _myColor;
     [SerializeField]
     protected float _fadeInc;
-
-    protected GameObject _Audio;
-    protected AudioManager _audioManager;
-    protected float volSFX;
-    protected AudioSource _speaker;
-
+    
     // Use this for initialization
     protected  virtual void Awake ()
     {
@@ -42,10 +37,6 @@ public class DoorMovement : MonoBehaviour {
     {
         _myRenderer.enabled = true;
         falling = true;
-
-        _Audio = GameObject.Find("AudioManager");
-        _audioManager = _Audio.GetComponent<AudioManager>();
-        volSFX = _audioManager.volSFX;
     }
 
     public virtual void RoomDone()

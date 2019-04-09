@@ -26,6 +26,8 @@ public class BaseEnemy : MonoBehaviour {
     protected float _collisionCheckDist;
     protected float _knockBack;
     protected bool _init;
+    protected bool _idling;
+    protected bool _attacking;
     
     [SerializeField]
     protected float _spookDistance;

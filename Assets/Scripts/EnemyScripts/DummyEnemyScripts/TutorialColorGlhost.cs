@@ -7,9 +7,6 @@ public class TutorialColorGlhost : BaseEnemy  {
 
     Vector3 _spawnPoint;
 
-    public AudioClip ghostHit;
-    public AudioClip ghostCorrectColor;
-
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
         _myAgent = GetComponent<NavMeshAgent>();
@@ -22,8 +19,6 @@ public class TutorialColorGlhost : BaseEnemy  {
 
         _mySpookiness.color = _myColor;
         _myRenderer.materials[1] = _mySpookiness;
-
-        _speaker = this.GetComponent<AudioSource>();
     }
 
     // Update is called once per frame

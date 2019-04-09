@@ -409,12 +409,12 @@ public class MiniTrapBossGlhost : BossEnemy
     //When the trap finishes its attack he will be reinabled and find a new trap
     private void possessTrap()
     {
-        gameObject.GetComponent<MeshRenderer>().enabled = false;
+        _mySkinRenderer.enabled = false;
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
         if (trapComplete)
         {
             _xAttack = false;
-            gameObject.GetComponent<MeshRenderer>().enabled = true;
+            _mySkinRenderer.enabled = true;
             gameObject.GetComponent<CapsuleCollider>().enabled = true;
             _MyAttack = TRAPSTRATS.FINDTRAP;
         }

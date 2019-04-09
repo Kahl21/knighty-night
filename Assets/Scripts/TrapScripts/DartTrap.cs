@@ -49,13 +49,9 @@ public class DartTrap : BaseTrap {
     float _startPossessTime;
     TrapBossGlhost _bossRef;
 
-    public AudioClip arrowSound;
-
     //Initilize function
     public override void Init()
     {
-        _speaker = this.transform.GetComponent<AudioSource>();
-
         base.Init();
         _startPos = transform.position;
 
@@ -122,9 +118,6 @@ public class DartTrap : BaseTrap {
 
         if (_currDelay >= 1)
         {
-            if (!_speaker.isPlaying)
-                _speaker.PlayOneShot(arrowSound, volSFX);
-
             _currDelay = 1;
 
             _currDart.GetComponent<DartMovement>().Init(_trapDamage);

@@ -523,6 +523,14 @@ public class ColorBossGlhost : BossEnemy {
                 {
                     hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
                 }
+
+                if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), Vector3.down, out hit, _bossCollisionDetectDistance))
+                {
+                    if (hit.collider.GetComponent<PlayerController>())
+                    {
+                        hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
+                    }
+                }
             }
         }
 

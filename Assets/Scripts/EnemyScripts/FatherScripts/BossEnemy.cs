@@ -98,7 +98,6 @@ public class BossEnemy : MonoBehaviour {
     protected float volSFX;
     protected AudioSource _speaker;
 
-
     protected bool _hasInit = false;
     
     //function that is called once the player enters the room

@@ -23,7 +23,6 @@ GameObject:
   - component: {fileID: 23451136525585640}
   - component: {fileID: 65584167044924050}
   - component: {fileID: 114126533685051228}
-  - component: {fileID: 82898414147382900}
   m_Layer: 0
   m_Name: FireStatueTrap
   m_TagString: Untagged
@@ -71,8 +70,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1875060388093014}
-  m_LocalRotation: {x: -0, y: -0.7071029, z: -0, w: -0.70711076}
-  m_LocalPosition: {x: -52.67, y: 0.70000017, z: 4.53}
+  m_LocalRotation: {x: -0, y: 0.0000015497205, z: -0, w: 1}
+  m_LocalPosition: {x: -70.45014, y: 0, z: 48.249863}
   m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_Children:
   - {fileID: 4995231072839366}
@@ -160,101 +159,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 124.33684, y: 274.468, z: 204.52266}
   m_Center: {x: 1.2980138e-11, y: 137.234, z: -39.9999}
---- !u!82 &82898414147382900
-AudioSource:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1875060388093014}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 1
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 30
-  Pan2D: 0
-  rolloffMode: 1
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!114 &114126533685051228
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -272,12 +176,10 @@ MonoBehaviour:
   _fireDelay: 2
   _fireIncDuration: 0.5
   _burningDuration: 0.5
-  _startDelay: 0
   _debugDamageArea: 1
   _spaceBetweenRays: 0.5
   _maxDetectDistance: 4
   _mySmoke: {fileID: 0}
-  fireNoise: {fileID: 8300000, guid: ff9c1246ff15f364d9a7dc24cefe0c1d, type: 3}
 --- !u!198 &198109688387283144
 ParticleSystem:
   m_ObjectHideFlags: 1

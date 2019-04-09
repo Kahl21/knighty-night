@@ -533,7 +533,9 @@ public class SpinBossGlhost : BossEnemy
         if (_currSpawnTime >= 1)
         {
             _currSpawnTime = 1;
-            GameObject _newEnemy = Instantiate<GameObject>(_enemyToSpawn, transform.position, transform.rotation);
+            Vector3 spawnPos = transform.position;
+            spawnPos += Vector3.up * _vertDetectOffset;
+            GameObject _newEnemy = Instantiate<GameObject>(_enemyToSpawn, spawnPos, transform.rotation);
             _newEnemy.GetComponent<BaseEnemy>().Init(_myRoom, Mechanic.BOSS);
             _startSpawnTime = Time.time;
         }

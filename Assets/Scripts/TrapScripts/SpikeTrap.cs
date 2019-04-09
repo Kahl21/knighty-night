@@ -47,8 +47,6 @@ public class SpikeTrap : BaseTrap {
     protected Vector3 _topLeftCorner;
     protected Vector3 _bottomRightCorner;
 
-    public AudioClip spikeSound;
-
     protected SpikeState myState = SpikeState.NONE;
 
     //Init function
@@ -61,8 +59,6 @@ public class SpikeTrap : BaseTrap {
         
         _topLeftCorner = _scanStartPos + ((Vector3.forward + Vector3.left) * BoxRadius);
         _bottomRightCorner = _scanStartPos + ((Vector3.back + Vector3.right) * BoxRadius);
-
-        _speaker = this.transform.GetComponent<AudioSource>();
     }
 
     protected virtual void Update()
@@ -152,9 +148,6 @@ public class SpikeTrap : BaseTrap {
     {
         if (_spikes.transform.localPosition.y <= _currBound.y)
         {
-            if (!_speaker.isPlaying)
-                _speaker.PlayOneShot(spikeSound, volSFX);
-
             _spikes.transform.localPosition += Vector3.up * _attackSpeed * Time.deltaTime;
             SearchAreaForPlayer();
         }

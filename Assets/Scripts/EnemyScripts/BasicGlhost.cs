@@ -110,7 +110,7 @@ public class BasicGlhost : BaseEnemy
         if (!_hit)
         {
             _speaker.PlayOneShot(ghostHit, volSFX);
-            _myAnimations.Play("Dazed");
+            _myAnimations.Play("Dazed_Start",0);
             _hit = true;
             _myAgent.enabled = false;
             _knockBack = _knockBackForce;
@@ -126,10 +126,6 @@ public class BasicGlhost : BaseEnemy
     //depending on what kind of room the ghost is in
     protected override void Die()
     {
-        if(!_actualDead)
-        {
-            _myAnimations.Play("Dazed");
-        }
 
         //Debug.DrawLine(transform.position, transform.position + _deathDirection*_collisionCheckDist);
         if (_actualDead == false)
@@ -207,11 +203,10 @@ public class BasicGlhost : BaseEnemy
                             _myAgent.enabled = true;
                             _hit = false;
                             _dead = false;
-                            _myAnimations.Play("Moving");
+                            _myAnimations.Play("Movement",0);
                         }
 
                     }
-
                     transform.position += _newDeathDirection * _knockBack * Time.deltaTime;
                     break;
                 case Mechanic.CHASE:

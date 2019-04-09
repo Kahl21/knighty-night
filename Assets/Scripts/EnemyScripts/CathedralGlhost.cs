@@ -15,10 +15,12 @@ public class CathedralGlhost : BasicGlhost {
     float _startProjSpawn;
     Vector3 _hoverPos;
     List<CathedralProjectile> _myProjectiles;
+    bool _firing;
 
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
         base.Init(_spawner, _incomingMech);
+        _myAnimations.Play("Idle", 0);
         _myProjectiles = new List<CathedralProjectile>();
     }
 
@@ -29,13 +31,10 @@ public class CathedralGlhost : BasicGlhost {
         {
             if (!_dead)
             {
-                if (_canMove)
+                Move();
+                
+                if(_firing)
                 {
-                    Move();
-                }
-                else
-                {
-                    Hover();
                     FireProjectile();
                 }
             }
@@ -49,61 +48,90 @@ public class CathedralGlhost : BasicGlhost {
     //moves the enemy toward the enemy
     protected override void Move()
     {
+
         if (Vector3.Distance(transform.position, _target.transform.position) <= _damageRange)
         {
-            _myAgent.SetDestination(transform.position);
-            transform.LookAt(_target.transform.position);
-            _myAgent.enabled = false;
-            _startProjSpawn = Time.time;
-            _hoverPos = transform.position - _target.transform.position;
-            _hoverPos.y = 0;
-            _canMove = false;
+            if(!_idling)
+            {
+                _myAnimations.Play("Idle", 0);
+                _idling = true;
+                _attacking = false;
+            }
+
+            if(!_firing)
+            {
+                _myAgent.SetDestination(transform.position);
+                _startProjSpawn = Time.time;
+                _hoverPos = transform.position - _target.transform.position;
+                _hoverPos.y = transform.position.y;
+                _firing = true;
+            }
+            else
+            {
+                Hover();
+            }
         }
         else
         {
+            if(!_attacking)
+            {
+                _myAnimations.Play("Movement", 0);
+                _attacking = true;
+                _idling = false;
+                _firing = false;
+            }
             _myAgent.SetDestination(_target.transform.position);
         }
 
         if (Vector3.Distance(transform.position, _target.transform.position) < _spookDistance)
         {
             ChangeSpookiness();
+           
         }
     }
 
     protected virtual void Hover()
     {
-        
         transform.position = _target.transform.position + _hoverPos;
+        if (Vector3.Distance(transform.position, _target.transform.position) >= _damageRange)
+        {
+            _idling = false;
+            _firing = false;
+            _attacking = false;
+        }
     }
 
     protected virtual void FireProjectile()
     {
+        //_myAnimations.Play("Shoot", 0);
         _currProjSpawn = (Time.time - _startTime) / _projectileSpawnWaitTime;
 
         if(_currProjSpawn >=1)
         {
+            _myAnimations.Play("Shoot", 0);
             _currProjSpawn = 0;
             _startTime = Time.time;
-            Vector3 _spawnPos = transform.position + (transform.forward * _projectileSpawnOffset) + Vector3.up;
+            Vector3 _spawnPos = transform.position + (transform.forward * _projectileSpawnOffset);
             GameObject _newProj = Instantiate<GameObject>(_projectilePF, _spawnPos, transform.rotation, null);
             _newProj.GetComponent<CathedralProjectile>().Init(gameObject);
             _myProjectiles.Add(_newProj.GetComponent<CathedralProjectile>());
         }
+        Vector3 lookPos = _target.transform.position;
+        lookPos.y = transform.position.y;
+        transform.LookAt(lookPos);
     }
 
     protected override void Die()
     {
-        if(_myProjectiles.Count >0)
+        if(_myProjectiles.Count > 0)
         {
-            for (int i = 0; i < _myProjectiles.Count; i++)
+            for (int i = 0; i < _myProjectiles.Count; i=0)
             {
                 _myProjectiles[i].Stop();
             }
         }
 
-        _mySpawner.RemoveMe(this);
-        _mySpawner.CheckForEnd();
-        Destroy(gameObject);
+        base.Die();
     }
 
     public virtual void RemoveProj(CathedralProjectile _projToRemove)
