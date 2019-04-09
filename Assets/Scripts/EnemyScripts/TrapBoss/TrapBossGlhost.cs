@@ -515,7 +515,7 @@ public class TrapBossGlhost : BossEnemy
     //When the trap finishes its attack he will be reinabled and find a new trap
     private void PossessTrap()
     {
-        gameObject.GetComponent<MeshRenderer>().enabled = false;
+        _mySkinRenderer.enabled = false;
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
 
         Vector3 possessPosition = currentTrap.transform.localPosition;
@@ -525,7 +525,7 @@ public class TrapBossGlhost : BossEnemy
         if (trapComplete)
         {
             _xAttack = false;
-            gameObject.GetComponent<MeshRenderer>().enabled = true;
+            _mySkinRenderer.enabled = true;
             gameObject.GetComponent<CapsuleCollider>().enabled = true;
             _enemyAgent.SetDestination(transform.position);
             _MyAttack = TRAPSTRATS.FINDTRAP;

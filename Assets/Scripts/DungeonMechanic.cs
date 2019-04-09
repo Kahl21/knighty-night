@@ -17,8 +17,6 @@ public enum Mechanic                                        //Enum for mechanic 
 public class DungeonMechanic : MonoBehaviour {
 
     
-    
-
     [Header("Mandatory Variables")]
     [SerializeField]
     Mechanic _roomMechanic;                                 //mechanic reference

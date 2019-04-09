@@ -23,9 +23,9 @@ public class MazeCheckpoint : MonoBehaviour {
     {
         _myCollider = GetComponent<BoxCollider>();
         _myCollider.enabled = false;
-        for (int i = 0; i < _myListOfEnemies.Count; i++)
+        for (int i = 0; i < _myRoom.GetCurrEnemyList.Count; i++)
         {
-            _myListOfEnemies[i].GetComponent<GraveyardGlhost>().ColorChange(_GhlostColorChange);
+            _myRoom.GetCurrEnemyList[i].GetComponent<GraveyardGlhost>().ColorChange(_GhlostColorChange);
         }
 
         for (int i = 0; i < _otherCheckpoints.Count; i++)

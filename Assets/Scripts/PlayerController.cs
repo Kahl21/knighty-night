@@ -583,7 +583,7 @@ public class PlayerController : MonoBehaviour
             {
                 thingHit.GetComponent<MazeCheckpoint>().CheckPointHit();                                //activate the checkpoint
             }
-            else if (thingHit.GetComponent<PM_Teleporter>())                                            //else if the player hits a teleporter
+            /*else if (thingHit.GetComponent<PM_Teleporter>())                                            //else if the player hits a teleporter
             {
                 thingHit.GetComponent<PM_Teleporter>().TriggerTeleport(gameObject.GetComponent<Collider>()); //Teleport the player across the arena
             }
@@ -591,7 +591,7 @@ public class PlayerController : MonoBehaviour
             {
                 Debug.Log("Hit Coin");
                 thingHit.GetComponent<Collectable>().AddToScore();                                      //Add to the score, Pacman only
-            }
+            }*/
             else if (!thingHit.GetComponent<HealingGrace>() || !thingHit.GetComponent<SpikeTrap>())      //else if the player did not hit any of the above and it isnt a spike trap or healing spot
             {
                 _move = Vector3.zero;                                                                   //you should probably stop cause i got not clue what you hit homeboy
