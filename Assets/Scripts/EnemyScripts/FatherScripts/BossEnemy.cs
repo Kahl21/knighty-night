@@ -16,8 +16,7 @@ public class BossEnemy : MonoBehaviour {
     }
 
     protected BossAI _myAI = BossAI.NONE;
-
-
+    
     protected NavMeshAgent _enemyAgent;
 
     [Header("Boss UI Variables")]
@@ -39,14 +38,19 @@ public class BossEnemy : MonoBehaviour {
 
     [Header("Generic Intro Variables")]
     [SerializeField]
+    protected Camera _bossCamera;
+    protected Vector3 _bossCameraPos;
+    protected Vector3 _bossCameraRot;
+    [SerializeField]
     protected GameObject _playerIntroPos;
     [SerializeField]
     protected float _cameraIntroDuration;
     [SerializeField]
     protected float _deathDuration;
     protected bool _showingDeath = false;
-    protected Vector3 cam0, cam1;
+    protected Vector3 cam0, cam1, rot0, rot1;
     protected Vector3 _camOffset;
+    protected Vector3 _ogCamPos, _ogCamRot;
 
     [Header("Generic Boss Variables")]
     [SerializeField]
@@ -99,7 +103,15 @@ public class BossEnemy : MonoBehaviour {
     protected AudioSource _speaker;
 
     protected bool _hasInit = false;
-    
+
+    protected void Awake()
+    {
+        _bossCamera.transform.parent = null;
+        _bossCameraPos = _bossCamera.transform.position;
+        _bossCameraRot = _bossCamera.transform.localEulerAngles;
+        _bossCamera.gameObject.SetActive(false);
+    }
+
     //function that is called once the player enters the room
     //plays the intro cutscene
     protected virtual void PlayIntro()
