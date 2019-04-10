@@ -68,7 +68,7 @@ public class BossEnemy : MonoBehaviour {
     protected RaycastHit hit;
     protected Vector3 _startPos;
     protected Quaternion _startRot;
-    protected MeshRenderer _myRenderer;
+    protected SkinnedMeshRenderer _mySkinRenderer;
     protected Material _myMaterial;
     protected Color _myColor;
 
@@ -93,6 +93,11 @@ public class BossEnemy : MonoBehaviour {
     protected DungeonMechanic _myRoom;
     protected Animator _myAnimations;
 
+    protected GameObject _Audio;
+    protected AudioManager _audioManager;
+    protected float volSFX;
+    protected AudioSource _speaker;
+
     protected bool _hasInit = false;
     
     //function that is called once the player enters the room
@@ -114,8 +119,8 @@ public class BossEnemy : MonoBehaviour {
     {
         _startPos = transform.position;
         _startRot = transform.rotation;
-        _myRenderer = GetComponent<MeshRenderer>();
-        _myMaterial = _myRenderer.materials[1];
+        _mySkinRenderer = transform.GetChild(2).GetComponent<SkinnedMeshRenderer>();
+        _myMaterial = _mySkinRenderer.materials[1];
         _myColor = _myMaterial.color;
         _menuRef = Menuing.Instance;
         _playerRef = PlayerController.Instance;
@@ -151,6 +156,11 @@ public class BossEnemy : MonoBehaviour {
         {
             _bossNameText.text += ", " + _bossSubTitle;
         }
+
+        _Audio = GameObject.Find("AudioManager");
+        _audioManager = _Audio.GetComponent<AudioManager>();
+        volSFX = _audioManager.volSFX;
+
         _hasInit = true;
     }
 

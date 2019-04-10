@@ -17,8 +17,6 @@ public enum Mechanic                                        //Enum for mechanic 
 public class DungeonMechanic : MonoBehaviour {
 
     
-    
-
     [Header("Mandatory Variables")]
     [SerializeField]
     Mechanic _roomMechanic;                                 //mechanic reference
@@ -364,7 +362,7 @@ public class DungeonMechanic : MonoBehaviour {
 
                 newEnemy.GetComponent<BaseEnemy>().SetColor = _coloredBlocks[listNum].GetColor;                 //set the color ghlosts starting color
                 newEnemy.GetComponent<BaseEnemy>().SetPillar = _coloredBlocks[listNum].gameObject;              //set the pillar associated with that ghlosts color    
-                newEnemy.transform.GetChild(4).GetComponent<Light>().color = _coloredBlocks[listNum].GetColor;  //ge the light of the color ghlost and change its color to the color of the pillar
+                newEnemy.transform.GetChild(0).GetComponent<Light>().color = _coloredBlocks[listNum].GetColor;  //ge the light of the color ghlost and change its color to the color of the pillar
                 break;
 
             default:

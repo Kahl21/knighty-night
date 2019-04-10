@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 
 public class PlayerController : MonoBehaviour
@@ -552,6 +553,11 @@ public class PlayerController : MonoBehaviour
             {
                 _move = Vector3.zero;                                                                   //there is no movement
                 baseRoomList.Clear();
+
+                GameManager.Instance.SaveCompletedRoom(SceneManager.GetActiveScene().buildIndex + 1);       //Save the completed room
+                GameManager.Instance.CheckForCompletedWorld(SceneManager.GetActiveScene().buildIndex);
+                LoadingAndSavingTool.Save();                                                            //Save levels completed into the save state
+
                 if (thingHit.GetComponent<WinScript>().IsLastLevel())                                   //if the win script is attached to the last level
                 {
                     EndLevel(true);                                                                     //end level is equal to true
@@ -583,7 +589,7 @@ public class PlayerController : MonoBehaviour
             {
                 thingHit.GetComponent<MazeCheckpoint>().CheckPointHit();                                //activate the checkpoint
             }
-            else if (thingHit.GetComponent<PM_Teleporter>())                                            //else if the player hits a teleporter
+            /*else if (thingHit.GetComponent<PM_Teleporter>())                                            //else if the player hits a teleporter
             {
                 thingHit.GetComponent<PM_Teleporter>().TriggerTeleport(gameObject.GetComponent<Collider>()); //Teleport the player across the arena
             }
@@ -591,7 +597,7 @@ public class PlayerController : MonoBehaviour
             {
                 Debug.Log("Hit Coin");
                 thingHit.GetComponent<Collectable>().AddToScore();                                      //Add to the score, Pacman only
-            }
+            }*/
             else if (!thingHit.GetComponent<HealingGrace>() || !thingHit.GetComponent<SpikeTrap>())      //else if the player did not hit any of the above and it isnt a spike trap or healing spot
             {
                 _move = Vector3.zero;                                                                   //you should probably stop cause i got not clue what you hit homeboy
@@ -806,7 +812,7 @@ public class PlayerController : MonoBehaviour
                         }
                         else if (thingHit.GetComponent<CathedralProjectile>())
                         {
-                            thingHit.GetComponent<CathedralProjectile>().HitProjectile(transform.forward);
+                            thingHit.GetComponent<CathedralProjectile>().HitProjectile(transform.forward,_swordSwingKnockback);
                         }
                         else if (thingHit.GetComponent<TrapLever>())
                         {

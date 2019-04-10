@@ -460,10 +460,15 @@ MonoBehaviour:
   _howManyGlhostsToKill: 0
   _spawnPoint: {fileID: 1976452483}
   _howManyGlhostsToSpawn: 6
+  _mazeCheckpoints: []
+  _debugChangeArea: 0
+  _ghlostChangeDistance: 0
+  _chaseChangePoint: {fileID: 0}
   _coloredBlocks: []
   _spawnPoints: []
   _LeversToEndRoom: []
   _healObject: {fileID: 0}
+  _puckSpawnPoint: {fileID: 0}
   nextCheckpoint: 0
 --- !u!65 &565867861
 BoxCollider:
@@ -1243,7 +1248,7 @@ Prefab:
         type: 2}
       propertyPath: _enemyPreFab
       value: 
-      objectReference: {fileID: 1676507669898506, guid: 7e9bb116fedfa8746886859de94405c0,
+      objectReference: {fileID: 1572586773812476, guid: cd10f19cfbb8be3459b5ac4f5c887e6d,
         type: 2}
     - target: {fileID: 1288966346453848, guid: e61a04ff14a464e41a6573d3853fdd26, type: 2}
       propertyPath: m_StaticEditorFlags

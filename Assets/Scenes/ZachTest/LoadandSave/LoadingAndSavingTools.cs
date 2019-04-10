@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
-public static class LoadingAndSaveingTool
+public static class LoadingAndSavingTool
 {
 
     //call whenever collectible collected after collectibleReference completed
@@ -25,8 +26,8 @@ public static class LoadingAndSaveingTool
 
 
         //make saves = saved CompletedLevels
-       // data.levelsCompleted = levelManager.levelsCompleted;
-        //data.firstOpen = levelManager.firstOpen;
+        data._unlockedLevels = GameManager._themesUnlocked;
+        data.lastLevel = GameManager._lastLevelIndex;
         //------------
 
         //put data into file
@@ -67,7 +68,8 @@ public static class LoadingAndSaveingTool
             */
 
             //Load levels Completed
-            //levelManager.levelsCompleted = data.levelsCompleted;
+            GameManager._themesUnlocked = data._unlockedLevels;
+            GameManager._lastLevelIndex = data.lastLevel;
             //levelManager.firstOpen = data.firstOpen;
             //----------------------
 
@@ -75,8 +77,8 @@ public static class LoadingAndSaveingTool
         else
         {
             //Create a new Save
-            //levelManager levelManager = new levelManager();
-            //levelManager.levelsCompleted = levelManager.createSave();
+            GameManager._themesUnlocked = GameManager.Instance.CreateSave();
+            Save();
             Debug.Log("New Save Created");
         }
 
@@ -97,8 +99,9 @@ public static class LoadingAndSaveingTool
 [Serializable]
 class GameData
 {
-    public bool[] levelsCompleted;
-    public bool firstOpen;
+    public bool[] _unlockedLevels;
+    public int lastLevel;
+    //public bool firstOpen;
 }
 
 
