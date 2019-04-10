@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 
 public class PlayerController : MonoBehaviour
@@ -273,26 +274,30 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            CheckForPause();                                //check for pause function
-            if (_movingHealth)                              //if moving health is true
+            if (SceneManager.GetActiveScene().buildIndex != 0)
             {
-                LerpHealthBar();          //lerp health bar function
-            }
+                CheckForPause();                                //check for pause function
+                if (_movingHealth)                              //if moving health is true
+                {
+                    LerpHealthBar();          //lerp health bar function
+                }
 
-            if (_movingSpecial)                              //if moving special
-            {
-                LerpSpecialBar();                           //lerp special bar function
-            }
-            CheckForMovement();                             //check for movement function
+                if (_movingSpecial)                              //if moving special
+                {
+                    LerpSpecialBar();                           //lerp special bar function
+                }
 
-            if (!_doingSomething)                           //if not doing something
-            {
-                LookAround();                               //look around function
-                CheckForActionInput();                      //check for action input
-            }
-            else
-            {
-                WhatAmIEvenDoing();                         //else what are you doing with your life. theres so much meaning to this universe and instead you are reading this extrordinarily long comment which really doesnt have a point much like, i assume, this function that probably just checks to see what else the player can do/ why it isnt doing what its supposed to
+                CheckForMovement();                             //check for movement function
+
+                if (!_doingSomething)                           //if not doing something
+                {
+                    LookAround();                               //look around function
+                    CheckForActionInput();                      //check for action input
+                }
+                else
+                {
+                    WhatAmIEvenDoing();                         //else what are you doing with your life. theres so much meaning to this universe and instead you are reading this extrordinarily long comment which really doesnt have a point much like, i assume, this function that probably just checks to see what else the player can do/ why it isnt doing what its supposed to
+                }
             }
         }
     }

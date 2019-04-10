@@ -107,7 +107,7 @@ public class DungeonMechanic : MonoBehaviour {
     //called when the player walks into the room
     public void Init()
     {
-        AudioManager.instance.GateClose();                  //play gate closing sound
+        //AudioManager.instance.GateClose();                  //play gate closing sound
 
         _myCollider.enabled = false;                        //turn off collider
 
@@ -117,6 +117,11 @@ public class DungeonMechanic : MonoBehaviour {
             for (int i = 0; i < _doors.Count; i++)
             {
                 _doors[i].Init();                           //initalize all doors
+
+                if(i>0)
+                {
+                    _doors[i].Mute();
+                }
             }
         }
 
@@ -439,7 +444,7 @@ public class DungeonMechanic : MonoBehaviour {
 
         if (_roomMechanic != Mechanic.CHASE)                            //if the mechanic is not a chase room
         {
-            AudioManager.instance.GateOpen();                           //play sound for opening a gate
+            //AudioManager.instance.GateOpen();                           //play sound for opening a gate
 
             if (_doors.Count > 0)                                       //if there are any doors 
             {
