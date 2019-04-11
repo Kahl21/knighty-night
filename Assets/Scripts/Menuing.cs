@@ -111,6 +111,11 @@ public class Menuing : MonoBehaviour {
     public Text changedMaster;
     public Text changedMusic;
     public Text changedSFX;
+
+    [Header("Level Select Variables")]
+    [SerializeField]
+    Sprite _lockedLevelSprite;
+
     // Use this for initialization
     void Awake ()
     {
@@ -162,6 +167,9 @@ public class Menuing : MonoBehaviour {
         _audioManager = _Audio.GetComponent<AudioManager>();
         currenResolution.text = Screen.width + " x " + Screen.height;
 
+        LoadingAndSavingTool.Load();
+        initLevelSelect();
+
 
         SetMenu((int)WhichUIMenu.MAINMENU);
     }
@@ -200,7 +208,6 @@ public class Menuing : MonoBehaviour {
             SetButtons((int)_whichMenu);
 
             currSelectableButtons[currSelected].Select();
-            Debug.Log("It went here");
         }
     }
 
@@ -388,7 +395,7 @@ public class Menuing : MonoBehaviour {
     public void ToAreYouSure()
     {
         AudioManager.instance.ButtonPressed();
-        GameManager.Instance.initLevelSelect();
+        initLevelSelect();
         SetMenu(WhichUIMenu.AREYOUSURE);
     }
 
@@ -446,6 +453,10 @@ public class Menuing : MonoBehaviour {
         if(currSelectableButtons[currSelected].GetComponent<Toggle>())
         {
             currSelectableButtons[currSelected].GetComponent<Toggle>().isOn = !currSelectableButtons[currSelected].GetComponent<Toggle>().isOn;
+        }
+        else if (currSelectableButtons[currSelected].gameObject.GetComponent<Button>().interactable == false)
+        {
+            //Skip and don't do anything
         }
         else
         {
@@ -726,11 +737,14 @@ public class Menuing : MonoBehaviour {
     }
 
 
-    
+    //Makes a specific button interactable or not based on if a level has been completed
     public void LockLevel(bool enable, int levelToLock)
     {
-        Button buttonToDisable = _menus[2].transform.GetChild(levelToLock + 1).GetComponent<Button>();
-
+        //Debug.Log("It went here");
+        _menus[12].SetActive(true);
+        Debug.Log(_menus[12].gameObject.name);
+        Button buttonToDisable = _menus[12].transform.GetChild(levelToLock + 1).GetComponent<Button>();
+        
         if (!enable)
         {
             buttonToDisable.interactable = false;
@@ -739,10 +753,17 @@ public class Menuing : MonoBehaviour {
         {
             buttonToDisable.interactable = true;
         }
-        
+        _menus[12].SetActive(false);
     }
-    
 
+    //Calls a for loop to check to see if level select buttons should be locked or unlocked.
+    public void initLevelSelect()
+    {
+        for (int i = 0; i < GameManager._themesUnlocked.Length; i++)
+        {
+                LockLevel(GameManager._themesUnlocked[i], i);
+        }
+    }
 
 
 

@@ -56,9 +56,6 @@ public class GameManager : MonoBehaviour {
             Destroy(gameObject);
         }
 
-        LoadingAndSavingTool.Load();
-        initLevelSelect();
-
         _playerRef = PlayerController.Instance;
         _menuRef = Menuing.Instance;
     }
@@ -79,7 +76,7 @@ public class GameManager : MonoBehaviour {
         {
             _themesUnlocked[index] = false;
         }
-
+        
         return _themesUnlocked;
     }
 
@@ -105,15 +102,6 @@ public class GameManager : MonoBehaviour {
         else if (currentScene == 13)
         {
             _themesUnlocked[3] = true;
-        }
-    }
-
-    
-    public void initLevelSelect()
-    {
-        for (int index = 0; index < _themesUnlocked.Length; index++)
-        {
-            Menuing.Instance.LockLevel(_themesUnlocked[index], index);
         }
     }
     
