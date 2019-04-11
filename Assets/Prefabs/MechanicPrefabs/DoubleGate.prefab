@@ -148,13 +148,13 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1783271344662090}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0.095845714, z: 0, w: 0.99539626}
   m_LocalPosition: {x: 0.14123048, y: 1.8, z: 1.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4818580349054080}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 11, z: 0}
 --- !u!4 &4302378462804094
 Transform:
   m_ObjectHideFlags: 1
@@ -187,21 +187,21 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1834769232680584}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: -0.095845714, z: 0, w: 0.99539626}
   m_LocalPosition: {x: 0.08148272, y: 1.8, z: -1.7284064}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4818580349054080}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -11, z: 0}
 --- !u!4 &4818580349054080
 Transform:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1387904007907072}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 21.939999, y: 0, z: 76.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4715713344974334}
@@ -212,7 +212,7 @@ Transform:
   - {fileID: 4302378462804094}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!4 &4825572056468356
 Transform:
   m_ObjectHideFlags: 1
@@ -458,8 +458,6 @@ MonoBehaviour:
   _doorSpeed: 3
   _raycastDist: 0
   _fadeInc: 0
+  gateOpen: {fileID: 8300000, guid: 849ba3c3ad6922a42a6efa4a7732111e, type: 3}
+  gateClose: {fileID: 8300000, guid: 52674afb2fdd4734ea1147ecebcccd07, type: 3}
   _rotationAmount: 75
-  _leftRot: {x: 0, y: 0, z: 0}
-  _rightRot: {x: 0, y: 0, z: 0}
-  _leftGoTo: {x: 0, y: 0, z: 0}
-  _rightGoTo: {x: 0, y: 0, z: 0}

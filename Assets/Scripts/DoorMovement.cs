@@ -24,7 +24,7 @@ public class DoorMovement : MonoBehaviour {
     protected AudioManager _audioManager;
     protected float volSFX;
 
-    private AudioSource _speaker;
+    protected AudioSource _speaker;
     public AudioClip gateOpen;
     public AudioClip gateClose;
 

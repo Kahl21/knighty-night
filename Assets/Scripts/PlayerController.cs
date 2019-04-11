@@ -156,6 +156,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     List<GameObject> baseRoomList;
 
+
+    bool dead;
+
     // Use this for initialization
     void Awake()
     {
@@ -183,6 +186,7 @@ public class PlayerController : MonoBehaviour
         _hearts = new List<HealthTracker>();
 
         reachCheckpoint = false;
+        dead = false;
     }
 
     //Secondary Initialization
@@ -203,6 +207,7 @@ public class PlayerController : MonoBehaviour
         _specialBar = _gameMenus[2].transform.GetChild(1).gameObject;
         _specialBar.GetComponent<Image>().fillAmount = 0;
         currentCheckpoint = 0;
+        dead = false;
     }
 
     //Called to reset the Player Stats
@@ -241,6 +246,7 @@ public class PlayerController : MonoBehaviour
         }
         _whatImDoing = Interactions.NONE;
         _myAnimations.Play("StandingIdle", 0);
+        dead = false;
     }
 
     // Update is called once per frame
@@ -840,7 +846,7 @@ public class PlayerController : MonoBehaviour
     {
         if (!_invincible)
         {
-            //AudioManager.instance.PlayerDamaged();
+            AudioManager.instance.PlayerDamaged();
             _invincible = true;
             IncHealthMeter(_damageTaken, false);
 
@@ -908,6 +914,7 @@ public class PlayerController : MonoBehaviour
         {
             _winImage.SetActive(false);
             _loseImage.SetActive(true);
+            dead = true;
         }
         _inMenu = true;
     }
@@ -954,4 +961,5 @@ public class PlayerController : MonoBehaviour
 
     public float GetCurrCheckpoint { get { return currentCheckpoint; } set { currentCheckpoint = value; } }
     public bool DoesHaveCheckpoint { get { return reachCheckpoint; } set { reachCheckpoint = value; } }
+    public bool getDead { get { return dead;} set { dead = value; } }
 }

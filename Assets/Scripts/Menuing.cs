@@ -270,7 +270,7 @@ public class Menuing : MonoBehaviour {
 
     public void NextLevel()
     {
-
+        AudioManager.instance.RoomComplete();
         if (isLoading == false)
         {
             _menus[(int)WhichUIMenu.VIDEO].SetActive(true);
@@ -358,6 +358,12 @@ public class Menuing : MonoBehaviour {
     {
         AudioManager.instance.ButtonPressed();
         SetMenu(WhichUIMenu.AREYOUSURE);
+    }
+
+    public void ToDead()
+    {
+        AudioManager.instance.ButtonPressed();
+        SetMenu(WhichUIMenu.WIN);
     }
 
 
@@ -692,6 +698,17 @@ public class Menuing : MonoBehaviour {
         changedSFX.text = _audioManager.volSFX.ToString();
     }
 
+
+    public void ToPause()
+    {
+        if (_playerRef.getDead)
+        {
+            ToDead();
+        }
+        else
+            Pause();
+    }
+
     private void CheckBack()                //B button settings
     {
         
@@ -730,9 +747,6 @@ public class Menuing : MonoBehaviour {
                     break;
                 case WhichUIMenu.SFX:
                     ToMusic();
-                    break;
-                case WhichUIMenu.AREYOUSURE:
-                    SetMenu(WhichUIMenu.PAUSE);
                     break;
 
             }
