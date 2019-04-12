@@ -18,23 +18,14 @@ public class SpinBossGlhost : BossEnemy
 
     [Header("Spin Boss Intro Variables")]
     [SerializeField]
-    float _introFallAndStopDuration;
-    [SerializeField]
-    float _introFallSpeed;
-    [SerializeField]
-    float _downCheckDistance;
-    [SerializeField]
-    float _introTurnAroundSpeed;
-    [SerializeField]
-    float _introTurnAroundDuration;
+    Camera _additionalCam1;
+    Vector3 _additionalPos1, _additionalRot1;
     [SerializeField]
     GameObject _enemiesToCrush;
     List<CutsceneGlhosts> _GlhostsUnderMe;
-    Vector3 _ogCamPos;
     bool _cameraInPosition = false;
-    bool _fallFinished = false;
-    bool _turnToPlayerFinished = false;
-    bool _glhostsCrushed = false;
+    bool _animating = false;
+    bool _animatingSecond = false;
 
     [Header("Spin Boss Variables")]
     [SerializeField]
@@ -89,6 +80,7 @@ public class SpinBossGlhost : BossEnemy
     float _realSpawnDelayDuration;
     float _currSpawnTime;
     float _startSpawnTime;
+    bool _tellSpawning;
 
     [Header("Pinball Variables")]
     [SerializeField]
@@ -98,9 +90,6 @@ public class SpinBossGlhost : BossEnemy
     [SerializeField]
     float _speedWhilePinballing;
     float _realSpeedWhilePinballing;
-    [SerializeField]
-    float _pinballTellDuration;
-    float _realPinballTellDuration;
     bool _tellPinballing;
     [SerializeField]
     float _pinballAttackDuration;
@@ -140,8 +129,6 @@ public class SpinBossGlhost : BossEnemy
     [SerializeField]
     float _hardSpeedWhilePinballing;
     [SerializeField]
-    float _hardPinballTellDuration;
-    [SerializeField]
     float _hardPinballAttackDuration;
 
     [Header("Sound Variables")]
@@ -155,93 +142,80 @@ public class SpinBossGlhost : BossEnemy
 
     SPINSTRATS _MyAttack = SPINSTRATS.FOLLOW;
 
+    protected override void Awake()
+    {
+        base.Awake();
+        _additionalCam1.transform.parent = null;
+        _additionalPos1 = _additionalCam1.transform.position;
+        _additionalRot1 = _additionalCam1.transform.localEulerAngles;
+        _additionalCam1.gameObject.SetActive(false);
+    }
+
     //intro cutscene function
     protected override void PlayIntro()
     {
         if (!_cameraInPosition)
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            if (_currAttackTime >= 1)
+            if (_cameraRef.MoveCamera())
             {
-                _currAttackTime = 1;
-                if (!_glhostsCrushed)
-                {
-                    for (int i = 0; i < _GlhostsUnderMe.Count; i++)
-                    {
-                        _GlhostsUnderMe[i].Init();
-                    }
-                    _glhostsCrushed = true;
-                }
-            }
-
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
-        }
-        else if (!_fallFinished)
-        {
-            _currAttackTime = (Time.time - _startAttackTime) / _introFallAndStopDuration;
-
-            if (_currAttackTime >= 1)
-            {
-                _currAttackTime = 1;
-
-                if (_enemiesToCrush.activeInHierarchy)
-                {
-                    for (int i = 0; i < _GlhostsUnderMe.Count; i++)
-                    {
-                        _GlhostsUnderMe[i].ParentYouself();
-                    }
-                    _enemiesToCrush.SetActive(false);
-                }
-
                 _startAttackTime = Time.time;
-                _fallFinished = true;
+
+                _cameraInPosition = true;
+
+                _myAnimations.Play("BigIntro", 0);
+
+                for (int i = 0; i < _GlhostsUnderMe.Count; i++)
+                {
+                    _GlhostsUnderMe[i].Init();
+                }
+
+                _mySkinRenderer.enabled = true;
             }
 
-            Vector3 fall = Vector3.down * Time.deltaTime * _introFallSpeed;
-            if (Physics.Raycast(transform.position, fall, _downCheckDistance))
-            {
-
-                fall = Vector3.zero;
-            }
-
-            transform.position += fall;
         }
-        else if (!_turnToPlayerFinished)
+        else if (!_animating)
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _introTurnAroundDuration;
-
-            transform.Rotate(Vector3.up, _introTurnAroundSpeed);
-
-            if (_currAttackTime >= 1)
+            if (_myAnimations.IsInTransition(0))
             {
                 _currAttackTime = 1;
 
                 cam0 = _cameraRef.transform.position;
-                cam1 = _ogCamPos;
+                cam1 = _additionalPos1;
+                rot0 = _cameraRef.transform.localEulerAngles;
+                rot1 = _additionalRot1;
 
+                _currSpinningSpeed = 0;
                 _startAttackTime = Time.time;
-                transform.LookAt(_playerRef.transform.position);
-                _turnToPlayerFinished = true;
+
+                _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+                _animating = true;
             }
+        }
+        else if(!_animatingSecond)
+        {
+            if (_cameraRef.MoveCamera())
+            {
+                if(_myAnimations.IsInTransition(0))
+                {
+                    _currAttackTime = 1;
 
+                    cam0 = _cameraRef.transform.position;
+                    cam1 = _ogCamPos;
+                    rot0 = _cameraRef.transform.localEulerAngles;
+                    rot1 = _ogCamRot;
 
+                    _currSpinningSpeed = 0;
+                    _startAttackTime = Time.time;
+
+                    _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+                    _enemiesToCrush.SetActive(false);
+                    _animatingSecond = true;
+                }
+            }
         }
         else
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
-
-            if (_currAttackTime >= 1)
+            if (_cameraRef.MoveCamera())
             {
                 _currAttackTime = 1;
                 _startAttackTime = Time.time;
@@ -287,7 +261,6 @@ public class SpinBossGlhost : BossEnemy
                 _realSpinAttackDuration = _spinAttackDuration;
                 _realSpawnDelayDuration = _spawnDelayDuration;
                 _realSpeedWhilePinballing = _speedWhilePinballing;
-                _realPinballTellDuration = _pinballTellDuration;
                 _realPinballAttackDuration = _pinballAttackDuration;
             }
             else
@@ -302,7 +275,6 @@ public class SpinBossGlhost : BossEnemy
                 _realSpinAttackDuration = _hardSpinAttackDuration;
                 _realSpawnDelayDuration = _hardSpawnDelayDuration;
                 _realSpeedWhilePinballing = _hardSpeedWhilePinballing;
-                _realPinballTellDuration = _hardPinballTellDuration;
                 _realPinballAttackDuration = _hardPinballAttackDuration;
             }
 
@@ -315,18 +287,24 @@ public class SpinBossGlhost : BossEnemy
         }
 
         _ogCamPos = _cameraRef.transform.position;
+        _ogCamRot = _cameraRef.transform.localEulerAngles;
         cam0 = _cameraRef.transform.position;
-        cam1 = transform.position + _camOffset;
-        cam1.y = _cameraRef.transform.position.y;
+        cam1 = _bossCameraPos;
+        rot0 = _cameraRef.transform.localEulerAngles;
+        rot1 = _bossCameraRot;
         _cameraRef.AmFollowingPlayer = false;
-
+        
+        _mySkinRenderer.enabled = false;
 
         _speaker = this.transform.GetComponent<AudioSource>();
+
         dazedParticle = this.transform.GetChild(5).gameObject;
         dazedParticle.SetActive(false);
 
 
         _totalPercentage = _realFollowPercentage + _realSpinAttackPercentage + _realPinballAttackPercentage;
+
+        _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
 
         _startAttackTime = Time.time;
         _myAI = BossAI.INTRO;
@@ -415,15 +393,18 @@ public class SpinBossGlhost : BossEnemy
             {
                 //Debug.Log("follow Chosen");
                 _startAttackTime = Time.time;
+                _myAnimations.Play("Movement", 0);
                 _MyAttack = SPINSTRATS.FOLLOW;
             }
             else if (_nextAttack > _realFollowPercentage && _nextAttack <= (_realFollowPercentage + _realSpinAttackPercentage))
             {
                 //Debug.Log("spin Chosen");
 
+                _tellSpawning = true;
                 _enemyAgent.enabled = false;
                 _startAttackTime = Time.time;
                 _startSpawnTime = Time.time;
+                _myAnimations.Play("Struggle", 0);
                 _MyAttack = SPINSTRATS.SPIN;
             }
             else
@@ -432,6 +413,7 @@ public class SpinBossGlhost : BossEnemy
                 _tellPinballing = true;
                 _enemyAgent.enabled = false;
                 _startAttackTime = Time.time;
+                _myAnimations.Play("SpinTell", 0);
                 _MyAttack = SPINSTRATS.PINBALL;
             }
         }
@@ -486,58 +468,74 @@ public class SpinBossGlhost : BossEnemy
     //Boss will spawn and shoot ghosts out in random directions
     private void SpinInPlace()
     {
-        _currAttackTime = (Time.time - _startAttackTime) / _realSpinAttackDuration;
-        _currSpawnTime = (Time.time - _startSpawnTime) / _realSpawnDelayDuration;
-
-        if (!_speaker.isPlaying)
-            _speaker.PlayOneShot(bossSpin, volSFX);
-        // _myAnimations.Play("Spin");
-
-        for (int i = 0; i <= _numOfCasts; i++)
+        if (_tellSpawning)
         {
-            float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
-            float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
-
-            Vector3 RayDir = (transform.forward * Zpos) + (transform.right * Xpos);
-
-            if (_debug)
+            if (_myAnimations.IsInTransition(0))
             {
-                Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (RayDir * _bossCollisionDetectDistance), Color.red);
+                _currAttackTime = 1;
+                _tellSpawning = false;
+                _moveDir = (_playerRef.transform.position - transform.position).normalized;
+                _moveDir.y = 0;
+                _startAttackTime = Time.time;
+                _startSpawnTime = Time.time;
             }
+        }
+        else
+        {
+            _currAttackTime = (Time.time - _startAttackTime) / _realSpinAttackDuration;
+            _currSpawnTime = (Time.time - _startSpawnTime) / _realSpawnDelayDuration;
 
-            _calcAngle += _detectionAngle / _numOfCasts;
+            if (!_speaker.isPlaying)
+                _speaker.PlayOneShot(bossSpin, volSFX);
+            // _myAnimations.Play("Spin");
 
-            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
+            for (int i = 0; i <= _numOfCasts; i++)
             {
-                if (hit.collider.GetComponent<PlayerController>())
+                float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
+                float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
+
+                Vector3 RayDir = (transform.forward * Zpos) + (transform.right * Xpos);
+
+                if (_debug)
                 {
-                    hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
+                    Debug.DrawLine(transform.position + (Vector3.up * _vertDetectOffset), transform.position + (Vector3.up * _vertDetectOffset) + (RayDir * _bossCollisionDetectDistance), Color.red);
+                }
+
+                _calcAngle += _detectionAngle / _numOfCasts;
+
+                if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
+                {
+                    if (hit.collider.GetComponent<PlayerController>())
+                    {
+                        hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
+                    }
                 }
             }
-        }
 
-        _calcAngle = _startAngle;
+            _calcAngle = _startAngle;
 
-        transform.Rotate(Vector3.up, _realSpinningSpeed);
-        //Debug.Log("spinning");
+            transform.Rotate(Vector3.up, _realSpinningSpeed);
+            //Debug.Log("spinning");
 
-        if (_currAttackTime >= 1)
-        {
-            //Debug.Log("spinning Done");
-            _invincible = false;
-            _enemyAgent.enabled = true;
-            _MyAttack = SPINSTRATS.STUNNED;
-            _startAttackTime = Time.time;
-        }
+            if (_currAttackTime >= 1)
+            {
+                //Debug.Log("spinning Done");
+                _invincible = false;
+                _enemyAgent.enabled = true;
+                _MyAttack = SPINSTRATS.STUNNED;
+                _myAnimations.Play("Dazed", 0);
+                _startAttackTime = Time.time;
+            }
 
-        if (_currSpawnTime >= 1)
-        {
-            _currSpawnTime = 1;
-            Vector3 spawnPos = transform.position;
-            spawnPos += Vector3.up * _vertDetectOffset;
-            GameObject _newEnemy = Instantiate<GameObject>(_enemyToSpawn, spawnPos, transform.rotation);
-            _newEnemy.GetComponent<BaseEnemy>().Init(_myRoom, Mechanic.BOSS);
-            _startSpawnTime = Time.time;
+            if (_currSpawnTime >= 1)
+            {
+                _currSpawnTime = 1;
+                Vector3 spawnPos = transform.position;
+                spawnPos += Vector3.up * _vertDetectOffset;
+                GameObject _newEnemy = Instantiate<GameObject>(_enemyToSpawn, spawnPos, transform.rotation);
+                _newEnemy.GetComponent<BaseEnemy>().Init(_myRoom, Mechanic.BOSS);
+                _startSpawnTime = Time.time;
+            }
         }
     }
 
@@ -548,14 +546,11 @@ public class SpinBossGlhost : BossEnemy
     {
         if (_tellPinballing)
         {
+            Vector3 playerPos = _playerRef.transform.position;
+            playerPos.y = transform.position.y;
+            transform.LookAt(playerPos);
 
-            if (!_speaker.isPlaying)
-                _speaker.PlayOneShot(bossSpin, volSFX);
-
-            _currAttackTime = (Time.time - _startAttackTime) / _realPinballTellDuration;
-            //_myAnimations.Play("Spin");
-
-            if (_currAttackTime >= 1)
+            if (_myAnimations.IsInTransition(0))
             {
                 _currAttackTime = 1;
                 _tellPinballing = false;
@@ -563,13 +558,14 @@ public class SpinBossGlhost : BossEnemy
                 _moveDir.y = 0;
                 _startAttackTime = Time.time;
             }
-
-            _currSpinningSpeed = _realSpinningSpeed * _currAttackTime;
-
-            transform.Rotate(Vector3.up, _currSpinningSpeed);
         }
         else
         {
+            if (!_speaker.isPlaying)
+            {
+                _speaker.PlayOneShot(bossSpin, volSFX);
+            }
+
             _currAttackTime = (Time.time - _startAttackTime) / _realPinballAttackDuration;
 
             //Debug.Log("pinballing");
@@ -623,6 +619,7 @@ public class SpinBossGlhost : BossEnemy
             {
                 _invincible = false;
                 _enemyAgent.enabled = true;
+                _myAnimations.Play("Dazed", 0);
                 _MyAttack = SPINSTRATS.STUNNED;
                 _startAttackTime = Time.time;
                 return;
@@ -794,9 +791,8 @@ public class SpinBossGlhost : BossEnemy
 
             _bossBar.SetActive(false);
             _cameraInPosition = false;
-            _fallFinished = false;
-            _turnToPlayerFinished = false;
-            _glhostsCrushed = false;
+            _animating = false;
+            _animatingSecond = false;
 
             _endingPlaying = false;
             _laggingHealth = false;

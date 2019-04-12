@@ -4,27 +4,21 @@ using UnityEngine;
 
 public class CutsceneGlhosts : MonoBehaviour {
 
-    bool _looking = false;
-    bool _walking = false;
-    bool _amDone = false;
+    bool _animating = false;
+    [SerializeField]
+    bool _AmLeft = false;
+    [SerializeField]
+    bool _AmMiddle = false;
+    [SerializeField]
+    bool _AmRight = false;
     PlayerController _player;
     GameManager _managerRef;
+    Animator _myAnimations;
 
     Vector3 _startPos;
     Quaternion _startRot;
     GameObject _parentOBJ;
-
-    float _currTime;
-    float _startTime;
-    [SerializeField]
-    float _lookSpeed;
-    [SerializeField]
-    float _lookDuration;
-    [SerializeField]
-    float _walkDuration;
-    [SerializeField]
-    float _walkDistance;
-    Vector3 c0, c1;
+    
     BossEnemy _myBoss;
 
     public void Init()
@@ -35,65 +29,50 @@ public class CutsceneGlhosts : MonoBehaviour {
         _startPos = transform.position;
         _startRot = transform.rotation;
         _player = PlayerController.Instance;
+        _myAnimations = GetComponent<Animator>();
+        BeginAnimation();
+    }
 
-        _startTime = Time.time;
-        _looking = true;
+    void BeginAnimation()
+    {
+        if(_AmLeft)
+        {
+            _myAnimations.Play("LeftIntro",0);
+        }
+        else if (_AmMiddle)
+        {
+            _myAnimations.Play("MiddleIntro", 0);
+        }
+        else if (_AmRight)
+        {
+            _myAnimations.Play("RightIntro", 0);
+        }
+        else
+        {
+            Debug.Log("animation bool not set");
+        }
+
+        _animating = true;
     }
 
     private void Update()
     {
-        if (_looking)
+        if (_animating)
         {
-            LookAtPlayer();
-        }
-        else if (_walking)
-        {
-            WalkAtPlayer();
+            DoTheAnimateThing();
         }
     }
 
-    private void LookAtPlayer()
+    private void DoTheAnimateThing()
     {
-
-        _currTime = (Time.time - _startTime) / _lookDuration;
-
-        transform.Rotate(Vector3.up, _lookSpeed * Time.deltaTime);
-
-        if (_currTime >= 1)
+        if (_myAnimations.IsInTransition(0))
         {
-            transform.LookAt(transform.position - Vector3.forward);
-
-            c0 = transform.position;
-            c1 = transform.position + (transform.forward * _walkDistance);
-            _startTime = Time.time;
-            _looking = false;
-            _walking = true;
+            ParentYouself();
+            _animating = false;
         }
-
-        
     }
 
-    private void WalkAtPlayer()
-    {
-        _currTime = (Time.time - _startTime) / _walkDuration;
-
-        Vector3 c01;
-
-        c01 = (1 - _currTime) * c0 + _currTime * c1;
-
-        if (_currTime >= 1)
-        {
-            _currTime = 1;
-
-            _amDone = true;
-
-            _myBoss.CheckForIntroEnd();
-
-           _walking = false;
-        }
-
-        transform.position = c01;
-    }
+    
 
     public void ParentYouself()
     {
@@ -105,10 +84,10 @@ public class CutsceneGlhosts : MonoBehaviour {
         transform.parent = _parentOBJ.transform;
         transform.position = _startPos;
         transform.rotation = _startRot;
-        _looking = false;
-        _walking = false;
-        _amDone = false;
+        _animating = false;
+        _myAnimations.Play("Nothing",0);
+        
     }
 
-    public bool AmDone { get { return _amDone; } }
+    public bool AmDone { get { return _animating; } }
 }

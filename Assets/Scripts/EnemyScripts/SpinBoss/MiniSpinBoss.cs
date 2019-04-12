@@ -16,13 +16,8 @@ public class MiniSpinBoss : BossEnemy
     }
 
     [Header("Spin Boss Intro Variables")]
-    [SerializeField]
-    float _revUpDuration;
-    [SerializeField]
-    float _spinDuration;
     bool _cameraInPosition = false;
     bool _animating = false;
-    bool _introLength;
 
     [Header("Spin Boss Variables")]
     [SerializeField]

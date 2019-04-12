@@ -104,7 +104,7 @@ public class BossEnemy : MonoBehaviour {
 
     protected bool _hasInit = false;
 
-    protected void Awake()
+    protected virtual void Awake()
     {
         _bossCamera.transform.parent = null;
         _bossCameraPos = _bossCamera.transform.position;
@@ -137,6 +137,7 @@ public class BossEnemy : MonoBehaviour {
         _menuRef = Menuing.Instance;
         _playerRef = PlayerController.Instance;
         _managerRef = GameManager.Instance;
+        _myAnimations = GetComponent<Animator>();
         _cameraRef = _playerRef.GetCamera;
         _camOffset = _cameraRef.GetOffset;
 
@@ -191,6 +192,13 @@ public class BossEnemy : MonoBehaviour {
         else if(_updatingHealth)
         {
             UpdateHealthBar();
+        }
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, _bossCollisionDetectDistance))
+        {
+            if (hit.collider.GetComponent<PlayerController>())
+            {
+                hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
+            }
         }
     }
 

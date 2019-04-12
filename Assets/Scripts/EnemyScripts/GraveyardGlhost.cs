@@ -114,6 +114,7 @@ public class GraveyardGlhost : BasicGlhost {
             else
             {
                 _invincible = true;
+                _myAnimations.Play("Invincible", 0);
                 _particle.SetActive(true);
             }
             _invStartTime = Time.time;
