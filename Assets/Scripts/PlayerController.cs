@@ -835,6 +835,17 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    
+    private void OnParticleCollision(GameObject other)
+    {
+        if (other.transform.parent.GetComponent<BossFireStatueTrap>())
+        {
+            TakeDamage(other.transform.parent.GetComponent<BossFireStatueTrap>().GetFireDamage);
+        }
+    }
+    
+
+
     //called by objects that damage the player 
     //damages the player
     public void TakeDamage(float _damageTaken)
