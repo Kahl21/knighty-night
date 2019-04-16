@@ -24,8 +24,8 @@ public enum WhichUIMenu
     MASTER,
     MUSIC,
     SFX,
-    AREYOUSURE,
-    LEVELSELECT
+    LEVELSELECT,
+    AREYOUSURE
 }
 
 
@@ -113,6 +113,8 @@ public class Menuing : MonoBehaviour {
     public Text changedMaster;
     public Text changedMusic;
     public Text changedSFX;
+
+    WhichUIMenu whichUI;
 
     [Header("Level Select Variables")]
     [SerializeField]
@@ -222,7 +224,7 @@ public class Menuing : MonoBehaviour {
 
     private void SetButtons(int _menuNum)
     {
-        if(_menuNum == (int)WhichUIMenu.WIN || _menuNum == (int)WhichUIMenu.MASTER || _menuNum == (int)WhichUIMenu.MUSIC || _menuNum == (int)WhichUIMenu.SFX || _menuNum == (int)WhichUIMenu.AREYOUSURE || _menuNum == (int)WhichUIMenu.LEVELSELECT)
+        if(_menuNum == (int)WhichUIMenu.WIN || _menuNum == (int)WhichUIMenu.MASTER || _menuNum == (int)WhichUIMenu.MUSIC || _menuNum == (int)WhichUIMenu.SFX || _menuNum == (int)WhichUIMenu.AREYOUSURE)
         {
             _playerRef.SetOrientation = MenuOrient.HORIZ;
         }
@@ -443,6 +445,14 @@ public class Menuing : MonoBehaviour {
     {
         AudioManager.instance.ButtonPressed();
         SetMenu(WhichUIMenu.LEVELSELECT);
+    }
+
+    public void ToPause()
+    {
+        if (_playerRef.getDead)
+            ToDead();
+        else
+            Pause();
     }
 
     public void MenuUpOrDown(bool _positiveMovement)
@@ -770,10 +780,11 @@ public class Menuing : MonoBehaviour {
         _menus[12].SetActive(true);
         Debug.Log(_menus[12].gameObject.name);
         Button buttonToDisable = _menus[12].transform.GetChild(levelToLock + 1).GetComponent<Button>();
-        
+
         if (!enable)
         {
-            buttonToDisable.interactable = false;
+           buttonToDisable.interactable = false;
+           
         }
         else
         {
