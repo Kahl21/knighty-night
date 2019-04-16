@@ -115,6 +115,8 @@ public class TrapBossGlhost : BossEnemy
     float _quadRotateSpeed;
     bool _xAttack = false;
 
+    [Header("Regular Fire Trap Variables")]
+
     
     float _startAttackTime;
     float _currAttackTime;
@@ -520,9 +522,14 @@ public class TrapBossGlhost : BossEnemy
         _mySkinRenderer.enabled = false;
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
 
-        Vector3 possessPosition = currentTrap.transform.localPosition;
-        possessPosition.y = transform.position.y;
-        transform.position = possessPosition;
+        //This might fix the telepoting bug
+        if (currentTrap.GetComponent<SpikeTrap>() || currentTrap.GetComponent<DartTrap>())
+        {
+            Vector3 possessPosition = currentTrap.transform.localPosition;
+            possessPosition.y = transform.position.y;
+            transform.position = possessPosition;
+        }
+        
 
         if (trapComplete)
         {
