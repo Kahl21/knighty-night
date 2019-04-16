@@ -14,12 +14,18 @@ public class CutsceneGlhosts : MonoBehaviour {
     PlayerController _player;
     GameManager _managerRef;
     Animator _myAnimations;
+    string _introName;
 
     Vector3 _startPos;
     Quaternion _startRot;
     GameObject _parentOBJ;
     
     BossEnemy _myBoss;
+
+    private void Awake()
+    {
+        _myAnimations.Play("Nothing", 0);
+    }
 
     public void Init()
     {
@@ -38,14 +44,17 @@ public class CutsceneGlhosts : MonoBehaviour {
         if(_AmLeft)
         {
             _myAnimations.Play("LeftIntro",0);
+            _introName = "LeftIntro";
         }
         else if (_AmMiddle)
         {
             _myAnimations.Play("MiddleIntro", 0);
+            _introName = "MiddleIntro";
         }
         else if (_AmRight)
         {
             _myAnimations.Play("RightIntro", 0);
+            _introName = "RightIntro";
         }
         else
         {
@@ -65,7 +74,7 @@ public class CutsceneGlhosts : MonoBehaviour {
 
     private void DoTheAnimateThing()
     {
-        if (_myAnimations.IsInTransition(0))
+        if (_myAnimations.GetCurrentAnimatorStateInfo(0).IsName(_introName))
         {
             ParentYouself();
             _animating = false;

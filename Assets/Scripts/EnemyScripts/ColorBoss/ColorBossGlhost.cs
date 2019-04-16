@@ -483,6 +483,7 @@ public class ColorBossGlhost : BossEnemy {
                 _tellCharging = true;
                 _enemyAgent.enabled = false;
                 _startAttackTime = Time.time;
+                _myAnimations.Play("RearUp", 0);
                 _myAttack = ColorStrats.CHARGE;
             }
         }
@@ -635,18 +636,17 @@ public class ColorBossGlhost : BossEnemy {
                         }
                     }
                 }
+
+                Vector3 c01, c12, c012;
+
+                c01 = (1 - _currAttackTime) * c0 + _currAttackTime * c1;
+                c12 = (1 - _currAttackTime) * c1 + _currAttackTime * c2;
+
+                c012 = (1 - _currAttackTime) * c01 + _currAttackTime * c12;
+
+                transform.position = c012;
             }
-
-            Vector3 c01, c12, c012;
-
-            c01 = (1 - _currAttackTime) * c0 + _currAttackTime * c1;
-            c12 = (1 - _currAttackTime) * c1 + _currAttackTime * c2;
-
-            c012 = (1 - _currAttackTime) * c01 + _currAttackTime * c12;
-
-            transform.position = c012;
         }
-        
     }
 
     //Attack
@@ -672,9 +672,12 @@ public class ColorBossGlhost : BossEnemy {
             }
             transform.LookAt(_playerRef.transform.position);
 
-            if (!Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), -transform.forward, _bossCollisionDetectDistance))
+            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), -transform.forward, out hit, _bossCollisionDetectDistance*2))
             {
-                transform.position -= transform.forward * _realChargeUpBackwardsSpeed * Time.deltaTime;
+                if(!hit.collider.GetComponent<BossWall>() || !hit.collider.GetComponent<DoorMovement>())
+                {
+                    transform.position -= transform.forward * _realChargeUpBackwardsSpeed * Time.deltaTime;
+                }
             }
 
         }
@@ -702,7 +705,7 @@ public class ColorBossGlhost : BossEnemy {
                     {
                         hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
                     }
-                    else if(!hit.collider.GetComponent<PlayerController>())
+                    else if(hit.collider.GetComponent<BossWall>() || hit.collider.GetComponent<DoorMovement>())
                     {
                         int _randomColor = Random.Range(0, _ColorsLeft.Count);
                         _myColor = _ColorsLeft[_randomColor];
