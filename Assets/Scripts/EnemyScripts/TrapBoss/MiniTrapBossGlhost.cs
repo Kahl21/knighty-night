@@ -77,6 +77,8 @@ public class MiniTrapBossGlhost : BossEnemy
     [SerializeField]
     float _quadBurnDuration;
     float _realQuadBurnDuration;
+    [SerializeField]
+    float _quadRotateSpeed;
     bool _xAttack = false;
 
     [Header("Fire Trap Variables")]
@@ -446,6 +448,7 @@ public class MiniTrapBossGlhost : BossEnemy
                 possessedTrap.GetStartDelay = _quadStartDelay;
                 possessedTrap.GetBurningDuration = _realQuadBurnDuration;
                 possessedTrap.GetFireDamage = _realQuadTrapDamage;
+                possessedTrap.SetRotateSpeed = _quadRotateSpeed;
                 possessedTrap.StartingDelay();
                 trapComplete = false;
             }
