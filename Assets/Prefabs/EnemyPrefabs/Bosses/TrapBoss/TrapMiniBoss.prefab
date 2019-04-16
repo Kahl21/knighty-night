@@ -2173,8 +2173,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1357090406945198}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -35.24, y: 52.83, z: -43.4}
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.00000058114523}
+  m_LocalPosition: {x: -8.385963, y: 2.1633005, z: 68.26901}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_Children:
   - {fileID: 4172012433248018}
@@ -2185,7 +2185,7 @@ Transform:
   - {fileID: 4683192038884902}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180.00002, z: 0}
 --- !u!4 &4332708189266046
 Transform:
   m_ObjectHideFlags: 1
@@ -2850,7 +2850,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1122949136765908}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -1, z: 2.64}
+  m_LocalPosition: {x: -0.22, y: -0.77, z: 6.62}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4330383025642224}
@@ -3501,6 +3501,7 @@ MonoBehaviour:
   _quadDetectDist: 9.5
   _quadFireStartDelay: 1
   _quadBurnDuration: 3
+  _quadRotateSpeed: 0.25
   _hardStunnedDuration: 0
   _hardXAttackPercentage: 0
   _hardQuadFirePercentage: 0

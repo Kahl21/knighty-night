@@ -111,6 +111,8 @@ public class TrapBossGlhost : BossEnemy
     [SerializeField]
     float _quadBurnDuration;
     float _realQuadBurnDuration;
+    [SerializeField]
+    float _quadRotateSpeed;
     bool _xAttack = false;
 
     
@@ -617,6 +619,7 @@ public class TrapBossGlhost : BossEnemy
                 possessedTrap.GetStartDelay = _quadStartDelay;
                 possessedTrap.GetBurningDuration = _realQuadBurnDuration;
                 possessedTrap.GetFireDamage = _realQuadTrapDamage;
+                possessedTrap.SetRotateSpeed = _quadRotateSpeed;
                 possessedTrap.StartingDelay();
                 trapComplete = false;
             }

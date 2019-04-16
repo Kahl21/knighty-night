@@ -563,6 +563,11 @@ public class PlayerController : MonoBehaviour
             {
                 _move = Vector3.zero;                                                                   //there is no movement
                 baseRoomList.Clear();
+
+                GameManager.Instance.SaveCompletedRoom(SceneManager.GetActiveScene().buildIndex + 1);       //Save the completed room
+                GameManager.Instance.CheckForCompletedWorld(SceneManager.GetActiveScene().buildIndex);
+                LoadingAndSavingTool.Save();                                                            //Save levels completed into the save state
+
                 if (thingHit.GetComponent<WinScript>().IsLastLevel())                                   //if the win script is attached to the last level
                 {
                     EndLevel(true);                                                                     //end level is equal to true
@@ -839,6 +844,17 @@ public class PlayerController : MonoBehaviour
                 break;
         }
     }
+
+    
+    private void OnParticleCollision(GameObject other)
+    {
+        if (other.transform.parent.GetComponent<BossFireStatueTrap>())
+        {
+            TakeDamage(other.transform.parent.GetComponent<BossFireStatueTrap>().GetFireDamage);
+        }
+    }
+    
+
 
     //called by objects that damage the player 
     //damages the player

@@ -28,6 +28,8 @@ public class BossFireStatueTrap : BaseTrap {
     float _burningDuration;
     [SerializeField]
     float _fireDistance;
+    [SerializeField]
+    float _rotateSpeed;
     float _startDelay;
     float _currDelay;
 
@@ -145,6 +147,13 @@ public class BossFireStatueTrap : BaseTrap {
         }
     }
 
+    void rotateFire()
+    {
+        //var main = _myFire.main;
+        //main.simulationSpace = ParticleSystemSimulationSpace.World;
+        transform.parent.transform.eulerAngles += new Vector3(0f, 1f * _rotateSpeed, 0f);
+    }
+
     //shoots out three raycasts along with the fire animation
     //player will take damage if he walks through the fire
     void IncreaseFire()
@@ -153,7 +162,7 @@ public class BossFireStatueTrap : BaseTrap {
 
         _currDetectDistance = _maxDetectDistance * _currDelay;
 
-        LookForPlayer();
+        //LookForPlayer();
 
         if (_currDelay >= 1)
         {
@@ -170,8 +179,8 @@ public class BossFireStatueTrap : BaseTrap {
     void BurnBabyBurn()
     {
         _currDelay = (Time.time - _startDelay) / _burningDuration;
-        
-        LookForPlayer();
+        rotateFire();
+        //LookForPlayer();
         Debug.Log("burn Player");
         if (_currDelay >= 1)
         {
@@ -193,7 +202,7 @@ public class BossFireStatueTrap : BaseTrap {
 
         _currDetectDistance = _maxDetectDistance * (1 - _currDelay);
 
-        LookForPlayer();
+        //LookForPlayer();
 
         if (_currDelay >= 1)
         {
@@ -295,5 +304,6 @@ public class BossFireStatueTrap : BaseTrap {
     public float GetStartDelay { get { return _startDelay; } set { _startDelay = value; } }
     public float GetBurningDuration { get { return _burningDuration; } set { _burningDuration = value; } }
     public float GetFireDamage { get { return _fireDamage; } set { _fireDamage = value; } }
+    public float SetRotateSpeed { get { return _rotateSpeed; } set { _rotateSpeed = value; } }
 
 }

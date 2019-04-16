@@ -114,8 +114,10 @@ public class Menuing : MonoBehaviour {
     public Text changedMusic;
     public Text changedSFX;
 
+    [Header("Level Select Variables")]
+    [SerializeField]
+    Sprite _lockedLevelSprite;
 
-    WhichUIMenu whichUI = new WhichUIMenu();
     // Use this for initialization
     void Awake ()
     {
@@ -167,9 +169,11 @@ public class Menuing : MonoBehaviour {
         _audioManager = _Audio.GetComponent<AudioManager>();
         currenResolution.text = Screen.width + " x " + Screen.height;
 
+        LoadingAndSavingTool.Load();
+        initLevelSelect();
+
 
         SetMenu((int)WhichUIMenu.MAINMENU);
-
     }
 
     private void Update()
@@ -210,6 +214,7 @@ public class Menuing : MonoBehaviour {
         if (_whichMenu != WhichUIMenu.PLAYER)
         {
             SetButtons((int)_whichMenu);
+
             currSelectableButtons[currSelected].Select();
         }
         whichUI = _whichMenu;
@@ -225,6 +230,7 @@ public class Menuing : MonoBehaviour {
         {
             _playerRef.SetOrientation = MenuOrient.VERT;
         }
+
         currSelectableButtons = new List<Selectable>();
         for (int i = 0; i < _menus[_menuNum].transform.childCount; i++)
         {
@@ -287,6 +293,46 @@ public class Menuing : MonoBehaviour {
         _paused = false;
         SetMenu(WhichUIMenu.PLAYER);
     }
+
+    
+    public void LoadContinuedLevel()
+    {
+        if (isLoading == false)
+        {
+            _menus[(int)WhichUIMenu.VIDEO].SetActive(true);
+            StartCoroutine(LoadSpecificScene(GameManager._lastLevelIndex));
+
+        }
+
+        _managerRef.SetGameReset = _playerRef.ResetPlayer;
+        _playerRef.GetCurrCheckpoint = 0;
+        _playerRef.DoesHaveCheckpoint = false;
+        _playerRef.InMenu = false;
+        Time.timeScale = 1;
+        _paused = false;
+        SetMenu(WhichUIMenu.PLAYER);
+    }
+    
+
+        
+    public void LoadSpecificLevel(int buildIndex)
+    {
+        if (isLoading == false)
+        {
+            _menus[(int)WhichUIMenu.VIDEO].SetActive(true);
+            StartCoroutine(LoadSpecificScene(buildIndex));
+
+        }
+
+        _managerRef.SetGameReset = _playerRef.ResetPlayer;
+        _playerRef.GetCurrCheckpoint = 0;
+        _playerRef.DoesHaveCheckpoint = false;
+        _playerRef.InMenu = false;
+        Time.timeScale = 1;
+        _paused = false;
+        SetMenu(WhichUIMenu.PLAYER);
+    }
+    
 
     public void RetryLevel()
     {
@@ -358,6 +404,7 @@ public class Menuing : MonoBehaviour {
     public void ToAreYouSure()
     {
         AudioManager.instance.ButtonPressed();
+        initLevelSelect();
         SetMenu(WhichUIMenu.AREYOUSURE);
     }
 
@@ -367,7 +414,13 @@ public class Menuing : MonoBehaviour {
         SetMenu(WhichUIMenu.WIN);
     }
 
-
+    
+    public void ToLevelSelect()
+    {
+        AudioManager.instance.ButtonPressed();
+        SetMenu(WhichUIMenu.LEVELSELECT);
+    }
+    
 
     public void MenuBack()
     {
@@ -426,6 +479,10 @@ public class Menuing : MonoBehaviour {
         if(currSelectableButtons[currSelected].GetComponent<Toggle>())
         {
             currSelectableButtons[currSelected].GetComponent<Toggle>().isOn = !currSelectableButtons[currSelected].GetComponent<Toggle>().isOn;
+        }
+        else if (currSelectableButtons[currSelected].gameObject.GetComponent<Button>().interactable == false)
+        {
+            //Skip and don't do anything
         }
         else
         {
@@ -706,14 +763,32 @@ public class Menuing : MonoBehaviour {
     }
 
 
-    public void ToPause()
+    //Makes a specific button interactable or not based on if a level has been completed
+    public void LockLevel(bool enable, int levelToLock)
     {
-        if (_playerRef.getDead)
+        //Debug.Log("It went here");
+        _menus[12].SetActive(true);
+        Debug.Log(_menus[12].gameObject.name);
+        Button buttonToDisable = _menus[12].transform.GetChild(levelToLock + 1).GetComponent<Button>();
+        
+        if (!enable)
         {
-            ToDead();
+            buttonToDisable.interactable = false;
         }
         else
-            Pause();
+        {
+            buttonToDisable.interactable = true;
+        }
+        _menus[12].SetActive(false);
+    }
+
+    //Calls a for loop to check to see if level select buttons should be locked or unlocked.
+    public void initLevelSelect()
+    {
+        for (int i = 0; i < GameManager._themesUnlocked.Length; i++)
+        {
+                LockLevel(GameManager._themesUnlocked[i], i);
+        }
     }
 
     private void CheckBack()                //B button settings
@@ -789,6 +864,7 @@ public class Menuing : MonoBehaviour {
         isLoading = false;
     }
 
+    
     IEnumerator LoadSpecificScene(int scene)
     {
         float time = 0;
@@ -811,6 +887,7 @@ public class Menuing : MonoBehaviour {
         asyncLoad.allowSceneActivation = true;
         isLoading = false;
     }
+    
 
     IEnumerator FadeIn()
     {
