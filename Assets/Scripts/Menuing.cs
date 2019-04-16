@@ -114,6 +114,14 @@ public class Menuing : MonoBehaviour {
     public Text changedMusic;
     public Text changedSFX;
 
+    //Start Button
+    public Sprite startNH;
+    public Sprite startHL;
+    public Sprite continueNH;
+    public Sprite continueHL;
+
+    
+
     WhichUIMenu whichUI;
 
     [Header("Level Select Variables")]
@@ -175,6 +183,7 @@ public class Menuing : MonoBehaviour {
         initLevelSelect();
 
 
+        SetStart();
         SetMenu((int)WhichUIMenu.MAINMENU);
     }
 
@@ -302,7 +311,11 @@ public class Menuing : MonoBehaviour {
         if (isLoading == false)
         {
             _menus[(int)WhichUIMenu.VIDEO].SetActive(true);
+            if(GameManager._lastLevelIndex >0)
             StartCoroutine(LoadSpecificScene(GameManager._lastLevelIndex));
+            else
+                StartCoroutine(LoadSpecificScene(1));
+
 
         }
 
@@ -364,6 +377,7 @@ public class Menuing : MonoBehaviour {
         _playerRef.GetPlayerAnimator.Play("Nothing", 0);
 
         _BossBar.SetActive(false);
+        SetStart();
         SetMenu(WhichUIMenu.MAINMENU);
     }
 
@@ -841,18 +855,47 @@ public class Menuing : MonoBehaviour {
                 case WhichUIMenu.SFX:
                     ToMusic();
                     break;
+                case WhichUIMenu.LEVELSELECT:
+                    MenuBack();
+                    break;
+                case WhichUIMenu.AREYOUSURE:
+                    ToPause();
+                    break;
 
             }
         }
         
     }
 
+    public void SetStart()
+    {
+        Button startButton = _menus[0].transform.GetChild(1).GetComponent<Button>();
+        Image startImage = _menus[0].transform.GetChild(1).GetComponent<Image>();
 
-   /* 
-    MASTER,
-    MUSIC,
-    SFX,
-    AREYOUSURE*/
+        SpriteState ss = new SpriteState();        
+
+        if (GameManager._lastLevelIndex >0)
+        {
+            startImage.sprite = continueNH;
+            ss.highlightedSprite = continueHL;
+            ss.pressedSprite = continueHL;
+        }
+        else
+        {
+            startImage.sprite = startNH;
+            ss.highlightedSprite = startHL;
+            ss.pressedSprite = startHL;
+        }
+        startButton.spriteState = ss;
+
+    }
+
+
+    /* 
+     MASTER,
+     MUSIC,
+     SFX,
+     AREYOUSURE*/
 
 
 
