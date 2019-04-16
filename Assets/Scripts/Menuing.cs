@@ -24,7 +24,8 @@ public enum WhichUIMenu
     MASTER,
     MUSIC,
     SFX,
-    AREYOUSURE
+    AREYOUSURE,
+    LEVELSELECT
 }
 
 
@@ -216,7 +217,7 @@ public class Menuing : MonoBehaviour {
 
     private void SetButtons(int _menuNum)
     {
-        if(_menuNum == (int)WhichUIMenu.WIN || _menuNum == (int)WhichUIMenu.MASTER || _menuNum == (int)WhichUIMenu.MUSIC || _menuNum == (int)WhichUIMenu.SFX || _menuNum == (int)WhichUIMenu.AREYOUSURE)
+        if(_menuNum == (int)WhichUIMenu.WIN || _menuNum == (int)WhichUIMenu.MASTER || _menuNum == (int)WhichUIMenu.MUSIC || _menuNum == (int)WhichUIMenu.SFX || _menuNum == (int)WhichUIMenu.AREYOUSURE || _menuNum == (int)WhichUIMenu.LEVELSELECT)
         {
             _playerRef.SetOrientation = MenuOrient.HORIZ;
         }
@@ -383,6 +384,12 @@ public class Menuing : MonoBehaviour {
     {
         AudioManager.instance.ButtonPressed();
         Application.Quit();
+    }
+
+    public void ToLS()
+    {
+        AudioManager.instance.ButtonPressed();
+        SetMenu(WhichUIMenu.LEVELSELECT);
     }
 
     public void MenuUpOrDown(bool _positiveMovement)
