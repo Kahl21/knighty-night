@@ -828,6 +828,11 @@ public class PlayerController : MonoBehaviour
                         {
                             thingHit.GetComponent<TrapLever>().StartRotation();
                         }
+
+                        else if (thingHit.GetComponent<SecretLever>())
+                        {
+                            thingHit.GetComponent<SecretLever>().StartRotation();
+                        }
                     }
                 }
                 break;
