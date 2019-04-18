@@ -180,8 +180,9 @@ public class BaseEnemy : MonoBehaviour {
 
     protected virtual void Dead()
     {
+        _speaker.Stop();
         if (!_speaker.isPlaying)
-            _speaker.PlayOneShot(ghostDeath, volSFX);
+        _speaker.PlayOneShot(ghostDeath, volSFX);
         _actualDead = true;
         _myAnimations.Play("Death");
         Destroy(gameObject, 1f);

@@ -204,29 +204,33 @@ public class AudioManager : MonoBehaviour {
     {
         int currentScene = SceneManager.GetActiveScene().buildIndex;
 
-        if(currentScene <=4)
+        if(currentScene >0 && currentScene <=4)
         {
             if (!MusicPlayer.isPlaying)
                 MusicPlayer.PlayOneShot(BGMDungeon, volMusic/10);
         }
 
-        else if (currentScene > 5 && currentScene <=7)
+        else if (currentScene > 4 && currentScene <=7)
         {
             if (!MusicPlayer.isPlaying)
                 MusicPlayer.PlayOneShot(BGMSewer, volMusic/10);
         }
 
-        else if (currentScene > 7 && currentScene <= 9)
+        else if (currentScene > 7 && currentScene <= 10)
         {
             if (!MusicPlayer.isPlaying)
-                MusicPlayer.PlayOneShot(BGMSewer, volMusic/10);
+                MusicPlayer.PlayOneShot(BGMGraveyard, volMusic/10);
         }
 
-        else if (currentScene > 9 && currentScene <= 11)
+        else if (currentScene > 10 && currentScene <= 13)
         {
             if (!MusicPlayer.isPlaying)
                 MusicPlayer.PlayOneShot(BGMCathedral, volMusic/10);
         }
+
+        else if (currentScene == 0)
+            if (!MusicPlayer.isPlaying)
+            MusicPlayer.PlayOneShot(BGMCathedral, volMusic / 10);
 
 
 

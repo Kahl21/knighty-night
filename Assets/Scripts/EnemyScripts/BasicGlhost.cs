@@ -181,6 +181,7 @@ public class BasicGlhost : BaseEnemy
                             ColoredBlock other = hit.collider.GetComponent<ColoredBlock>();
                             if (_myColor == other.GetColor)
                             {
+                                _speaker.Stop();
                                 _speaker.PlayOneShot(colorGhostCorrect, volSFX);
                                 _myCollider.enabled = false;
                                 other.CorrectMatch();

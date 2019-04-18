@@ -940,12 +940,13 @@ public class Menuing : MonoBehaviour {
         _loadScreen.color = transparentColor;
         asyncLoad.allowSceneActivation = true;
         isLoading = false;
+        //AudioManager.instance.RestartMusic();
     }
     
 
     IEnumerator FadeIn()
     {
-        
+        AudioManager.instance.RestartMusic();
         float time;
         if (!_paused)
             time = 0;
