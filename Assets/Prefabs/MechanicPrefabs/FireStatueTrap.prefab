@@ -176,10 +176,11 @@ MonoBehaviour:
   _fireDelay: 2
   _fireIncDuration: 0.5
   _burningDuration: 0.5
+  _startDelay: 0
   _debugDamageArea: 1
   _spaceBetweenRays: 0.5
   _maxDetectDistance: 4
-  _mySmoke: {fileID: 0}
+  _mySmoke: {fileID: 198819388087488688, guid: 9b9a65a7a61213348afee14887fc21ff, type: 2}
 --- !u!198 &198109688387283144
 ParticleSystem:
   m_ObjectHideFlags: 1
@@ -192,7 +193,7 @@ ParticleSystem:
   stopAction: 0
   looping: 1
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   useRigidbodyForVelocity: 1

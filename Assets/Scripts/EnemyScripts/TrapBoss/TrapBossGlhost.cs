@@ -95,6 +95,7 @@ public class TrapBossGlhost : BossEnemy
 
 
     [Header("Quad Fire Variables")]
+    List<GameObject> _quadFireTrapsInScene;
     [SerializeField]
     float _quadTrapDamage;
     float _realQuadTrapDamage;
@@ -116,8 +117,10 @@ public class TrapBossGlhost : BossEnemy
     bool _xAttack = false;
 
     [Header("Regular Fire Trap Variables")]
+    [SerializeField]
+    GameObject _regularFireTrapPrefab;
+    List<GameObject> _regularFireTrapsInScene;
 
-    
     float _startAttackTime;
     float _currAttackTime;
 
@@ -388,7 +391,20 @@ public class TrapBossGlhost : BossEnemy
             _cameraRef.AmFollowingPlayer = true;
             _calcAngle = _startAngle;
 
-            
+            _regularFireTrapsInScene = new List<GameObject>();
+            _quadFireTrapsInScene = new List<GameObject>();
+            for (int i = 0; i < _myRoom.GetCurrTrapList.Count; i++)
+            {
+                if (_myRoom.GetCurrTrapList[i].GetComponent<EmptyBossTrap>())
+                {
+                    _quadFireTrapsInScene.Add(_myRoom.GetCurrTrapList[i].gameObject);
+                    _myRoom.GetCurrTrapList[i].gameObject.GetComponent<MeshRenderer>().enabled = false;
+                    GameObject fireOBJ = Instantiate(_regularFireTrapPrefab, _myRoom.GetCurrTrapList[i].transform.position, _myRoom.GetCurrTrapList[i].transform.rotation);
+                    _regularFireTrapsInScene.Add(fireOBJ);
+                    //fireOBJ
+                    //StartRegularFire(_myRoom.GetCurrTrapList[i].transform.GetChild(0).GetComponent<BossFireStatueTrap>(), null);
+                }
+            }
         }
         _myAI = BossAI.FIGHTING;
         _init = true;
@@ -529,7 +545,7 @@ public class TrapBossGlhost : BossEnemy
             possessPosition.y = transform.position.y;
             transform.position = possessPosition;
         }
-        
+
 
         if (trapComplete)
         {
@@ -538,6 +554,23 @@ public class TrapBossGlhost : BossEnemy
             gameObject.GetComponent<CapsuleCollider>().enabled = true;
             _enemyAgent.SetDestination(transform.position);
             _MyAttack = TRAPSTRATS.FINDTRAP;
+
+            if (currentTrap.GetComponent<EmptyBossTrap>())
+            {
+                currentTrap.GetComponent<MeshRenderer>().enabled = true;
+                for (int index = 0; index < _regularFireTrapsInScene.Count; index++)
+                {
+                    if (_regularFireTrapsInScene[index].transform.position == currentTrap.transform.position)
+                    {
+                        _regularFireTrapsInScene[index].transform.rotation = currentTrap.transform.rotation;
+                        _regularFireTrapsInScene[index].GetComponent<FireStatueTrap>().Init();
+                        _regularFireTrapsInScene[index].GetComponent<MeshRenderer>().enabled = true;
+                    }
+                }
+                BossFireStatueTrap possessedTrap = currentTrap.GetComponent<Transform>().GetChild(0).GetComponent<BossFireStatueTrap>();
+
+                //StartRegularFire(possessedTrap, null);
+            }
         }
     }
 
@@ -618,6 +651,16 @@ public class TrapBossGlhost : BossEnemy
                     possessedTrap.GetXAttack = true;
                 }
 
+                currentTrap.GetComponent<MeshRenderer>().enabled = true;
+
+                for (int index = 0; index < _regularFireTrapsInScene.Count; index++)
+                {
+                    if (_regularFireTrapsInScene[index].transform.position == currentTrap.transform.position)
+                    {
+                        _regularFireTrapsInScene[index].GetComponent<FireStatueTrap>().DisableTrap();
+                        _regularFireTrapsInScene[index].GetComponent<MeshRenderer>().enabled = false;
+                    }
+                }
 
                 possessedTrap.GetBossEntity = this.gameObject;
                 possessedTrap.GetFireDelay = _realQuadFireStartDelay;
@@ -627,6 +670,7 @@ public class TrapBossGlhost : BossEnemy
                 possessedTrap.GetBurningDuration = _realQuadBurnDuration;
                 possessedTrap.GetFireDamage = _realQuadTrapDamage;
                 possessedTrap.SetRotateSpeed = _quadRotateSpeed;
+                possessedTrap.SetIntependantTrap = false;
                 possessedTrap.StartingDelay();
                 trapComplete = false;
             }
