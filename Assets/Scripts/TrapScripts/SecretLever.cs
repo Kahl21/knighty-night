@@ -7,6 +7,8 @@ public class SecretLever : MonoBehaviour
     [Header("Secret Door")]
     [SerializeField]
     GameObject _door;
+    [SerializeField]
+    GameObject _secretRoom;
 
     //lever variables
     [Header("Lever Variables")]
@@ -59,6 +61,7 @@ public class SecretLever : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
+        _secretRoom.SetActive(false);
         _lever = transform.GetChild(1).gameObject;
         _startPos.z = _startingRotation;
         _lever.transform.localEulerAngles = _startPos;
@@ -107,6 +110,7 @@ public class SecretLever : MonoBehaviour
         falling = true;
 
         _lever.transform.Rotate(transform.forward, _rotateSpeed * Time.deltaTime);
+        _secretRoom.SetActive(true);
 
         if (_currRotate >= 1)
         {
