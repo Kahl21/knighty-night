@@ -158,7 +158,6 @@ public class SpinBossGlhost : BossEnemy
         {
             if (_cameraRef.MoveCamera())
             {
-                _startAttackTime = Time.time;
 
                 _cameraInPosition = true;
 
@@ -177,15 +176,10 @@ public class SpinBossGlhost : BossEnemy
         {
             if (_myAnimations.IsInTransition(0))
             {
-                _currAttackTime = 1;
-
                 cam0 = _cameraRef.transform.position;
                 cam1 = _additionalPos1;
                 rot0 = _cameraRef.transform.localEulerAngles;
                 rot1 = _additionalRot1;
-
-                _currSpinningSpeed = 0;
-                _startAttackTime = Time.time;
 
                 _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
                 _animating = true;
@@ -197,15 +191,10 @@ public class SpinBossGlhost : BossEnemy
             {
                 if(_myAnimations.IsInTransition(0))
                 {
-                    _currAttackTime = 1;
-
                     cam0 = _cameraRef.transform.position;
                     cam1 = _ogCamPos;
                     rot0 = _cameraRef.transform.localEulerAngles;
                     rot1 = _ogCamRot;
-
-                    _currSpinningSpeed = 0;
-                    _startAttackTime = Time.time;
 
                     _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
                     _enemiesToCrush.SetActive(false);

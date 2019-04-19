@@ -55,22 +55,35 @@ public class CameraFollow : MonoBehaviour {
     public bool MoveCamera()
     {
         _currIntroTime = (Time.time - _startIntroTime) / _introDuration;
+        
+        Vector3 cam01;
 
-
-        if(_currIntroTime >= 1)
+        if (_currIntroTime >= 1)
         {
             _currIntroTime = 1;
+
+            cam01 = (1 - _currIntroTime) * cam0 + _currIntroTime * cam1;
+
+            transform.localEulerAngles = Vector3.Slerp(rot0, rot1, _currIntroTime);
+            transform.position = cam01;
             return true;
         }
 
-        Vector3 cam01;
-
         cam01 = (1 - _currIntroTime) * cam0 + _currIntroTime * cam1;
 
-        transform.localEulerAngles = Vector3.Slerp(rot0, rot1, _currIntroTime);
+        transform.localEulerAngles = AngleLerp(rot0, rot1, _currIntroTime);
         transform.position = cam01;
 
         return false;
+    }
+
+    Vector3 AngleLerp(Vector3 StartAngle, Vector3 FinishAngle, float t)
+    {
+        float xLerp = Mathf.LerpAngle(StartAngle.x, FinishAngle.x, t);
+        float yLerp = Mathf.LerpAngle(StartAngle.y, FinishAngle.y, t);
+        float zLerp = Mathf.LerpAngle(StartAngle.z, FinishAngle.z, t);
+        Vector3 Lerped = new Vector3(xLerp, yLerp, zLerp);
+        return Lerped;
     }
 
     public Vector3 GetOffset { get { return _offset; } }
