@@ -1577,6 +1577,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1936194078676484
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4866663491568900}
+  - component: {fileID: 20252038822922744}
+  - component: {fileID: 81844549424841616}
+  m_Layer: 0
+  m_Name: BossCamera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1964594406474530
 GameObject:
   m_ObjectHideFlags: 1
@@ -2418,14 +2435,15 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1698123324289944}
-  m_LocalRotation: {x: 0.00084155117, y: 0.9984779, z: 0.015913663, w: -0.052801806}
-  m_LocalPosition: {x: 35.616554, y: 42.16971, z: 13.1581135}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: -30.1, y: 0.84, z: 82.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4941178121117412}
   - {fileID: 4179591142218702}
   - {fileID: 4260884366652482}
   - {fileID: 4088933327484792}
+  - {fileID: 4866663491568900}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
@@ -2921,6 +2939,19 @@ Transform:
   m_Father: {fileID: 4191348039481624}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4866663491568900
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1936194078676484}
+  m_LocalRotation: {x: 0, y: 0.9961947, z: -0.08715578, w: 0}
+  m_LocalPosition: {x: -0.04, y: 1.57, z: 4.37}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4425021250217544}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 10, y: 180, z: 0}
 --- !u!4 &4871220082261762
 Transform:
   m_ObjectHideFlags: 1
@@ -3063,7 +3094,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1640484604646932}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 664}
+  m_LocalPosition: {x: 2.87, y: 0, z: 12.82}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4425021250217544}
@@ -3178,6 +3209,53 @@ Transform:
   m_Father: {fileID: 4521070238037110}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!20 &20252038822922744
+Camera:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1936194078676484}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_projectionMatrixMode: 1
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_FocalLength: 50
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 1000
+  field of view: 60
+  orthographic: 0
+  orthographic size: 5
+  m_Depth: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
+--- !u!81 &81844549424841616
+AudioListener:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1936194078676484}
+  m_Enabled: 0
 --- !u!82 &82241664153886224
 AudioSource:
   m_ObjectHideFlags: 1
@@ -3282,7 +3360,7 @@ Animator:
   m_GameObject: {fileID: 1698123324289944}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: becedf009f273bd43a374427292aa11b, type: 3}
-  m_Controller: {fileID: 9100000, guid: 5359880ed6be3409ebc96f4fa807907e, type: 2}
+  m_Controller: {fileID: 9100000, guid: 30b97cc647f73eb42b7b8305e4a8e5b2, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -3343,6 +3421,7 @@ MonoBehaviour:
   _bossSubTitle: Defender of Spin
   _healthLagDuration: 1
   _healthUpdateDuration: 1
+  _bossCamera: {fileID: 20252038822922744}
   _playerIntroPos: {fileID: 1640484604646932}
   _cameraIntroDuration: 1.4
   _deathDuration: 3
@@ -3353,8 +3432,6 @@ MonoBehaviour:
   _InvincibleDuration: 1
   _maxHardBossHealth: 20
   _bossHardDefaultSpeed: 2.5
-  _revUpDuration: 1.5
-  _spinDuration: 2.55
   _timeBetweenAttacks: 1.5
   _stunnedDuration: 0.5
   _vertDetectOffset: 0.4

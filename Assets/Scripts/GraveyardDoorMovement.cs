@@ -26,6 +26,7 @@ public class GraveyardDoorMovement : DoorMovement
         rightDoor.transform.parent = null;
         _rightRot = rightDoor.transform.localEulerAngles;
         _rightRot.y -= _rotationAmount;
+        _speaker = this.transform.GetComponent<AudioSource>();
     }
 
     public override void Init()
@@ -55,6 +56,8 @@ public class GraveyardDoorMovement : DoorMovement
     { 
         if(leftDoor.transform.localEulerAngles.y <= _leftGoTo.y)
         {
+            if (!_speaker.isPlaying)
+                _speaker.PlayOneShot(gateClose);
             leftDoor.transform.Rotate(Vector3.up * _doorSpeed);
             rightDoor.transform.Rotate(Vector3.down * _doorSpeed);
         }
@@ -70,6 +73,8 @@ public class GraveyardDoorMovement : DoorMovement
 
         if (leftDoor.transform.localEulerAngles.y >= _leftRot.y)
         {
+            if (!_speaker.isPlaying)
+                _speaker.PlayOneShot(gateOpen);
             leftDoor.transform.Rotate(Vector3.down * _doorSpeed);
             rightDoor.transform.Rotate(Vector3.up * _doorSpeed);
         }

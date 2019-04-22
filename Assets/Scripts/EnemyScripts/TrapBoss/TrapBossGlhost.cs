@@ -19,12 +19,27 @@ public class TrapBossGlhost : BossEnemy
         QUADFIRE,
         WAITING
     }
-    
+
+    [Header("Trap Boss Intro Variables")]
+    [SerializeField]
+    Camera _additionalCam1;
+    [SerializeField]
+    Camera _additionalCam2, _additionalCam3;
+    Vector3 _additionalPos1, _additionalRot1, _additionalPos2, _additionalRot2, _additionalPos3, _additionalRot3;
+    [SerializeField]
+    GameObject _introTrap;
+    Animator _trapAnimations;
+    bool _cameraInPosition = false;
+    bool _animating = false;
+    bool _animatingSecond = false;
+    bool _trapAnimating = false;
+    bool _animatingThird = false;
+    bool _animatingFourth = false;
 
     [Header("Trap Boss Variables")]
-    //[SerializeField]
-    //float _timeBetweenAttacks;
-    //float _realTimeBetweenAttacks;
+    [SerializeField]
+    float _offsetTrapJumpInDistance;
+    bool _enteringTrap = false;
     [SerializeField]
     float _vertDetectOffset;
     [SerializeField]
@@ -111,8 +126,6 @@ public class TrapBossGlhost : BossEnemy
     [SerializeField]
     float _quadBurnDuration;
     float _realQuadBurnDuration;
-    [SerializeField]
-    float _quadRotateSpeed;
     bool _xAttack = false;
 
     
@@ -173,133 +186,144 @@ public class TrapBossGlhost : BossEnemy
     //[SerializeField]
     //float _hardFollowDuration;
 
-
-    Vector3 _ogCamPos;
-    bool _cameraInPosition;
-
     TRAPSTRATS _MyAttack = TRAPSTRATS.FINDTRAP;
 
     //intro cutscene function
-    
+
+    protected override void Awake()
+    {
+        base.Awake();
+        _additionalCam1.transform.parent = null;
+        _additionalPos1 = _additionalCam1.transform.position;
+        _additionalRot1 = _additionalCam1.transform.localEulerAngles;
+        _additionalCam1.gameObject.SetActive(false);
+
+        _additionalCam2.transform.parent = null;
+        _additionalPos2 = _additionalCam2.transform.position;
+        _additionalRot2 = _additionalCam2.transform.localEulerAngles;
+        _additionalCam2.gameObject.SetActive(false);
+
+        _additionalCam3.transform.parent = null;
+        _additionalPos3 = _additionalCam3.transform.position;
+        _additionalRot3 = _additionalCam3.transform.localEulerAngles;
+        _additionalCam3.gameObject.SetActive(false);
+    }
+
     protected override void PlayIntro()
     {
-        /*
         if (!_cameraInPosition)
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            if (_currAttackTime >= 1)
+            if (_cameraRef.MoveCamera())
             {
-                _currAttackTime = 1;
-                if (!_glhostsCrushed)
-                {
-                    for (int i = 0; i < _GlhostsUnderMe.Count; i++)
-                    {
-                        _GlhostsUnderMe[i].Init();
-                    }
-                    _glhostsCrushed = true;
-                }
-            }
+                _cameraInPosition = true;
 
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
-        }
-        else if (!_fallFinished)
-        {
-            _currAttackTime = (Time.time - _startAttackTime) / _introFallAndStopDuration;
-
-            if (_currAttackTime >= 1)
-            {
-                _currAttackTime = 1;
-
-                if (_enemiesToCrush.activeInHierarchy)
-                {
-                    for (int i = 0; i < _GlhostsUnderMe.Count; i++)
-                    {
-                        _GlhostsUnderMe[i].ParentYouself();
-                    }
-                    _enemiesToCrush.SetActive(false);
-                }
-
-                _startAttackTime = Time.time;
-                _fallFinished = true;
-            }
-
-            Vector3 fall = Vector3.down * Time.deltaTime * _introFallSpeed;
-            if (Physics.Raycast(transform.position, fall, _downCheckDistance))
-            {
-
-                fall = Vector3.zero;
-            }
-
-            transform.position += fall;
-        }
-        else if (!_turnToPlayerFinished)
-        {
-            _currAttackTime = (Time.time - _startAttackTime) / _introTurnAroundDuration;
-
-            transform.Rotate(Vector3.up, _introTurnAroundSpeed);
-
-            if (_currAttackTime >= 1)
-            {
-                _currAttackTime = 1;
+                _myAnimations.Play("BigIntro1", 0);
 
                 cam0 = _cameraRef.transform.position;
-                cam1 = _ogCamPos;
-
-                _startAttackTime = Time.time;
-                transform.LookAt(_playerRef.transform.position);
-                _turnToPlayerFinished = true;
+                cam1 = _additionalPos1;
+                rot0 = _cameraRef.transform.localEulerAngles;
+                rot1 = _additionalRot1;
+                
+                _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+                //Debug.Log("Part1 Done");
             }
 
+        }
+        else if (!_animating)
+        {
+            if(_cameraRef.MoveCamera())
+            {
+                if (_myAnimations.IsInTransition(0))
+                {
+                    cam0 = _cameraRef.transform.position;
+                    cam1 = _additionalPos1;
+                    rot0 = _cameraRef.transform.localEulerAngles;
+                    rot1 = _additionalRot1;
+                    _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+                    _animating = true;
 
+                    //Debug.Log("Part2 Done");
+                }
+            }
+        }
+        else if (!_animatingSecond)
+        {
+            if (_cameraRef.MoveCamera())
+            {
+                if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime>.95f)
+                {
+                    cam0 = _cameraRef.transform.position;
+                    cam1 = _additionalPos2;
+                    rot0 = _cameraRef.transform.localEulerAngles;
+                    rot1 = _additionalRot2;
+
+                    _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+                    _trapAnimations.Play("SpikeActivate");
+                    _animatingSecond = true;
+
+                    //Debug.Log("Part3 Done");
+                }
+            }
+            
+        }
+        else if(!_trapAnimating)
+        {
+            if (_cameraRef.MoveCamera())
+            {
+                if (_trapAnimations.IsInTransition(0))
+                {
+
+                    _myAnimations.Play("BigIntro3", 0);
+                    _trapAnimating = true;
+
+                    //Debug.Log("Part4 Done");
+                }
+            }
+        }
+        else if (!_animatingThird)
+        {
+            if (_myAnimations.IsInTransition(0))
+            {
+                cam0 = _cameraRef.transform.position;
+                cam1 = _additionalPos3;
+                rot0 = _cameraRef.transform.localEulerAngles;
+                rot1 = _additionalRot3;
+
+                _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+                _animatingThird = true;
+
+                //Debug.Log("Part5 Done");
+            }
+        }
+        else if (!_animatingFourth)
+        {
+            if (_cameraRef.MoveCamera())
+            {
+                if (_myAnimations.IsInTransition(0))
+                {
+                    cam0 = _cameraRef.transform.position;
+                    cam1 = _ogCamPos;
+                    rot0 = _cameraRef.transform.localEulerAngles;
+                    rot1 = _ogCamRot;
+
+                    _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+                    _animatingFourth = true;
+
+                    //Debug.Log("Part6 Done");
+                }
+            }
         }
         else
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
-
-            if (_currAttackTime >= 1)
+            if (_cameraRef.MoveCamera())
             {
-                _currAttackTime = 1;
                 _startAttackTime = Time.time;
                 _playerRef.AmInCutscene = false;
                 StartFight();
             }
         }
-        */
-        _playerRef.AmInCutscene = false;
-        _cameraInPosition = true;
-        StartFight();
         
     }
-
-    /*
-    //called when any other objects for the cutscene are done with their intros
-    public override void CheckForIntroEnd()
-    {
-        for (int i = 0; i < _GlhostsUnderMe.Count; i++)
-        {
-            if (!_GlhostsUnderMe[i].AmDone)
-            {
-                //Debug.Log("returned");
-                return;
-            }
-        }
-
-        //Debug.Log("falling started");
-        _startAttackTime = Time.time;
-        _cameraInPosition = true;
-    }
-    */
 
     //called for Init, after the cutscene
     public override void Init()
@@ -354,18 +378,28 @@ public class TrapBossGlhost : BossEnemy
             }
         }
 
+        _introTrap.transform.parent = null;
+        _trapAnimations = _introTrap.GetComponent<Animator>();
+
         _DartXMin = (_myRoom.transform.position.x - (_myRoom.transform.localScale.x * 4.5f));
         _DartZMin = (_myRoom.transform.position.z - (_myRoom.transform.localScale.z * 4.5f));
         _DartXMax = (_myRoom.transform.position.x + (_myRoom.transform.localScale.x * 4.5f));
         _DartZMax = (_myRoom.transform.position.z + (_myRoom.transform.localScale.z * 4.5f));
 
         //_ogCamPos = _cameraRef.transform.position;
+        _ogCamPos = _cameraRef.transform.position;
+        _ogCamRot = _cameraRef.transform.localEulerAngles;
         cam0 = _cameraRef.transform.position;
-        cam1 = transform.position + _camOffset;
-        cam1.y = _cameraRef.transform.position.y;
+        cam1 = _bossCameraPos;
+        rot0 = _cameraRef.transform.localEulerAngles;
+        rot1 = _bossCameraRot;
         _cameraRef.AmFollowingPlayer = false;
 
+        _speaker = this.transform.GetComponent<AudioSource>();
+
         _totalPercentageFireTrap = _realQuadFirePercentage + _realXAttackPercentage;
+
+        _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
 
         _startAttackTime = Time.time;
         _myAI = BossAI.INTRO;
@@ -377,7 +411,7 @@ public class TrapBossGlhost : BossEnemy
     {
         if (!_init)
         {
-            Debug.Log("start Fight");
+            //Debug.Log("start Fight");
             _bossBar.SetActive(true);
             _laggedBossHealthBar.fillAmount = 1;
             _actualBossHealthBar.fillAmount = 1;
@@ -456,7 +490,7 @@ public class TrapBossGlhost : BossEnemy
     private void WhatDoNext()
     {
         float _nextAttack = Random.Range(0, _totalPercentageFireTrap);
-        Debug.Log("Next attack: " + _nextAttack);
+        //Debug.Log("Next attack: " + _nextAttack);
 
         if(currentTrap.GetComponent<SpikeTrap>())
         {
@@ -470,12 +504,12 @@ public class TrapBossGlhost : BossEnemy
         {
             if (_nextAttack > 0 && _nextAttack <= _realQuadFirePercentage)
             {
-                Debug.Log("Quad Fire");
+                //Debug.Log("Quad Fire");
                 _MyAttack = TRAPSTRATS.QUADFIRE;
             }
             else
             {
-                Debug.Log("XATTACK");
+                //Debug.Log("XATTACK");
                 _MyAttack = TRAPSTRATS.XATTACK;
             }
         }
@@ -488,28 +522,41 @@ public class TrapBossGlhost : BossEnemy
     {
         if (_enemyAgent.hasPath == false)
         {
-            Debug.Log("findTrap");
+            
+            //Debug.Log("findTrap");
             fcurrentTrap = Random.Range(0, _myRoom.GetCurrTrapList.Count);
             GameObject newTrap = _myRoom.GetCurrTrapList[fcurrentTrap].gameObject;
-            Debug.Log("1N = " + newTrap.name);
-            
-           
+            //Debug.Log("1N = " + newTrap.name);
+
+
             if (newTrap == currentTrap)
             {
                 return;
             }
             else
             {
-                currentTrap = newTrap;
-                Debug.Log("2N = " + newTrap.name);
-                Debug.Log("C = " + currentTrap.name);
-                _enemyAgent.SetDestination(currentTrap.transform.position);
+                if (_myAnimations.IsInTransition(0))
+                {
+                    currentTrap = newTrap;
+                    _enteringTrap = true;
+                    // Debug.Log("2N = " + newTrap.name);
+                    //Debug.Log("C = " + currentTrap.name);
+                    Vector3 _trapPos = currentTrap.transform.position;
+                    _trapPos.y = transform.position.y;
+                    transform.LookAt(_trapPos);
+                    _enemyAgent.SetDestination(currentTrap.transform.position - (transform.forward * _offsetTrapJumpInDistance));
+                }
+                else
+                {
+                    return;
+                }
             }
+
             
+            //Debug.DrawRay(transform.position + Vector3.up, this.transform.forward);
+
+            WhatDoNext();
         }
-        //Debug.DrawRay(transform.position + Vector3.up, this.transform.forward);
-        
-        WhatDoNext();
     }
 
     //Attack
@@ -529,6 +576,7 @@ public class TrapBossGlhost : BossEnemy
             _xAttack = false;
             _mySkinRenderer.enabled = true;
             gameObject.GetComponent<CapsuleCollider>().enabled = true;
+            _myAnimations.Play("Rise", 0);
             _enemyAgent.SetDestination(transform.position);
             _MyAttack = TRAPSTRATS.FINDTRAP;
         }
@@ -566,14 +614,21 @@ public class TrapBossGlhost : BossEnemy
     {
         if (_enemyAgent.hasPath == false)
         {
-            BossSpikeTrap possessedTrap = currentTrap.GetComponent<BossSpikeTrap>();
+            if(_enteringTrap)
+            {
+                _myAnimations.Play("Dive", 0);
+                _enteringTrap = false;
+            }
+            else if(_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .95f)
+            {
+                BossSpikeTrap possessedTrap = currentTrap.GetComponent<BossSpikeTrap>();
 
-            possessedTrap.BecomePossessed(this, _realSpikePossessTime, _realSpikeAttackSpeed, _realSpikeAttackDelay, _realSpikeRetreatSpeed, _realSpikeFollowSpeed);
+                possessedTrap.BecomePossessed(this, _realSpikePossessTime, _realSpikeAttackSpeed, _realSpikeAttackDelay, _realSpikeRetreatSpeed, _realSpikeFollowSpeed);
 
-            trapComplete = false;
+                trapComplete = false;
 
-            _MyAttack = TRAPSTRATS.INSIDETRAP;
-
+                _MyAttack = TRAPSTRATS.INSIDETRAP;
+            }
         }
 
     }
@@ -582,14 +637,21 @@ public class TrapBossGlhost : BossEnemy
     {
         if (_enemyAgent.hasPath == false)
         {
+            if (_enteringTrap)
+            {
+                _myAnimations.Play("Dive", 0);
+                _enteringTrap = false;
+            }
+            else if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .95f)
+            {
+                DartTrap possessedTrap = currentTrap.GetComponent<DartTrap>();
 
-            DartTrap possessedTrap = currentTrap.GetComponent<DartTrap>();
+                possessedTrap.BecomePossessed(this, _realDartPossessTime, _realDartFireDelay, _realDartSpawnDelay, _realDartShooterMoveSpeed, _DartXMin, _DartXMax, _DartZMin, _DartZMax);
 
-            possessedTrap.BecomePossessed(this, _realDartPossessTime, _realDartFireDelay, _realDartSpawnDelay, _realDartShooterMoveSpeed, _DartXMin, _DartXMax, _DartZMin, _DartZMax);
+                trapComplete = false;
 
-            trapComplete = false;
-
-            _MyAttack = TRAPSTRATS.INSIDETRAP;
+                _MyAttack = TRAPSTRATS.INSIDETRAP;
+            }
         }
             
     }
@@ -599,32 +661,39 @@ public class TrapBossGlhost : BossEnemy
     {
         if (_enemyAgent.hasPath == false)
         {
-            //Moves all the variables from the boss to each fire trap gameobject
-            for (int z = 0; z < 4; z++)
+            if (_enteringTrap)
             {
-
-                BossFireStatueTrap possessedTrap = currentTrap.GetComponent<Transform>().GetChild(z).GetComponent<BossFireStatueTrap>();
-
-                if (_xAttack)
+                _myAnimations.Play("Dive", 0);
+                _enteringTrap = false;
+            }
+            else if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .95f)
+            {
+                //Moves all the variables from the boss to each fire trap gameobject
+                for (int z = 0; z < 4; z++)
                 {
-                    possessedTrap.transform.eulerAngles += new Vector3(0, 45f, 0);
-                    possessedTrap.GetXAttack = true;
+
+                    BossFireStatueTrap possessedTrap = currentTrap.GetComponent<Transform>().GetChild(z).GetComponent<BossFireStatueTrap>();
+
+                    if (_xAttack)
+                    {
+                        possessedTrap.transform.eulerAngles += new Vector3(0, 45f, 0);
+                        possessedTrap.GetXAttack = true;
+                    }
+
+
+                    possessedTrap.GetBossEntity = this.gameObject;
+                    possessedTrap.GetFireDelay = _realQuadFireStartDelay;
+                    possessedTrap.GetFireDistance = _realQuadShootDist;
+                    possessedTrap.GetMaxDetectDistance = _realQuadDetectDist;
+                    possessedTrap.GetStartDelay = _quadStartDelay;
+                    possessedTrap.GetBurningDuration = _realQuadBurnDuration;
+                    possessedTrap.GetFireDamage = _realQuadTrapDamage;
+                    possessedTrap.StartingDelay();
+                    trapComplete = false;
                 }
 
-
-                possessedTrap.GetBossEntity = this.gameObject;
-                possessedTrap.GetFireDelay = _realQuadFireStartDelay;
-                possessedTrap.GetFireDistance = _realQuadShootDist;
-                possessedTrap.GetMaxDetectDistance = _realQuadDetectDist;
-                possessedTrap.GetStartDelay = _quadStartDelay;
-                possessedTrap.GetBurningDuration = _realQuadBurnDuration;
-                possessedTrap.GetFireDamage = _realQuadTrapDamage;
-                possessedTrap.SetRotateSpeed = _quadRotateSpeed;
-                possessedTrap.StartingDelay();
-                trapComplete = false;
+                _MyAttack = TRAPSTRATS.INSIDETRAP;
             }
-
-            _MyAttack = TRAPSTRATS.INSIDETRAP;
         }
     }
 
@@ -654,14 +723,17 @@ public class TrapBossGlhost : BossEnemy
         _myRoom.CheckForEnd();
 
         _enemyAgent.enabled = false;
+        _enteringTrap = false;
 
         _playerRef.GoingToOutroCutscene();
 
-        _ogCamPos = _cameraRef.transform.position;
         cam0 = _cameraRef.transform.position;
-        cam1 = transform.position + _camOffset;
-        cam1.y = _cameraRef.transform.position.y;
+        cam1 = _bossCameraPos;
+        rot0 = _cameraRef.transform.localEulerAngles;
+        rot1 = _bossCameraRot;
         _cameraRef.AmFollowingPlayer = false;
+
+        _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
 
 
         _startAttackTime = Time.time;
@@ -676,34 +748,27 @@ public class TrapBossGlhost : BossEnemy
     {
         if (!_cameraInPosition)
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            if (_currAttackTime >= 1)
+            if (_cameraRef.MoveCamera())
             {
-                _currAttackTime = 1;
-
-                _startAttackTime = Time.time;
-                _cameraInPosition = true;
+                if(_myAnimations.IsInTransition(0))
+                {
+                    _cameraInPosition = true;
+                }
             }
 
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
         }
         else if (!_showingDeath)
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _deathDuration;
             //Debug.Log("showing death");
-
-
-            if (_currAttackTime > 1)
+            
+            if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .98f)
             {
-                _currAttackTime = 1;
-
                 cam0 = _cameraRef.transform.position;
                 cam1 = _ogCamPos;
+                rot0 = _cameraRef.transform.localEulerAngles;
+                rot1 = _ogCamRot;
+
+                _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
 
                 _mySkinRenderer.enabled = false;
 
@@ -711,23 +776,16 @@ public class TrapBossGlhost : BossEnemy
                 _showingDeath = true;
             }
 
-            _myColor.a = 1 - _currAttackTime;
+            _myColor.a = 1 - _myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime;
             _myMaterial.color = _myColor;
             _mySkinRenderer.materials[1] = _myMaterial;
             _mySkinRenderer.materials[0] = _myMaterial;
         }
         else
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
             //Debug.Log("putting camera back");
 
-            if (_currAttackTime >= 1)
+            if (_cameraRef.MoveCamera())
             {
                 //Debug.Log("camera put back");
                 _currAttackTime = 1;
@@ -758,22 +816,20 @@ public class TrapBossGlhost : BossEnemy
             //Debug.Log("Boss Reset");
             transform.position = _startPos;
             transform.rotation = _startRot;
-            /*
-            _enemiesToCrush.SetActive(true);
-            for (int i = 0; i < _GlhostsUnderMe.Count; i++)
-            {
-                _GlhostsUnderMe[i].ResetCutscene();
-            }
-            */
             _currBossHealth = _actualMaxHealth;
             _laggedBossHealthBar.fillAmount = 1;
             _actualBossHealthBar.fillAmount = 1;
 
-            _bossBar.SetActive(false);
+
             _cameraInPosition = false;
-            //_fallFinished = false;
-            //_turnToPlayerFinished = false;
-            //_glhostsCrushed = false;
+            _animating = false;
+            _animatingSecond = false;
+            _trapAnimating = false;
+            _animatingThird = false;
+            _animatingFourth = false;
+            _myAnimations.Play("Idle", 0);
+
+            _bossBar.SetActive(false);
 
             _endingPlaying = false;
             _laggingHealth = false;

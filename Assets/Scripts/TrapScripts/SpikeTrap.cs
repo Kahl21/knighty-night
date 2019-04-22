@@ -49,6 +49,9 @@ public class SpikeTrap : BaseTrap {
 
     protected SpikeState myState = SpikeState.NONE;
 
+    [SerializeField]
+    protected AudioClip spikeNoise;
+
     //Init function
     public override void Init()
     {
@@ -59,6 +62,8 @@ public class SpikeTrap : BaseTrap {
         
         _topLeftCorner = _scanStartPos + ((Vector3.forward + Vector3.left) * BoxRadius);
         _bottomRightCorner = _scanStartPos + ((Vector3.back + Vector3.right) * BoxRadius);
+
+        _speaker = this.transform.GetComponent<AudioSource>();
     }
 
     protected virtual void Update()
@@ -146,6 +151,9 @@ public class SpikeTrap : BaseTrap {
     //damages the player if they are on top of the plates
     protected virtual void Attack()
     {
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(spikeNoise);
+
         if (_spikes.transform.localPosition.y <= _currBound.y)
         {
             _spikes.transform.localPosition += Vector3.up * _attackSpeed * Time.deltaTime;
