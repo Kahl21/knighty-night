@@ -235,6 +235,7 @@ public class MiniBossColor : BossEnemy
                 StartFight();
             }
         }
+        AudioManager.instance.BossStart();
     }
 
     //called when any other objects for the cutscene are done with their intros
@@ -662,7 +663,7 @@ public class MiniBossColor : BossEnemy
     //called once the boss is defeated
     protected override void Die()
     {
-
+        AudioManager.instance.BossStop();
         _speaker.Stop();
         _speaker.PlayOneShot(bossDeath, volSFX);
 

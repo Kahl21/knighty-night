@@ -182,7 +182,7 @@ public class BasicGlhost : BaseEnemy
                             if (_myColor == other.GetColor)
                             {
                                 _speaker.Stop();
-                                _speaker.PlayOneShot(colorGhostCorrect, volSFX);
+                                AudioManager.instance.GhostColorCorrect();
                                 _myCollider.enabled = false;
                                 other.CorrectMatch();
                                 _mySpawner.RemoveMe(this);

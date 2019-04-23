@@ -107,6 +107,8 @@ public class DartTrap : BaseTrap {
 
         if (_currDelay >= 1)
         {
+            
+
             _currDelay = 1;
 
             _currDart = Instantiate<GameObject>(_dartsPrefab, _spawnPos, _spawnRot, this.transform);
@@ -120,11 +122,11 @@ public class DartTrap : BaseTrap {
     {
         _currDelay = (Time.time - _startDelay) / _realFireDelay;
 
-        if (!_speaker.isPlaying)
-            _speaker.PlayOneShot(ArrowNoise);
 
         if (_currDelay >= 1)
         {
+            if (!_speaker.isPlaying)
+                _speaker.PlayOneShot(ArrowNoise);
             _currDelay = 1;
 
             _currDart.GetComponent<DartMovement>().Init(_trapDamage);

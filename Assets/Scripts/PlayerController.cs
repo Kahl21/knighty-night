@@ -869,7 +869,7 @@ public class PlayerController : MonoBehaviour
     //damages the player
     public void TakeDamage(float _damageTaken)
     {
-        if (!_invincible)
+        if (!_invincible && !_inCutscene)
         {
             AudioManager.instance.PlayerDamaged();
             _invincible = true;
