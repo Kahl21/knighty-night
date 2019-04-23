@@ -56,6 +56,8 @@ public class GraveyardGlhost : BasicGlhost {
             _particle.SetActive(false);
             _invStartTime = Time.time;
         }
+
+        AudioManager.instance.ChaseStart();
     }
     
     protected override void Update()
@@ -121,6 +123,7 @@ public class GraveyardGlhost : BasicGlhost {
 
         if(!_invincible)
         {
+            AudioManager.instance.ChaseStop();
             Color _inBetweenColor;
 
             _inBetweenColor = _invCurrTime * _invincibleColor + (1 - _invCurrTime) * _startingColor;

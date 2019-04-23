@@ -439,6 +439,10 @@ public class DungeonMechanic : MonoBehaviour {
     //ends the room
     public void EndAll()
     {
+        if(_roomMechanic == Mechanic.CHASE)
+        AudioManager.instance.ChaseStop();
+        if(_roomMechanic == Mechanic.BOSS)
+        AudioManager.instance.BossStop();
         _roomStarted = false;                                           //stop room working
         _spawning = false;                                              //stop room spawning
 

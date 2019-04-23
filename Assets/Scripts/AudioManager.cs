@@ -27,6 +27,9 @@ public class AudioManager : MonoBehaviour {
     [SerializeField]
     AudioClip PlayerDamageClip;
 
+    [SerializeField]
+    AudioClip PlayerDead;
+
 
     //Sewer SFX
     [Header("Sewer SFX")]
@@ -42,6 +45,9 @@ public class AudioManager : MonoBehaviour {
 
     [SerializeField]
     AudioClip ButtonPressedClip;
+
+    [SerializeField]
+    AudioClip ButtonMovedClip;
 
 
     //Ghost SFX
@@ -63,6 +69,12 @@ public class AudioManager : MonoBehaviour {
     AudioClip BGMGraveyard;
     [SerializeField]
     AudioClip BGMCathedral;
+    [SerializeField]
+    AudioClip BGMMenu;
+    [SerializeField]
+    AudioClip BGMBoss;
+    [SerializeField]
+    AudioClip BGMChase;
 
     //master volume value
     public float volMaster = 10;
@@ -77,6 +89,9 @@ public class AudioManager : MonoBehaviour {
     //SFXPlayer.PlayOneShot(clip, volume);
     //Put This In code To Make Noise
     //AudioManager.instance.Swing();
+
+    bool boss;
+    bool chase;
 
     public static AudioManager instance = null;
 
@@ -162,6 +177,11 @@ public class AudioManager : MonoBehaviour {
     {
             SFXPlayer.PlayOneShot(PlayerDamageClip, volSFX);
     }
+
+    public virtual void PlayerDied()
+    {
+        SFXPlayer.PlayOneShot(PlayerDead, volSFX);
+    }
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -196,6 +216,12 @@ public class AudioManager : MonoBehaviour {
         SFXPlayer.PlayOneShot(ButtonPressedClip, volSFX);
     }
 
+    public virtual void ButtonMoving()
+    {
+        SFXPlayer.PlayOneShot(ButtonMovedClip, volSFX);
+    }
+
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -204,33 +230,49 @@ public class AudioManager : MonoBehaviour {
     {
         int currentScene = SceneManager.GetActiveScene().buildIndex;
 
-        if(currentScene >0 && currentScene <=4)
+        if (!boss && !chase)
         {
-            if (!MusicPlayer.isPlaying)
-                MusicPlayer.PlayOneShot(BGMDungeon, volMusic/10);
+
+            if (currentScene > 0 && currentScene <= 4)
+            {
+                if (!MusicPlayer.isPlaying)
+                    MusicPlayer.PlayOneShot(BGMDungeon, volMusic / 10);
+            }
+
+            else if (currentScene > 4 && currentScene <= 7)
+            {
+                if (!MusicPlayer.isPlaying)
+                    MusicPlayer.PlayOneShot(BGMSewer, volMusic / 10);
+            }
+
+            else if (currentScene > 7 && currentScene <= 10)
+            {
+                if (!MusicPlayer.isPlaying)
+                    MusicPlayer.PlayOneShot(BGMGraveyard, volMusic / 10);
+            }
+
+            else if (currentScene > 10 && currentScene <= 13)
+            {
+                if (!MusicPlayer.isPlaying)
+                    MusicPlayer.PlayOneShot(BGMCathedral, volMusic / 10);
+            }
+
+            else if (currentScene == 0)
+                if (!MusicPlayer.isPlaying)
+                    MusicPlayer.PlayOneShot(BGMMenu, volMusic / 10);
         }
 
-        else if (currentScene > 4 && currentScene <=7)
+        else if(boss && !chase)
         {
             if (!MusicPlayer.isPlaying)
-                MusicPlayer.PlayOneShot(BGMSewer, volMusic/10);
+                MusicPlayer.PlayOneShot(BGMBoss, volMusic / 10);
         }
 
-        else if (currentScene > 7 && currentScene <= 10)
+        else if(!boss && chase)
         {
             if (!MusicPlayer.isPlaying)
-                MusicPlayer.PlayOneShot(BGMGraveyard, volMusic/10);
+                MusicPlayer.PlayOneShot(BGMChase, volMusic / 10);
         }
-
-        else if (currentScene > 10 && currentScene <= 13)
-        {
-            if (!MusicPlayer.isPlaying)
-                MusicPlayer.PlayOneShot(BGMCathedral, volMusic/10);
-        }
-
-        else if (currentScene == 0)
-            if (!MusicPlayer.isPlaying)
-            MusicPlayer.PlayOneShot(BGMCathedral, volMusic / 10);
 
 
 
@@ -242,4 +284,10 @@ public class AudioManager : MonoBehaviour {
         if(volMusic>0)
             ChooseMusic();
     }
+
+
+    public virtual void ChaseStart() { chase = true; RestartMusic(); }
+    public virtual void ChaseStop() { chase = false; RestartMusic(); }
+    public virtual void BossStart() { boss = true; RestartMusic(); }
+    public virtual void BossStop() { boss = false; RestartMusic(); }
 }

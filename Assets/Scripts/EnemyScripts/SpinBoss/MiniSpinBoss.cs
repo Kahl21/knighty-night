@@ -121,6 +121,7 @@ public class MiniSpinBoss : BossEnemy
 
     protected override void PlayIntro()
     {
+        AudioManager.instance.BossStart();
         if(!_cameraInPosition)
         {
             _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
@@ -558,6 +559,7 @@ public class MiniSpinBoss : BossEnemy
 
     protected override void Die()
     {
+        AudioManager.instance.BossStop();
         _speaker.PlayOneShot(bossDeath, volSFX);
 
         _myRoom.CheckForEnd();

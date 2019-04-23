@@ -162,6 +162,8 @@ public class BossEnemy : MonoBehaviour {
         volSFX = _audioManager.volSFX;
 
         _hasInit = true;
+
+        AudioManager.instance.BossStart();
     }
 
     //called after the beginning cutscene is called to actually start the fight
@@ -260,7 +262,7 @@ public class BossEnemy : MonoBehaviour {
     //Function that tells that boss that it is dead and should start to play the ending cutscene
     protected virtual void Die()
     {
-
+        AudioManager.instance.BossStop();
     }
 
     //called whe the boss dies and the ending cutscene starts to play

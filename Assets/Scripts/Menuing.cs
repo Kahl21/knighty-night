@@ -474,6 +474,7 @@ public class Menuing : MonoBehaviour {
         //Debug.Log(_positiveMovement);
         if(_canMenu)
         {
+            AudioManager.instance.ButtonMoving();
             _canMenu = false;
             if (_positiveMovement)
             {
@@ -908,7 +909,9 @@ public class Menuing : MonoBehaviour {
         isLoading = true;
         AsyncOperation asyncLoad  = SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex + 1);
         asyncLoad.allowSceneActivation = false;
-        
+        _audioManager.ChaseStop();
+        _audioManager.BossStop();
+
         yield return new WaitForSeconds(2f);
 
         _loadScreen.color = fullColor;
@@ -926,6 +929,8 @@ public class Menuing : MonoBehaviour {
         isLoading = true;
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(scene);
         asyncLoad.allowSceneActivation = false;
+        _audioManager.ChaseStop();
+        _audioManager.BossStop();
 
         while (time < fadeTime)
         {

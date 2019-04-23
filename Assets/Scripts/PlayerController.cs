@@ -326,10 +326,12 @@ public class PlayerController : MonoBehaviour
             float _updown = Input.GetAxis("VertMove");      //updown is equal to vertical movement
             if (_updown > 0.5f)                              //if there is some vert movement greater than 0.5
             {
+                //AudioManager.instance.ButtonMoving();
                 _menuRef.MenuUpOrDown(true);                //MenuUpOrDown from the Menuing Script is true
             }
             else if (_updown < -0.5f)                        //else if its less than -0.05f
             {
+               // AudioManager.instance.ButtonMoving();
                 _menuRef.MenuUpOrDown(false);               //MenuUpOrDown from the Menuing Script is false
             }
         }
@@ -338,10 +340,12 @@ public class PlayerController : MonoBehaviour
             float _leftright = Input.GetAxis("HorizMove");  //_leftright equals horizontal movement
             if (_leftright > 0.5f)                           //if leftright is greater than or equal to 0.5f
             {
+                //AudioManager.instance.ButtonMoving();
                 _menuRef.MenuUpOrDown(true);                //the MenuUpOrDown from menuing script is true
             }
             else if (_leftright < -0.5f)                    //else if leftright is left than 0.5f
             {
+                //AudioManager.instance.ButtonMoving();
                 _menuRef.MenuUpOrDown(false);               //MenuUpOrDown from the Menuing Script is false
             }
         }
@@ -877,6 +881,7 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
+                AudioManager.instance.PlayerDied();
                 _myAnimations.Play("Death");
                 EndLevel(false);
             }
