@@ -8,6 +8,7 @@ public class PM_Manager : MonoBehaviour
 {
     private enum PHASES
     {
+        NONE,
         START,
         INITPHASE,
         COLOREDPHASE,
@@ -83,11 +84,21 @@ public class PM_Manager : MonoBehaviour
     int spawnCounter = 0;
     PlayerController _playerRef;
     bool _playerHasSpecialSword = false;
-    PHASES _pmPhase = PHASES.START;
+    PHASES _pmPhase = PHASES.NONE;
 
     // Use this for initialization
     void Start()
     {
+        for (int index = 0; index < _teleporters.Count; index++)
+        {
+            _teleporters[index].SetActive(false);
+        }
+
+        for (int index = 0; index < _coloredPillars.Count; index++)
+        {
+            _coloredPillars[index].SetActive(false);
+        }
+
         _scoreText.text = "Score: " + _currentScore + "/" + _initialScoreNeeded;
         _startTimer = Time.time;
         _ghostsInScene = new List<GameObject>();
@@ -112,6 +123,9 @@ public class PM_Manager : MonoBehaviour
     {
         switch (_pmPhase)
         {
+            case PHASES.NONE:
+                break;
+
             case PHASES.START:
                 Init();
                 break;
@@ -136,12 +150,13 @@ public class PM_Manager : MonoBehaviour
 
     }
 
-    private void Init()
+    public void Init()
     {
-        for (int index = 0; index < _coloredPillars.Count; index++)
+        for (int index = 0; index < _teleporters.Count; index++)
         {
-            _coloredPillars[index].SetActive(false);
+            _teleporters[index].SetActive(true);
         }
+
         _pmPhase = PHASES.INITPHASE;
     }
 
@@ -266,6 +281,7 @@ public class PM_Manager : MonoBehaviour
         {
             _coloredPillars[index].SetActive(true);
             GameObject coloredObj = Instantiate(_coloredGhlostPrefab);
+            _ghostsInScene.Add(coloredObj);
             coloredObj.transform.position = _colorSpawnPoints[index].position;
             coloredObj.GetComponent<PM_ColoredGhlost>().InitColor(_coloredPillars[index].GetComponent<ColoredBlock>().GetColor, GetComponent<PM_Manager>(), _travelRadius, _coloredPillars[index]);
         }
@@ -306,6 +322,30 @@ public class PM_Manager : MonoBehaviour
             EnableColoredPillars();
             _pmPhase = PHASES.COLOREDPHASE;
         }
+    }
+
+    public void MyReset()
+    {
+        for (int index = 0; index < _ghostsInScene.Count; index++)
+        {
+            Destroy(_ghostsInScene[index]);
+        }
+        _ghostsInScene.Clear();
+
+        _pmPhase = PHASES.NONE;
+        Destroy(_currentCoins);
+        _currentCoins = Instantiate(_coinLayoutPrefab);
+        _currentCoins.SetActive(true);
+        _swordPowerUp.SetActive(false);
+        _playerHasSpecialSword = false;
+
+        _currentScore = 0;
+        _scoreText.text = "Score: " + _currentScore + "/" + _initialScoreNeeded;
+
+
+
+        Debug.Log("RESET PACMAN");
+        Start();
     }
 
     public List<GameObject> GetTargetPoints { get { return _targetPoints; } }

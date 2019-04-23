@@ -11,7 +11,8 @@ public enum Mechanic                                        //Enum for mechanic 
     TRAP,
     BOSS,
     HEAL,
-    BREAKOUT
+    BREAKOUT,
+    PACMAN
 }
 
 public class DungeonMechanic : MonoBehaviour {
@@ -89,6 +90,10 @@ public class DungeonMechanic : MonoBehaviour {
     [SerializeField]
     GameObject _puckSpawnPoint;                             //gameobject on where to spawn the puck
     BreakoutManager _breakRef;                              //reference to the breakout manager
+
+    [Header("If PACMAN Room")]
+    [SerializeField]
+    PM_Manager _PMRef;
 
     GameManager _managerRef;                                //refernce to the main game manager
     BoxCollider _myCollider;                                //rooms collider
@@ -197,6 +202,13 @@ public class DungeonMechanic : MonoBehaviour {
                 _breakRef = GetComponent<BreakoutManager>();            //set breakout reference
                 _breakRef.Init();                                       //initialize breakout room
                 SpawnEnemy(0);                                          //spawn puck
+                break;
+
+            case Mechanic.PACMAN:                                     //if PACMAN
+
+                //_PMRef.GetComponent<PM_Manager>();                      //set PACMAN reference
+                _PMRef.Init();                                          //initialize breakout room
+                
                 break;
 
             default:
@@ -583,6 +595,12 @@ public class DungeonMechanic : MonoBehaviour {
 
                 _healObject.SetActive(true);                            //turns on the heal aura
                 _healObject.GetComponent<HealingGrace>().HealReset();   //resets the heal aura
+                break;
+
+            case Mechanic.PACMAN:
+
+
+                _PMRef.MyReset();
                 break;
 
             default:
