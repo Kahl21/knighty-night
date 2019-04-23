@@ -28,6 +28,8 @@ public enum WhichUIMenu
     AREYOUSURE
 }
 
+
+
 public class Menuing : MonoBehaviour {
 
     private static Menuing _instance;
@@ -112,6 +114,16 @@ public class Menuing : MonoBehaviour {
     public Text changedMusic;
     public Text changedSFX;
 
+    //Start Button
+    public Sprite startNH;
+    public Sprite startHL;
+    public Sprite continueNH;
+    public Sprite continueHL;
+
+    
+
+    WhichUIMenu whichUI;
+
     [Header("Level Select Variables")]
     [SerializeField]
     Sprite _lockedLevelSprite;
@@ -137,7 +149,7 @@ public class Menuing : MonoBehaviour {
         {
             _menus.Add(transform.GetChild(i).gameObject);
         }
-        _BossBar = _menus[(int)WhichUIMenu.PLAYER].transform.GetChild(3).gameObject;
+        _BossBar = _menus[(int)WhichUIMenu.PLAYER].transform.GetChild(2).gameObject;
         _BossBar.SetActive(false);
 
         _creditsStartPos = _credits.transform.localPosition;
@@ -171,6 +183,7 @@ public class Menuing : MonoBehaviour {
         initLevelSelect();
 
 
+        SetStart();
         SetMenu((int)WhichUIMenu.MAINMENU);
     }
 
@@ -192,10 +205,16 @@ public class Menuing : MonoBehaviour {
         currentMaster.text = changedMaster.text;
         currentMusic.text = changedMusic.text;
         currentSFX.text = changedSFX.text;
+
+
+
+        CheckBack();
+        
     }
 
     public void SetMenu(WhichUIMenu _whichMenu)
     {
+        
         for (int i = 0; i < transform.childCount; i++)
         {
             _menus[i].SetActive(false);
@@ -209,6 +228,7 @@ public class Menuing : MonoBehaviour {
 
             currSelectableButtons[currSelected].Select();
         }
+        whichUI = _whichMenu;
     }
 
     private void SetButtons(int _menuNum)
@@ -268,7 +288,7 @@ public class Menuing : MonoBehaviour {
 
     public void NextLevel()
     {
-
+        AudioManager.instance.RoomComplete();
         if (isLoading == false)
         {
             _menus[(int)WhichUIMenu.VIDEO].SetActive(true);
@@ -291,7 +311,11 @@ public class Menuing : MonoBehaviour {
         if (isLoading == false)
         {
             _menus[(int)WhichUIMenu.VIDEO].SetActive(true);
+            if(GameManager._lastLevelIndex >0)
             StartCoroutine(LoadSpecificScene(GameManager._lastLevelIndex));
+            else
+                StartCoroutine(LoadSpecificScene(1));
+
 
         }
 
@@ -353,6 +377,7 @@ public class Menuing : MonoBehaviour {
         _playerRef.GetPlayerAnimator.Play("Nothing", 0);
 
         _BossBar.SetActive(false);
+        SetStart();
         SetMenu(WhichUIMenu.MAINMENU);
     }
 
@@ -399,6 +424,12 @@ public class Menuing : MonoBehaviour {
         SetMenu(WhichUIMenu.AREYOUSURE);
     }
 
+    public void ToDead()
+    {
+        AudioManager.instance.ButtonPressed();
+        SetMenu(WhichUIMenu.WIN);
+    }
+
     
     public void ToLevelSelect()
     {
@@ -409,14 +440,33 @@ public class Menuing : MonoBehaviour {
 
     public void MenuBack()
     {
+        if(SceneManager.GetActiveScene().buildIndex ==0)
         AudioManager.instance.ButtonPressed();
-        SetMenu(WhichUIMenu.MAINMENU);
+
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+            SetMenu(WhichUIMenu.MAINMENU);
+        else
+            SetMenu(WhichUIMenu.PAUSE);
     }
 
     public void EndGame()
     {
         AudioManager.instance.ButtonPressed();
         Application.Quit();
+    }
+
+    public void ToLS()
+    {
+        AudioManager.instance.ButtonPressed();
+        SetMenu(WhichUIMenu.LEVELSELECT);
+    }
+
+    public void ToPause()
+    {
+        if (_playerRef.getDead)
+            ToDead();
+        else
+            Pause();
     }
 
     public void MenuUpOrDown(bool _positiveMovement)
@@ -744,10 +794,11 @@ public class Menuing : MonoBehaviour {
         _menus[12].SetActive(true);
         Debug.Log(_menus[12].gameObject.name);
         Button buttonToDisable = _menus[12].transform.GetChild(levelToLock + 1).GetComponent<Button>();
-        
+
         if (!enable)
         {
-            buttonToDisable.interactable = false;
+           buttonToDisable.interactable = false;
+           
         }
         else
         {
@@ -765,7 +816,86 @@ public class Menuing : MonoBehaviour {
         }
     }
 
+    private void CheckBack()                //B button settings
+    {
+        
+        Scene m_Scene;
 
+        m_Scene = SceneManager.GetActiveScene();
+
+
+        if (Input.GetKeyDown("joystick button 1"))
+        {
+            switch (whichUI)
+            {
+                case WhichUIMenu.AUDIO:
+                    ToOptions();
+                    break;
+                case WhichUIMenu.VIDEO:
+                    ToOptions();
+                    break;
+                case WhichUIMenu.OPTIONS:
+                    if (m_Scene.buildIndex == 0)
+                        MenuBack();
+                    else
+                        SetMenu(WhichUIMenu.PAUSE);
+                    break;
+                case WhichUIMenu.PAUSE:
+                    Pause();
+                    break;
+                case WhichUIMenu.RESOLUTION:
+                    ToVideo();
+                    break;
+                case WhichUIMenu.MASTER:
+                    ToMusic();
+                    break;
+                case WhichUIMenu.MUSIC:
+                    ToMusic();
+                    break;
+                case WhichUIMenu.SFX:
+                    ToMusic();
+                    break;
+                case WhichUIMenu.LEVELSELECT:
+                    MenuBack();
+                    break;
+                case WhichUIMenu.AREYOUSURE:
+                    ToPause();
+                    break;
+
+            }
+        }
+        
+    }
+
+    public void SetStart()
+    {
+        Button startButton = _menus[0].transform.GetChild(1).GetComponent<Button>();
+        Image startImage = _menus[0].transform.GetChild(1).GetComponent<Image>();
+
+        SpriteState ss = new SpriteState();        
+
+        if (GameManager._lastLevelIndex >0)
+        {
+            startImage.sprite = continueNH;
+            ss.highlightedSprite = continueHL;
+            ss.pressedSprite = continueHL;
+        }
+        else
+        {
+            startImage.sprite = startNH;
+            ss.highlightedSprite = startHL;
+            ss.pressedSprite = startHL;
+        }
+        startButton.spriteState = ss;
+
+    }
+
+
+    /* 
+     MASTER,
+     MUSIC,
+     SFX,
+     AREYOUSURE*/
 
 
 
@@ -810,12 +940,13 @@ public class Menuing : MonoBehaviour {
         _loadScreen.color = transparentColor;
         asyncLoad.allowSceneActivation = true;
         isLoading = false;
+        //AudioManager.instance.RestartMusic();
     }
     
 
     IEnumerator FadeIn()
     {
-        
+        AudioManager.instance.RestartMusic();
         float time;
         if (!_paused)
             time = 0;

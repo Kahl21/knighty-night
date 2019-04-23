@@ -97,6 +97,7 @@ public class CathedralProjectile : MonoBehaviour {
         {
             _hit = true;
             _projKnockback = knockBackForce;
+            transform.eulerAngles += new Vector3(0, 180, 0);
             _deathDirection = flyDir;
             _deathDirection.y = 0;
             _startTime = Time.time;

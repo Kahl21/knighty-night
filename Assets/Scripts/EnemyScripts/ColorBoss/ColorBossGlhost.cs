@@ -27,7 +27,6 @@ public class ColorBossGlhost : BossEnemy {
     [SerializeField]
     GameObject _colorIntroGlhosts;
     List<ColorIntroGlhost> _introGlhostList;
-    Vector3 _ogCamPos;
     bool _cameraInPosition = false;
     bool _glhostsDone = false;
     bool _eatingFinished = false;
@@ -95,6 +94,7 @@ public class ColorBossGlhost : BossEnemy {
     [SerializeField]
     float _bounceSpawnAngleOffset;
     Vector3 c0, c1, c2;
+    bool _jumping;
 
     [Header("Charge Attack Variables")]
     [SerializeField]
@@ -461,6 +461,7 @@ public class ColorBossGlhost : BossEnemy {
                 //Debug.Log("follow Chosen");
                 _startAttackTime = Time.time;
                 _myAttack = ColorStrats.FOLLOW;
+                _myAnimations.Play("Movement", 0);
             }
             else if (_nextAttack > _realFollowPercentage && _nextAttack <= (_realFollowPercentage + _realBouncePercentage))
             {
@@ -471,7 +472,9 @@ public class ColorBossGlhost : BossEnemy {
                 c1 = ((c0 + c2) / 2) + (Vector3.up * _bounceHeight);
 
                 _enemyAgent.enabled = false;
-                _startAttackTime = Time.time;
+                _jumping = false;
+                _jumpingFinished = false;
+                _myAnimations.Play("StartJump", 0);
                 _myAttack = ColorStrats.BOUNCE;
             }
             else
@@ -480,6 +483,7 @@ public class ColorBossGlhost : BossEnemy {
                 _tellCharging = true;
                 _enemyAgent.enabled = false;
                 _startAttackTime = Time.time;
+                _myAnimations.Play("RearUp", 0);
                 _myAttack = ColorStrats.CHARGE;
             }
         }
@@ -542,73 +546,105 @@ public class ColorBossGlhost : BossEnemy {
     //will do it any number of times
     private void BounceAttack()
     {
-        _currAttackTime = (Time.time - _startAttackTime) / _realBouncingAirtime;
-        //Debug.Log("spinning");
-
-        Vector3 c01, c12, c012;
-
-        c01 = (1 - _currAttackTime) * c0 + _currAttackTime * c1;
-        c12 = (1 - _currAttackTime) * c1 + _currAttackTime * c2;
-
-        c012 = (1 - _currAttackTime) * c01 + _currAttackTime * c12;
-
-        transform.position = c012;
-
-        if (_currAttackTime >= 1)
+        if (!_jumping)
         {
-            //Debug.Log("spinning Done");
-            if (_currBounces >= _realNumOfBounces)
+            if (_myAnimations.IsInTransition(0))
             {
-                int _randomColor = Random.Range(0, _ColorsLeft.Count);
-                _myColor = _ColorsLeft[_randomColor];
-                _myMaterial.color = _myColor;
-                _mySkinRenderer.materials[1] = _myMaterial;
-
-                SpawnGlhosts(_bounceSpawnAngle, _bounceSpawnAngleOffset);
-                _enemyAgent.enabled = true;
-                _currBounces = 0;
-                _myAttack = ColorStrats.STUNNED;
-                _startAttackTime = Time.time;
-            }
-            else
-            {
-                _calcAngle = _startAngle;
-
-                _currBounces++;
-
-                _speaker.PlayOneShot(bossBounce, volSFX);
-
-
-                c0 = transform.position;
-                c2 = _playerRef.transform.position;
-                c1 = ((c0 + c2) / 2) + (Vector3.up * _bounceHeight);
-
+                _jumping = true;
                 _startAttackTime = Time.time;
             }
         }
         else
         {
-            for (int i = 0; i <= _numOfCasts; i++)
+            _currAttackTime = (Time.time - _startAttackTime) / _realBouncingAirtime;
+            //Debug.Log("spinning");
+
+            if (_currAttackTime >= 1)
             {
-                float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
-                float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
-
-                Vector3 RayDir = (transform.forward * Zpos) + (transform.right * Xpos);
-
-                if (_debug)
+                //Debug.Log("spinning Done");
+                if (_currBounces >= _realNumOfBounces)
                 {
-                    Debug.DrawRay(transform.position + (Vector3.up * _vertDetectOffset), RayDir * _bossCollisionDetectDistance, Color.red);
-                }
-
-                _calcAngle += _detectionAngle / _numOfCasts;
-
-                if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
-                {
-                    if (hit.collider.GetComponent<PlayerController>())
+                    _currAttackTime = 1;
+                    
+                    if (!_jumpingFinished)
                     {
-                        hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
+                        _myAnimations.Play("EndJump", 0);
+                        _jumpingFinished = true;
+                    }
+                    else if (_myAnimations.IsInTransition(0))
+                    {
+                        _jumpingFinished = false;
+                        int _randomColor = Random.Range(0, _ColorsLeft.Count);
+                        _myColor = _ColorsLeft[_randomColor];
+                        _myMaterial.color = _myColor;
+                        _mySkinRenderer.materials[1] = _myMaterial;
+
+                        SpawnGlhosts(_bounceSpawnAngle, _bounceSpawnAngleOffset);
+                        _enemyAgent.enabled = true;
+                        _currBounces = 0;
+                        _myAnimations.Play("Spawn", 0);
+                        _myAttack = ColorStrats.STUNNED;
+                        _startAttackTime = Time.time;
                     }
                 }
+                else
+                {
+                    _currAttackTime = 1;
+
+                    if (!_speaker.isPlaying)
+                        _speaker.PlayOneShot(bossBounce, volSFX);
+
+                    _calcAngle = _startAngle;
+
+                    if(!_jumpingFinished)
+                    {
+                        _myAnimations.Play("EndJump", 0);
+                        _jumpingFinished = true;
+                    }
+                    else if (_myAnimations.GetCurrentAnimatorStateInfo(0).IsName("StartJump"))
+                    {
+                        _currBounces++;
+                        c0 = transform.position;
+                        c2 = _playerRef.transform.position;
+                        c1 = ((c0 + c2) / 2) + (Vector3.up * _bounceHeight);
+                        _jumpingFinished = false;
+                        _startAttackTime = Time.time;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i <= _numOfCasts; i++)
+                {
+                    float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
+                    float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
+
+                    Vector3 RayDir = (transform.forward * Zpos) + (transform.right * Xpos);
+
+                    if (_debug)
+                    {
+                        Debug.DrawRay(transform.position + (Vector3.up * _vertDetectOffset), RayDir * _bossCollisionDetectDistance, Color.red);
+                    }
+
+                    _calcAngle += _detectionAngle / _numOfCasts;
+
+                    if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), RayDir, out hit, _bossCollisionDetectDistance))
+                    {
+                        if (hit.collider.GetComponent<PlayerController>())
+                        {
+                            hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
+                        }
+                    }
+                }
+
+                Vector3 c01, c12, c012;
+
+                c01 = (1 - _currAttackTime) * c0 + _currAttackTime * c1;
+                c12 = (1 - _currAttackTime) * c1 + _currAttackTime * c2;
+
+                c012 = (1 - _currAttackTime) * c01 + _currAttackTime * c12;
+
+                transform.position = c012;
             }
         }
     }
@@ -636,9 +672,12 @@ public class ColorBossGlhost : BossEnemy {
             }
             transform.LookAt(_playerRef.transform.position);
 
-            if (!Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), -transform.forward, _bossCollisionDetectDistance))
+            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), -transform.forward, out hit, _bossCollisionDetectDistance*2))
             {
-                transform.position -= transform.forward * _realChargeUpBackwardsSpeed * Time.deltaTime;
+                if(!hit.collider.GetComponent<BossWall>() || !hit.collider.GetComponent<DoorMovement>())
+                {
+                    transform.position -= transform.forward * _realChargeUpBackwardsSpeed * Time.deltaTime;
+                }
             }
 
         }
@@ -666,7 +705,7 @@ public class ColorBossGlhost : BossEnemy {
                     {
                         hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
                     }
-                    else if(!hit.collider.GetComponent<PlayerController>())
+                    else if(hit.collider.GetComponent<BossWall>() || hit.collider.GetComponent<DoorMovement>())
                     {
                         int _randomColor = Random.Range(0, _ColorsLeft.Count);
                         _myColor = _ColorsLeft[_randomColor];
@@ -676,6 +715,7 @@ public class ColorBossGlhost : BossEnemy {
                         SpawnGlhosts(_chargeSpawnAngle, _chargeSpawnAngleOffset);
 
                         _enemyAgent.enabled = true;
+                        _myAnimations.Play("Spawn", 0);
                         _myAttack = ColorStrats.STUNNED;
                         _startAttackTime = Time.time;
                         return;
@@ -731,12 +771,15 @@ public class ColorBossGlhost : BossEnemy {
     private void Stunned()
     {
         _currAttackTime = (Time.time - _startAttackTime) / _realStunnedDuration;
-        _speaker.PlayOneShot(bossDazed, volSFX);
 
         //Debug.Log("stunned");
 
         if (_currAttackTime >= 1)
         {
+            if (!_speaker.isPlaying)
+                _speaker.PlayOneShot(bossDazed, volSFX);
+
+            _myAnimations.Play("SuckUp", 0);
             _myColor = _basicColor;
             _myMaterial.color = _myColor;
             _mySkinRenderer.materials[1] = _myMaterial;
@@ -754,6 +797,7 @@ public class ColorBossGlhost : BossEnemy {
     {
         if(_myRoom.GetCurrEnemyList.Count == 0)
         {
+            _myAnimations.Play("Movement", 0);
             _myAttack = ColorStrats.DOWNTIME;
             _startAttackTime = Time.time;
         }

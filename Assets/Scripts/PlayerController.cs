@@ -156,6 +156,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     List<GameObject> baseRoomList;
 
+
+    bool dead;
+
     // Use this for initialization
     void Awake()
     {
@@ -183,6 +186,7 @@ public class PlayerController : MonoBehaviour
         _hearts = new List<HealthTracker>();
 
         reachCheckpoint = false;
+        dead = false;
     }
 
     //Secondary Initialization
@@ -203,6 +207,7 @@ public class PlayerController : MonoBehaviour
         _specialBar = _gameMenus[2].transform.GetChild(1).gameObject;
         _specialBar.GetComponent<Image>().fillAmount = 0;
         currentCheckpoint = 0;
+        dead = false;
     }
 
     //Called to reset the Player Stats
@@ -241,6 +246,7 @@ public class PlayerController : MonoBehaviour
         }
         _whatImDoing = Interactions.NONE;
         _myAnimations.Play("StandingIdle", 0);
+        dead = false;
     }
 
     // Update is called once per frame
@@ -274,26 +280,30 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            CheckForPause();                                //check for pause function
-            if (_movingHealth)                              //if moving health is true
+            if (SceneManager.GetActiveScene().buildIndex != 0)
             {
-                LerpHealthBar();          //lerp health bar function
-            }
+                CheckForPause();                                //check for pause function
+                if (_movingHealth)                              //if moving health is true
+                {
+                    LerpHealthBar();          //lerp health bar function
+                }
 
-            if (_movingSpecial)                              //if moving special
-            {
-                LerpSpecialBar();                           //lerp special bar function
-            }
-            CheckForMovement();                             //check for movement function
+                if (_movingSpecial)                              //if moving special
+                {
+                    LerpSpecialBar();                           //lerp special bar function
+                }
 
-            if (!_doingSomething)                           //if not doing something
-            {
-                LookAround();                               //look around function
-                CheckForActionInput();                      //check for action input
-            }
-            else
-            {
-                WhatAmIEvenDoing();                         //else what are you doing with your life. theres so much meaning to this universe and instead you are reading this extrordinarily long comment which really doesnt have a point much like, i assume, this function that probably just checks to see what else the player can do/ why it isnt doing what its supposed to
+                CheckForMovement();                             //check for movement function
+
+                if (!_doingSomething)                           //if not doing something
+                {
+                    LookAround();                               //look around function
+                    CheckForActionInput();                      //check for action input
+                }
+                else
+                {
+                    WhatAmIEvenDoing();                         //else what are you doing with your life. theres so much meaning to this universe and instead you are reading this extrordinarily long comment which really doesnt have a point much like, i assume, this function that probably just checks to see what else the player can do/ why it isnt doing what its supposed to
+                }
             }
         }
     }
@@ -818,6 +828,11 @@ public class PlayerController : MonoBehaviour
                         {
                             thingHit.GetComponent<TrapLever>().StartRotation();
                         }
+
+                        else if (thingHit.GetComponent<SecretLever>())
+                        {
+                            thingHit.GetComponent<SecretLever>().StartRotation();
+                        }
                     }
                 }
                 break;
@@ -852,7 +867,7 @@ public class PlayerController : MonoBehaviour
     {
         if (!_invincible)
         {
-            //AudioManager.instance.PlayerDamaged();
+            AudioManager.instance.PlayerDamaged();
             _invincible = true;
             IncHealthMeter(_damageTaken, false);
 
@@ -920,6 +935,7 @@ public class PlayerController : MonoBehaviour
         {
             _winImage.SetActive(false);
             _loseImage.SetActive(true);
+            dead = true;
         }
         _inMenu = true;
     }
@@ -966,4 +982,5 @@ public class PlayerController : MonoBehaviour
 
     public float GetCurrCheckpoint { get { return currentCheckpoint; } set { currentCheckpoint = value; } }
     public bool DoesHaveCheckpoint { get { return reachCheckpoint; } set { reachCheckpoint = value; } }
+    public bool getDead { get { return dead;} set { dead = value; } }
 }

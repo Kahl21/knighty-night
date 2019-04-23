@@ -16,15 +16,8 @@ public class MiniSpinBoss : BossEnemy
     }
 
     [Header("Spin Boss Intro Variables")]
-    [SerializeField]
-    float _revUpDuration;
-    [SerializeField]
-    float _spinDuration;
-    Vector3 _ogCamPos;
     bool _cameraInPosition = false;
-    bool _spinAroundStart = false;
-    bool _spinAroundScreen = false;
-    bool _spinAroundEnd = false;
+    bool _animating = false;
 
     [Header("Spin Boss Variables")]
     [SerializeField]
@@ -123,98 +116,37 @@ public class MiniSpinBoss : BossEnemy
     {
         if(!_cameraInPosition)
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-            
-            if (_currAttackTime >= 1)
+            if (_cameraRef.MoveCamera())
             {
-                _currAttackTime = 1;
-
                 _startAttackTime = Time.time;
 
                 _cameraInPosition = true;
+                _myAnimations.Play("MiniIntro", 0);
             }
 
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
         }
-        else if(!_spinAroundStart)
+        else if(!_animating)
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _revUpDuration;
-
-            _currSpinningSpeed = _realSpinningSpeed * _currAttackTime;
-
-            transform.Rotate(Vector3.up, _currSpinningSpeed);
-
-            if (_currAttackTime >= 1)
-            {
-                _currAttackTime = 1;
-
-                _currSpinningSpeed = _realSpinningSpeed;
-                _startAttackTime = Time.time;
-                _spinAroundStart = true;
-            }
-        }
-        else if(!_spinAroundScreen)
-        {
-            _currAttackTime = (Time.time - _startAttackTime) / _spinDuration;
-
-            if (_currAttackTime >= 1)
-            {
-                _currAttackTime = 1;
-                
-                _startAttackTime = Time.time;
-                _spinAroundScreen = true;
-            }
-            transform.Rotate(Vector3.up, _realSpinningSpeed);
-        }
-        else if(!_spinAroundEnd)
-        {
-            _currAttackTime = (Time.time - _startAttackTime) / _revUpDuration;
-
-            if (_currAttackTime >= 1)
+            if (_myAnimations.IsInTransition(0))
             {
                 _currAttackTime = 1;
 
                 cam0 = _cameraRef.transform.position;
                 cam1 = _ogCamPos;
+                rot0 = _cameraRef.transform.localEulerAngles;
+                rot1 = _ogCamRot;
 
                 _currSpinningSpeed = 0;
                 _startAttackTime = Time.time;
                 transform.LookAt(_playerRef.transform.position);
-                _spinAroundEnd = true;
-            }
 
-            _currSpinningSpeed = _realSpinningSpeed * ( 1 -_currAttackTime);
-
-            transform.Rotate(Vector3.up, _currSpinningSpeed);
-
-            if (_currAttackTime >= 1)
-            {
-                _currAttackTime = 1;
-
-                cam0 = _cameraRef.transform.position;
-                cam1 = _ogCamPos;
-
-                _currSpinningSpeed = 0;
-                _startAttackTime = Time.time;
-                transform.LookAt(_playerRef.transform.position);
-                _spinAroundEnd = true;
+                _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+                _animating = true;
             }
         }
         else
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
-
-            if (_currAttackTime >= 1)
+            if (_cameraRef.MoveCamera())
             {
                 _currAttackTime = 1;
                 _startAttackTime = Time.time;
@@ -237,6 +169,7 @@ public class MiniSpinBoss : BossEnemy
             _menuRef = Menuing.Instance;
             _playerRef = PlayerController.Instance;
             _managerRef = GameManager.Instance;
+            _myAnimations = GetComponent<Animator>();
             _cameraRef = _playerRef.GetCamera;
             _camOffset = _cameraRef.GetOffset;
 
@@ -282,24 +215,28 @@ public class MiniSpinBoss : BossEnemy
             _actualBossHealthBar.fillAmount = 1;
             _bossNameText = _bossBar.transform.GetChild(3).gameObject.GetComponent<Text>();
             _bossNameText.text = _bossName;
+
             if (_managerRef.HasSubtitles)
             {
                 _bossNameText.text += ", " + _bossSubTitle;
             }
+
             _hasInit = true;
         }
         
         _ogCamPos = _cameraRef.transform.position;
+        _ogCamRot = _cameraRef.transform.localEulerAngles;
         cam0 = _cameraRef.transform.position;
-        cam1 = transform.position + _camOffset;
-        cam1.y = _cameraRef.transform.position.y;
+        cam1 = _bossCamera.transform.position;
+        rot0 = _cameraRef.transform.localEulerAngles;
+        rot1 = _bossCamera.transform.localEulerAngles;
         _cameraRef.AmFollowingPlayer = false;
 
         _speaker = this.transform.GetComponent<AudioSource>();
 
         _totalPercentage = _realFollowPercentage + _realPinballAttackPercentage;
 
-        _startAttackTime = Time.time;
+        _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
         _myAI = BossAI.INTRO;
     }
 
@@ -314,6 +251,7 @@ public class MiniSpinBoss : BossEnemy
         _calcAngle = _startAngle;
 
         _myAI = BossAI.FIGHTING;
+        _myAnimations.Play("Movement", 0);
         _init = true;
     }
 
@@ -365,8 +303,8 @@ public class MiniSpinBoss : BossEnemy
 
     private void WhatDoNext()
     {
-        _currAttackTime = (Time.time - _startAttackTime) / _realTimeBetweenAttacks;
         //Debug.Log("thinking");
+        _currAttackTime = (Time.time - _startAttackTime) / _realTimeBetweenAttacks;
 
         if (_currAttackTime >= 1)
         {
@@ -377,6 +315,7 @@ public class MiniSpinBoss : BossEnemy
                 //Debug.Log("follow Chosen");
                 _startAttackTime = Time.time;
                 _MyAttack = SPINSTRATS.FOLLOW;
+                _myAnimations.Play("Movement", 0);
             }
             else
             {
@@ -385,6 +324,7 @@ public class MiniSpinBoss : BossEnemy
                 _enemyAgent.enabled = false;
                 _startAttackTime = Time.time;
                 _MyAttack = SPINSTRATS.PINBALL;
+                _myAnimations.Play("SpinTell", 0);
             }
         }
     }
@@ -437,26 +377,26 @@ public class MiniSpinBoss : BossEnemy
         if(_tellPinballing)
         {
 
-            if (!_speaker.isPlaying)
-                _speaker.PlayOneShot(bossSpin, volSFX);
-
-            _currAttackTime = (Time.time - _startAttackTime) / _realPinballTellDuration;
+            Vector3 playerPos = _playerRef.transform.position;
+            playerPos.y = transform.position.y;
+            transform.LookAt(playerPos);
             
-            if (_currAttackTime >= 1)
+            if (_myAnimations.IsInTransition(0))
             {
                 _currAttackTime = 1;
                 _tellPinballing = false;
                 _moveDir = (_playerRef.transform.position - transform.position).normalized;
                 _moveDir.y = 0;
                 _startAttackTime = Time.time;
-            } 
-
-            _currSpinningSpeed = _realSpinningSpeed * _currAttackTime;
-
-            transform.Rotate(Vector3.up, _currSpinningSpeed);
+            }
         }
         else
         {
+            if (!_speaker.isPlaying)
+            {
+                _speaker.PlayOneShot(bossSpin, volSFX);
+            }
+
             _currAttackTime = (Time.time - _startAttackTime) / _realPinballAttackDuration;
 
             //Debug.Log("pinballing");
@@ -511,6 +451,7 @@ public class MiniSpinBoss : BossEnemy
                 _invincible = false;
                 _enemyAgent.enabled = true;
                 _MyAttack = SPINSTRATS.STUNNED;
+                _myAnimations.Play("Dazed", 0);
                 _startAttackTime = Time.time;
                 return;
             }
@@ -584,58 +525,44 @@ public class MiniSpinBoss : BossEnemy
     {
         if (!_cameraInPosition)
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            if (_currAttackTime >= 1)
+            if (_cameraRef.MoveCamera())
             {
-                _currAttackTime = 1;
-
-                _startAttackTime = Time.time;
-                _cameraInPosition = true;
+                if (_myAnimations.IsInTransition(0))
+                {
+                    _cameraInPosition = true;
+                }
             }
 
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
         }
-        else if(!_showingDeath)
+        else if (!_showingDeath)
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _deathDuration;
             //Debug.Log("showing death");
 
-
-            if (_currAttackTime > 1)
+            if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .98f)
             {
-                _currAttackTime = 1;
-
                 cam0 = _cameraRef.transform.position;
                 cam1 = _ogCamPos;
+                rot0 = _cameraRef.transform.localEulerAngles;
+                rot1 = _ogCamRot;
+
+                _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
 
                 _mySkinRenderer.enabled = false;
 
                 _startAttackTime = Time.time;
                 _showingDeath = true;
             }
-            
-            _myColor.a = 1 - _currAttackTime;
+
+            _myColor.a = 1 - _myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime;
             _myMaterial.color = _myColor;
             _mySkinRenderer.materials[1] = _myMaterial;
             _mySkinRenderer.materials[0] = _myMaterial;
         }
         else
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
             //Debug.Log("putting camera back");
 
-            if (_currAttackTime >= 1)
+            if (_cameraRef.MoveCamera())
             {
                 //Debug.Log("camera put back");
                 _currAttackTime = 1;
@@ -673,9 +600,7 @@ public class MiniSpinBoss : BossEnemy
 
             _bossBar.SetActive(false);
             _cameraInPosition = false;
-            _spinAroundStart = false;
-            _spinAroundScreen = false;
-            _spinAroundEnd = false;
+            _animating = false;
 
             _endingPlaying = false;
             _laggingHealth = false;
@@ -686,6 +611,7 @@ public class MiniSpinBoss : BossEnemy
 
             _myAI = BossAI.NONE;
             _MyAttack = SPINSTRATS.FOLLOW;
+            _bossCamera.transform.position = _bossCameraPos;
             _init = false;
         }
     }

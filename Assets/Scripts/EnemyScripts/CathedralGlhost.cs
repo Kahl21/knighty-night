@@ -92,7 +92,7 @@ public class CathedralGlhost : BasicGlhost {
 
     protected virtual void Hover()
     {
-        transform.position = _target.transform.position + _hoverPos;
+        //transform.position = _target.transform.position + _hoverPos;
         if (Vector3.Distance(transform.position, _target.transform.position) >= _damageRange)
         {
             _idling = false;
