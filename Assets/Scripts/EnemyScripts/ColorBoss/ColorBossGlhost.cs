@@ -551,6 +551,7 @@ public class ColorBossGlhost : BossEnemy {
             if (_myAnimations.IsInTransition(0))
             {
                 _jumping = true;
+                _jumpingFinished = false;
                 _startAttackTime = Time.time;
             }
         }
@@ -592,7 +593,9 @@ public class ColorBossGlhost : BossEnemy {
                     _currAttackTime = 1;
 
                     if (!_speaker.isPlaying)
+                    {
                         _speaker.PlayOneShot(bossBounce, volSFX);
+                    }
 
                     _calcAngle = _startAngle;
 

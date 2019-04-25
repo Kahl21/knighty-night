@@ -1955,13 +1955,13 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1826877968002442}
-  m_LocalRotation: {x: 0.11832749, y: 0.8275068, z: -0.19018926, w: 0.51483905}
-  m_LocalPosition: {x: -1.581, y: 1.761, z: 0.887}
+  m_LocalRotation: {x: 0.12531456, y: 0.86904824, z: -0.28122282, w: 0.38725328}
+  m_LocalPosition: {x: -1.1319993, y: 1.761, z: 1.348999}
   m_LocalScale: {x: 1.0000004, y: 1, z: 1.0000002}
   m_Children: []
   m_Father: {fileID: 4330383025642224}
   m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 25.887001, y: 116.22401, z: 0}
+  m_LocalEulerAnglesHint: {x: 35.863003, y: 131.964, z: 0}
 --- !u!4 &4160390040369304
 Transform:
   m_ObjectHideFlags: 1
@@ -2264,8 +2264,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1357090406945198}
-  m_LocalRotation: {x: -0, y: -0.9424955, z: -0, w: 0.3342189}
-  m_LocalPosition: {x: 64.34, y: -2.3678578e-17, z: 328.84}
+  m_LocalRotation: {x: -0, y: 0.9447198, z: -0, w: -0.32787883}
+  m_LocalPosition: {x: 65.04, y: 0.49, z: 328.22}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_Children:
   - {fileID: 4045066435454014}
@@ -2276,7 +2276,7 @@ Transform:
   - {fileID: 4149854822670052}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: -140.95001, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 218.28, z: 0}
 --- !u!4 &4332708189266046
 Transform:
   m_ObjectHideFlags: 1
@@ -2941,7 +2941,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1122949136765908}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.77, y: 0, z: 2.18}
+  m_LocalPosition: {x: 0.1, y: -0.566, z: -4.33}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4330383025642224}
@@ -3666,7 +3666,7 @@ MonoBehaviour:
   _playerIntroPos: {fileID: 1122949136765908}
   _cameraIntroDuration: 1
   _deathDuration: 3
-  _maxBossHealth: 7.5
+  _maxBossHealth: 14
   _bossDamage: 0.5
   _bossDefaultSpeed: 2
   _bossCollisionDetectDistance: 1
@@ -3684,8 +3684,8 @@ MonoBehaviour:
   _xAttackPercentage: 50
   _quadFirePercentage: 50
   _quadTrapDamage: 0.5
-  _quadShootDist: 3
-  _quadDetectDist: 3
+  _quadShootDist: 1.75
+  _quadDetectDist: 9.5
   _quadFireStartDelay: 1
   _quadBurnDuration: 3
   _hardStunnedDuration: 0

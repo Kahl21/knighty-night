@@ -24,6 +24,7 @@ public class CutsceneGlhosts : MonoBehaviour {
 
     private void Awake()
     {
+        _myAnimations = GetComponent<Animator>();
         _myAnimations.Play("Nothing", 0);
     }
 
@@ -35,7 +36,6 @@ public class CutsceneGlhosts : MonoBehaviour {
         _startPos = transform.position;
         _startRot = transform.rotation;
         _player = PlayerController.Instance;
-        _myAnimations = GetComponent<Animator>();
         BeginAnimation();
     }
 

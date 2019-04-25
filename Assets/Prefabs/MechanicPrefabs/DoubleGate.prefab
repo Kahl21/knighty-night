@@ -56,7 +56,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4818580349054080}
   - component: {fileID: 114233279921467914}
-  - component: {fileID: 82320148218199066}
+  - component: {fileID: 82079632509231416}
   m_Layer: 0
   m_Name: DoubleGate
   m_TagString: Untagged
@@ -202,7 +202,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1387904007907072}
   m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 21.939999, y: 0, z: 76.5}
+  m_LocalPosition: {x: 3.963018, y: -0.8999998, z: 22.380562}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4715713344974334}
@@ -445,7 +445,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 2.4068346, y: 4.259515, z: 0.5513065}
   m_Center: {x: -1.1305127, y: 0.6844506, z: 0.19257617}
---- !u!82 &82320148218199066
+--- !u!82 &82079632509231416
 AudioSource:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -464,7 +464,7 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 1
+  MinDistance: 4.1252327
   MaxDistance: 500
   Pan2D: 0
   rolloffMode: 0

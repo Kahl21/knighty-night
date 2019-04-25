@@ -116,6 +116,8 @@ public class ShootingMiniBoss : BossEnemy
             }
         }
 
+        _attachedShooter.GetBossAnimator = _myAnimations;
+
         //_ogCamPos = _cameraRef.transform.position;
         cam0 = _cameraRef.transform.position;
         cam1 = transform.position + _camOffset;
@@ -196,6 +198,7 @@ public class ShootingMiniBoss : BossEnemy
     {
         if (_attachedShooter.attackInProgress != true)
         {
+            _myAnimations.Play("Stunned", 0);
             _MyState = SHOOTERSTATES.STUNNED;
             _startTimer = Time.time;
         }
@@ -206,6 +209,7 @@ public class ShootingMiniBoss : BossEnemy
         float timeTaken = Time.time - _startTimer;
         if (timeTaken >= _stunnedTime)
         {
+            _myAnimations.Play("Movement", 0);
             _MyState = SHOOTERSTATES.FOLLOWING;
             _startTimer = Time.time;
         }
@@ -404,7 +408,9 @@ public class ShootingMiniBoss : BossEnemy
     {
         if (_init)
         {
+            _attachedShooter.enabled = true;
             _attachedShooter.MyReset();
+
             gameObject.SetActive(true);
             _mySkinRenderer.enabled = true;
             _myColor.a = 1;

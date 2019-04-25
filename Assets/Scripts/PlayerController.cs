@@ -739,7 +739,8 @@ public class PlayerController : MonoBehaviour
             _myAnimations.Play("SwordSwing", 0);                                                                                    //play the sword swing animation
             IncSpecialMeter(_MaxSpecialAmount, false);                                                                              //empty the special meter
             _doingSomething = true;                                                                                                 //player is set to do something
-            Instantiate<GameObject>(BWPrefab, transform.position + transform.forward + Vector3.up, transform.rotation);             //creates an instance of the special attack prefab
+            GameObject _newWave = Instantiate<GameObject>(BWPrefab, transform.position + transform.forward + Vector3.up, transform.rotation);             //creates an instance of the special attack prefab
+            _newWave.GetComponent<BacklashWave>().Init();
             _SwingStartTime = Time.time;                                                                                            //start the time for the swing
             _whatImDoing = Interactions.WAVESPECIAL;                                                                                //player is using the special slash
             AudioManager.instance.FireAttack();                                                                                     //play the sound of the fire slash
@@ -832,6 +833,10 @@ public class PlayerController : MonoBehaviour
                         else if (thingHit.GetComponent<SecretLever>())
                         {
                             thingHit.GetComponent<SecretLever>().StartRotation();
+                        }
+                        else if(thingHit.GetComponent<BreakableObject>())
+                        {
+                            thingHit.GetComponent<BreakableObject>().BreakObject();
                         }
                     }
                 }
