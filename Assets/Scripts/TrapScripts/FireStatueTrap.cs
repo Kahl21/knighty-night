@@ -41,6 +41,8 @@ public class FireStatueTrap : BaseTrap {
     ParticleSystem _myFire;
     public ParticleSystem _mySmoke;
 
+    public AudioClip fireNoise;
+
     FireState _mystate = FireState.NONE;
 
     //Start Function
@@ -48,9 +50,15 @@ public class FireStatueTrap : BaseTrap {
     {
         _myFire = transform.GetChild(0).transform.GetComponent<ParticleSystem>();
         _mySmoke = transform.GetChild(1).transform.GetComponent<ParticleSystem>();
+        _speaker = this.transform.GetComponent<AudioSource>();
+
         _mySmoke.Stop();
         _myFire.Stop();
+        
+
         base.Start();
+
+
     }
 
     //Initilizes trap
@@ -162,6 +170,9 @@ public class FireStatueTrap : BaseTrap {
     //Keeps the animation playing and damage raycasts up for a certain amount of time
     void BurnBabyBurn()
     {
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(fireNoise);
+
         _currDelay = (Time.time - _startDelay) / _burningDuration;
         
         LookForPlayer();

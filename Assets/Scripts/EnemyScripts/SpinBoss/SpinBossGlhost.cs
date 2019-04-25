@@ -44,8 +44,6 @@ public class SpinBossGlhost : BossEnemy
     int _numOfCasts;
     float _calcAngle;
     [SerializeField]
-    float _maxDistanceOut;
-    [SerializeField]
     bool _debug;
 
     [Header("Percentages of Attacks")]
@@ -136,11 +134,10 @@ public class SpinBossGlhost : BossEnemy
     public AudioClip bossDazed;
     public AudioClip bossDeath;
 
-
     GameObject dazedParticle;
 
-
     SPINSTRATS _MyAttack = SPINSTRATS.FOLLOW;
+    
 
     protected override void Awake()
     {
@@ -206,7 +203,6 @@ public class SpinBossGlhost : BossEnemy
         {
             if (_cameraRef.MoveCamera())
             {
-                _currAttackTime = 1;
                 _startAttackTime = Time.time;
                 _playerRef.AmInCutscene = false;
                 StartFight();

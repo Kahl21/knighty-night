@@ -24,6 +24,7 @@ public class GhlostShooter : MonoBehaviour
     public bool attackInProgress = false;
     [SerializeField]
     float _SpawnedDistAway;
+    Animator _ghostAnimations;
 
     [Header("Pulse Attack variables")]
     [SerializeField]
@@ -82,6 +83,7 @@ public class GhlostShooter : MonoBehaviour
     float _spiralAttackPercentage;
     float _totalAttackPercentages;
 
+    [SerializeField]
     List<GameObject> _ghlostsInScene = new List<GameObject>();
 
     ATTACKSTATE _attackState = ATTACKSTATE.WAITFORATK;
@@ -139,18 +141,22 @@ public class GhlostShooter : MonoBehaviour
         if (_nextAttack > 0 && _nextAttack <= _pulseAttackPercentage)
         {
             Debug.Log("Pulse Attack");
+
+            _ghostAnimations.Play("ShootStart", 0);
             _attackState = ATTACKSTATE.PULSEATK;
             _currentPulse = 0;
         }
         else if (_nextAttack > _pulseAttackPercentage && _nextAttack <= (_pulseAttackPercentage + _lineAttackPercentage))
         {
             Debug.Log("Line Attack");
+            _ghostAnimations.Play("ShootStart", 0);
             _startingAngle = transform.eulerAngles;
             _attackState = ATTACKSTATE.LINEATK;
         }
         else
         {
             Debug.Log("Spiral Attack");
+            _ghostAnimations.Play("ShootStart", 0);
             _attackState = ATTACKSTATE.SPIRALATK;
         }
         startTime = Time.time;
@@ -288,7 +294,12 @@ public class GhlostShooter : MonoBehaviour
         {
             GameObject ghlostRef;
             ghlostRef = _ghlostsInScene[index];
-            _ghlostsInScene.Remove(ghlostRef);
+            Destroy(ghlostRef);
+            
+            
         }
+        _ghlostsInScene.Clear();
     }
+
+    public Animator GetBossAnimator { get { return _ghostAnimations; } set { _ghostAnimations = value; } }
 }

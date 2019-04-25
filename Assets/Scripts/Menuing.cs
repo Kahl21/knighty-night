@@ -24,8 +24,11 @@ public enum WhichUIMenu
     MASTER,
     MUSIC,
     SFX,
+    LEVELSELECT,
     AREYOUSURE
 }
+
+
 
 public class Menuing : MonoBehaviour {
 
@@ -110,6 +113,21 @@ public class Menuing : MonoBehaviour {
     public Text changedMaster;
     public Text changedMusic;
     public Text changedSFX;
+
+    //Start Button
+    public Sprite startNH;
+    public Sprite startHL;
+    public Sprite continueNH;
+    public Sprite continueHL;
+
+    
+
+    WhichUIMenu whichUI;
+
+    [Header("Level Select Variables")]
+    [SerializeField]
+    Sprite _lockedLevelSprite;
+
     // Use this for initialization
     void Awake ()
     {
@@ -131,7 +149,7 @@ public class Menuing : MonoBehaviour {
         {
             _menus.Add(transform.GetChild(i).gameObject);
         }
-        _BossBar = _menus[(int)WhichUIMenu.PLAYER].transform.GetChild(3).gameObject;
+        _BossBar = _menus[(int)WhichUIMenu.PLAYER].transform.GetChild(2).gameObject;
         _BossBar.SetActive(false);
 
         _creditsStartPos = _credits.transform.localPosition;
@@ -161,9 +179,12 @@ public class Menuing : MonoBehaviour {
         _audioManager = _Audio.GetComponent<AudioManager>();
         currenResolution.text = Screen.width + " x " + Screen.height;
 
+        LoadingAndSavingTool.Load();
+        initLevelSelect();
 
+
+        SetStart();
         SetMenu((int)WhichUIMenu.MAINMENU);
-
     }
 
     private void Update()
@@ -184,10 +205,16 @@ public class Menuing : MonoBehaviour {
         currentMaster.text = changedMaster.text;
         currentMusic.text = changedMusic.text;
         currentSFX.text = changedSFX.text;
+
+
+
+        CheckBack();
+        
     }
 
     public void SetMenu(WhichUIMenu _whichMenu)
     {
+        
         for (int i = 0; i < transform.childCount; i++)
         {
             _menus[i].SetActive(false);
@@ -198,8 +225,10 @@ public class Menuing : MonoBehaviour {
         if (_whichMenu != WhichUIMenu.PLAYER)
         {
             SetButtons((int)_whichMenu);
+
             currSelectableButtons[currSelected].Select();
         }
+        whichUI = _whichMenu;
     }
 
     private void SetButtons(int _menuNum)
@@ -212,6 +241,7 @@ public class Menuing : MonoBehaviour {
         {
             _playerRef.SetOrientation = MenuOrient.VERT;
         }
+
         currSelectableButtons = new List<Selectable>();
         for (int i = 0; i < _menus[_menuNum].transform.childCount; i++)
         {
@@ -258,7 +288,7 @@ public class Menuing : MonoBehaviour {
 
     public void NextLevel()
     {
-
+        AudioManager.instance.RoomComplete();
         if (isLoading == false)
         {
             _menus[(int)WhichUIMenu.VIDEO].SetActive(true);
@@ -274,6 +304,50 @@ public class Menuing : MonoBehaviour {
         _paused = false;
         SetMenu(WhichUIMenu.PLAYER);
     }
+
+    
+    public void LoadContinuedLevel()
+    {
+        if (isLoading == false)
+        {
+            _menus[(int)WhichUIMenu.VIDEO].SetActive(true);
+            if(GameManager._lastLevelIndex >0)
+            StartCoroutine(LoadSpecificScene(GameManager._lastLevelIndex));
+            else
+                StartCoroutine(LoadSpecificScene(1));
+
+
+        }
+
+        _managerRef.SetGameReset = _playerRef.ResetPlayer;
+        _playerRef.GetCurrCheckpoint = 0;
+        _playerRef.DoesHaveCheckpoint = false;
+        _playerRef.InMenu = false;
+        Time.timeScale = 1;
+        _paused = false;
+        SetMenu(WhichUIMenu.PLAYER);
+    }
+    
+
+        
+    public void LoadSpecificLevel(int buildIndex)
+    {
+        if (isLoading == false)
+        {
+            _menus[(int)WhichUIMenu.VIDEO].SetActive(true);
+            StartCoroutine(LoadSpecificScene(buildIndex));
+
+        }
+
+        _managerRef.SetGameReset = _playerRef.ResetPlayer;
+        _playerRef.GetCurrCheckpoint = 0;
+        _playerRef.DoesHaveCheckpoint = false;
+        _playerRef.InMenu = false;
+        Time.timeScale = 1;
+        _paused = false;
+        SetMenu(WhichUIMenu.PLAYER);
+    }
+    
 
     public void RetryLevel()
     {
@@ -303,6 +377,7 @@ public class Menuing : MonoBehaviour {
         _playerRef.GetPlayerAnimator.Play("Nothing", 0);
 
         _BossBar.SetActive(false);
+        SetStart();
         SetMenu(WhichUIMenu.MAINMENU);
     }
 
@@ -345,21 +420,53 @@ public class Menuing : MonoBehaviour {
     public void ToAreYouSure()
     {
         AudioManager.instance.ButtonPressed();
+        initLevelSelect();
         SetMenu(WhichUIMenu.AREYOUSURE);
     }
 
+    public void ToDead()
+    {
+        AudioManager.instance.ButtonPressed();
+        SetMenu(WhichUIMenu.WIN);
+    }
 
+    
+    public void ToLevelSelect()
+    {
+        AudioManager.instance.ButtonPressed();
+        SetMenu(WhichUIMenu.LEVELSELECT);
+    }
+    
 
     public void MenuBack()
     {
+        if(SceneManager.GetActiveScene().buildIndex ==0)
         AudioManager.instance.ButtonPressed();
-        SetMenu(WhichUIMenu.MAINMENU);
+
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+            SetMenu(WhichUIMenu.MAINMENU);
+        else
+            SetMenu(WhichUIMenu.PAUSE);
     }
 
     public void EndGame()
     {
         AudioManager.instance.ButtonPressed();
         Application.Quit();
+    }
+
+    public void ToLS()
+    {
+        AudioManager.instance.ButtonPressed();
+        SetMenu(WhichUIMenu.LEVELSELECT);
+    }
+
+    public void ToPause()
+    {
+        if (_playerRef.getDead)
+            ToDead();
+        else
+            Pause();
     }
 
     public void MenuUpOrDown(bool _positiveMovement)
@@ -396,6 +503,10 @@ public class Menuing : MonoBehaviour {
         if(currSelectableButtons[currSelected].GetComponent<Toggle>())
         {
             currSelectableButtons[currSelected].GetComponent<Toggle>().isOn = !currSelectableButtons[currSelected].GetComponent<Toggle>().isOn;
+        }
+        else if (currSelectableButtons[currSelected].gameObject.GetComponent<Button>().interactable == false)
+        {
+            //Skip and don't do anything
         }
         else
         {
@@ -676,8 +787,115 @@ public class Menuing : MonoBehaviour {
     }
 
 
+    //Makes a specific button interactable or not based on if a level has been completed
+    public void LockLevel(bool enable, int levelToLock)
+    {
+        //Debug.Log("It went here");
+        _menus[12].SetActive(true);
+        Debug.Log(_menus[12].gameObject.name);
+        Button buttonToDisable = _menus[12].transform.GetChild(levelToLock + 1).GetComponent<Button>();
+
+        if (!enable)
+        {
+           buttonToDisable.interactable = false;
+           
+        }
+        else
+        {
+            buttonToDisable.interactable = true;
+        }
+        _menus[12].SetActive(false);
+    }
+
+    //Calls a for loop to check to see if level select buttons should be locked or unlocked.
+    public void initLevelSelect()
+    {
+        for (int i = 0; i < GameManager._themesUnlocked.Length; i++)
+        {
+                LockLevel(GameManager._themesUnlocked[i], i);
+        }
+    }
+
+    private void CheckBack()                //B button settings
+    {
+        
+        Scene m_Scene;
+
+        m_Scene = SceneManager.GetActiveScene();
 
 
+        if (Input.GetKeyDown("joystick button 1"))
+        {
+            switch (whichUI)
+            {
+                case WhichUIMenu.AUDIO:
+                    ToOptions();
+                    break;
+                case WhichUIMenu.VIDEO:
+                    ToOptions();
+                    break;
+                case WhichUIMenu.OPTIONS:
+                    if (m_Scene.buildIndex == 0)
+                        MenuBack();
+                    else
+                        SetMenu(WhichUIMenu.PAUSE);
+                    break;
+                case WhichUIMenu.PAUSE:
+                    Pause();
+                    break;
+                case WhichUIMenu.RESOLUTION:
+                    ToVideo();
+                    break;
+                case WhichUIMenu.MASTER:
+                    ToMusic();
+                    break;
+                case WhichUIMenu.MUSIC:
+                    ToMusic();
+                    break;
+                case WhichUIMenu.SFX:
+                    ToMusic();
+                    break;
+                case WhichUIMenu.LEVELSELECT:
+                    MenuBack();
+                    break;
+                case WhichUIMenu.AREYOUSURE:
+                    ToPause();
+                    break;
+
+            }
+        }
+        
+    }
+
+    public void SetStart()
+    {
+        Button startButton = _menus[0].transform.GetChild(1).GetComponent<Button>();
+        Image startImage = _menus[0].transform.GetChild(1).GetComponent<Image>();
+
+        SpriteState ss = new SpriteState();        
+
+        if (GameManager._lastLevelIndex >0)
+        {
+            startImage.sprite = continueNH;
+            ss.highlightedSprite = continueHL;
+            ss.pressedSprite = continueHL;
+        }
+        else
+        {
+            startImage.sprite = startNH;
+            ss.highlightedSprite = startHL;
+            ss.pressedSprite = startHL;
+        }
+        startButton.spriteState = ss;
+
+    }
+
+
+    /* 
+     MASTER,
+     MUSIC,
+     SFX,
+     AREYOUSURE*/
 
 
 
@@ -700,6 +918,7 @@ public class Menuing : MonoBehaviour {
         isLoading = false;
     }
 
+    
     IEnumerator LoadSpecificScene(int scene)
     {
         float time = 0;
@@ -721,11 +940,13 @@ public class Menuing : MonoBehaviour {
         _loadScreen.color = transparentColor;
         asyncLoad.allowSceneActivation = true;
         isLoading = false;
+        //AudioManager.instance.RestartMusic();
     }
+    
 
     IEnumerator FadeIn()
     {
-        
+        AudioManager.instance.RestartMusic();
         float time;
         if (!_paused)
             time = 0;

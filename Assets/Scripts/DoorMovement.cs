@@ -19,9 +19,18 @@ public class DoorMovement : MonoBehaviour {
     protected Color _myColor;
     [SerializeField]
     protected float _fadeInc;
-    
+
+    protected GameObject _Audio;
+    protected AudioManager _audioManager;
+    protected float volSFX;
+
+    protected AudioSource _speaker;
+    public AudioClip gateOpen;
+    public AudioClip gateClose;
+
+
     // Use this for initialization
-    protected  virtual void Awake ()
+    protected virtual void Awake()
     {
         _myRenderer = GetComponent<MeshRenderer>();
         _myMaterial = _myRenderer.material;
@@ -31,27 +40,35 @@ public class DoorMovement : MonoBehaviour {
         _myRenderer.material = _myMaterial;
         _startPos = transform.position;
         _myRenderer.enabled = false;
-	}
+
+        _Audio = GameObject.Find("AudioManager");
+        _audioManager = _Audio.GetComponent<AudioManager>();
+        volSFX = _audioManager.volSFX;
+        _speaker = this.transform.GetComponent<AudioSource>();
+    }
 
     public virtual void Init()
     {
+        _speaker.PlayOneShot(gateOpen);
         _myRenderer.enabled = true;
         falling = true;
     }
 
     public virtual void RoomDone()
     {
+        if(!_speaker.isPlaying)
+        _speaker.PlayOneShot(gateClose);
         falling = false;
         rising = true;
     }
 
     // Update is called once per frame
-    protected virtual void Update () {
-        if(falling)
+    protected virtual void Update() {
+        if (falling)
         {
             Fall();
         }
-        else if(rising)
+        else if (rising)
         {
             Rise();
         }
@@ -92,4 +109,14 @@ public class DoorMovement : MonoBehaviour {
             transform.position += Vector3.up * _doorSpeed * Time.deltaTime;
         }
     }
+
+
+
+    public virtual void Mute()
+    {
+        _speaker.volume = 0;
+        _speaker.mute = !_speaker.mute;
+        _speaker.maxDistance = 10;
+    }
+    
 }

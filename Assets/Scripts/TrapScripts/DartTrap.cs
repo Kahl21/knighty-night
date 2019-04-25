@@ -49,6 +49,8 @@ public class DartTrap : BaseTrap {
     float _startPossessTime;
     TrapBossGlhost _bossRef;
 
+    public AudioClip ArrowNoise;
+
     //Initilize function
     public override void Init()
     {
@@ -57,6 +59,8 @@ public class DartTrap : BaseTrap {
 
         _realFireDelay = _fireDelay;
         _realSpawnDelay = _spawnDelay;
+
+        _speaker = this.transform.GetComponent<AudioSource>();
 
         _init = true;
         _startDelay = Time.time;
@@ -115,6 +119,9 @@ public class DartTrap : BaseTrap {
     private void FireDart()
     {
         _currDelay = (Time.time - _startDelay) / _realFireDelay;
+
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(ArrowNoise);
 
         if (_currDelay >= 1)
         {

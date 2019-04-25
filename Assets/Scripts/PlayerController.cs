@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 
 public class PlayerController : MonoBehaviour
@@ -155,6 +156,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     List<GameObject> baseRoomList;
 
+
+    bool dead;
+
     // Use this for initialization
     void Awake()
     {
@@ -182,6 +186,7 @@ public class PlayerController : MonoBehaviour
         _hearts = new List<HealthTracker>();
 
         reachCheckpoint = false;
+        dead = false;
     }
 
     //Secondary Initialization
@@ -202,6 +207,7 @@ public class PlayerController : MonoBehaviour
         _specialBar = _gameMenus[2].transform.GetChild(1).gameObject;
         _specialBar.GetComponent<Image>().fillAmount = 0;
         currentCheckpoint = 0;
+        dead = false;
     }
 
     //Called to reset the Player Stats
@@ -240,6 +246,7 @@ public class PlayerController : MonoBehaviour
         }
         _whatImDoing = Interactions.NONE;
         _myAnimations.Play("StandingIdle", 0);
+        dead = false;
     }
 
     // Update is called once per frame
@@ -273,26 +280,30 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            CheckForPause();                                //check for pause function
-            if (_movingHealth)                              //if moving health is true
+            if (SceneManager.GetActiveScene().buildIndex != 0)
             {
-                LerpHealthBar();          //lerp health bar function
-            }
+                CheckForPause();                                //check for pause function
+                if (_movingHealth)                              //if moving health is true
+                {
+                    LerpHealthBar();          //lerp health bar function
+                }
 
-            if (_movingSpecial)                              //if moving special
-            {
-                LerpSpecialBar();                           //lerp special bar function
-            }
-            CheckForMovement();                             //check for movement function
+                if (_movingSpecial)                              //if moving special
+                {
+                    LerpSpecialBar();                           //lerp special bar function
+                }
 
-            if (!_doingSomething)                           //if not doing something
-            {
-                LookAround();                               //look around function
-                CheckForActionInput();                      //check for action input
-            }
-            else
-            {
-                WhatAmIEvenDoing();                         //else what are you doing with your life. theres so much meaning to this universe and instead you are reading this extrordinarily long comment which really doesnt have a point much like, i assume, this function that probably just checks to see what else the player can do/ why it isnt doing what its supposed to
+                CheckForMovement();                             //check for movement function
+
+                if (!_doingSomething)                           //if not doing something
+                {
+                    LookAround();                               //look around function
+                    CheckForActionInput();                      //check for action input
+                }
+                else
+                {
+                    WhatAmIEvenDoing();                         //else what are you doing with your life. theres so much meaning to this universe and instead you are reading this extrordinarily long comment which really doesnt have a point much like, i assume, this function that probably just checks to see what else the player can do/ why it isnt doing what its supposed to
+                }
             }
         }
     }
@@ -552,6 +563,11 @@ public class PlayerController : MonoBehaviour
             {
                 _move = Vector3.zero;                                                                   //there is no movement
                 baseRoomList.Clear();
+
+                GameManager.Instance.SaveCompletedRoom(SceneManager.GetActiveScene().buildIndex + 1);       //Save the completed room
+                GameManager.Instance.CheckForCompletedWorld(SceneManager.GetActiveScene().buildIndex);
+                LoadingAndSavingTool.Save();                                                            //Save levels completed into the save state
+
                 if (thingHit.GetComponent<WinScript>().IsLastLevel())                                   //if the win script is attached to the last level
                 {
                     EndLevel(true);                                                                     //end level is equal to true
@@ -723,7 +739,8 @@ public class PlayerController : MonoBehaviour
             _myAnimations.Play("SwordSwing", 0);                                                                                    //play the sword swing animation
             IncSpecialMeter(_MaxSpecialAmount, false);                                                                              //empty the special meter
             _doingSomething = true;                                                                                                 //player is set to do something
-            Instantiate<GameObject>(BWPrefab, transform.position + transform.forward + Vector3.up, transform.rotation);             //creates an instance of the special attack prefab
+            GameObject _newWave = Instantiate<GameObject>(BWPrefab, transform.position + transform.forward + Vector3.up, transform.rotation);             //creates an instance of the special attack prefab
+            _newWave.GetComponent<BacklashWave>().Init();
             _SwingStartTime = Time.time;                                                                                            //start the time for the swing
             _whatImDoing = Interactions.WAVESPECIAL;                                                                                //player is using the special slash
             AudioManager.instance.FireAttack();                                                                                     //play the sound of the fire slash
@@ -812,6 +829,15 @@ public class PlayerController : MonoBehaviour
                         {
                             thingHit.GetComponent<TrapLever>().StartRotation();
                         }
+
+                        else if (thingHit.GetComponent<SecretLever>())
+                        {
+                            thingHit.GetComponent<SecretLever>().StartRotation();
+                        }
+                        else if(thingHit.GetComponent<BreakableObject>())
+                        {
+                            thingHit.GetComponent<BreakableObject>().BreakObject();
+                        }
                     }
                 }
                 break;
@@ -829,13 +855,24 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    
+    private void OnParticleCollision(GameObject other)
+    {
+        if (other.transform.parent.GetComponent<BossFireStatueTrap>())
+        {
+            TakeDamage(other.transform.parent.GetComponent<BossFireStatueTrap>().GetFireDamage);
+        }
+    }
+    
+
+
     //called by objects that damage the player 
     //damages the player
     public void TakeDamage(float _damageTaken)
     {
         if (!_invincible)
         {
-            //AudioManager.instance.PlayerDamaged();
+            AudioManager.instance.PlayerDamaged();
             _invincible = true;
             IncHealthMeter(_damageTaken, false);
 
@@ -903,6 +940,7 @@ public class PlayerController : MonoBehaviour
         {
             _winImage.SetActive(false);
             _loseImage.SetActive(true);
+            dead = true;
         }
         _inMenu = true;
     }
@@ -949,4 +987,5 @@ public class PlayerController : MonoBehaviour
 
     public float GetCurrCheckpoint { get { return currentCheckpoint; } set { currentCheckpoint = value; } }
     public bool DoesHaveCheckpoint { get { return reachCheckpoint; } set { reachCheckpoint = value; } }
+    public bool getDead { get { return dead;} set { dead = value; } }
 }

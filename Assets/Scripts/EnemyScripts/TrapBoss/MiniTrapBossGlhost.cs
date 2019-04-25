@@ -375,7 +375,8 @@ public class MiniTrapBossGlhost : BossEnemy
         _mySkinRenderer.enabled = false;
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
 
-        Vector3 possessPosition = currentTrap.transform.localPosition;
+        Vector3 possessPosition = currentTrap.transform.position;
+        Debug.Log(currentTrap.transform.position);
         possessPosition.y = transform.position.y;
         transform.position = possessPosition;
 

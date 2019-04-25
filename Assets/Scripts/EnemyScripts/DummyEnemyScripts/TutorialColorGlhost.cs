@@ -12,6 +12,7 @@ public class TutorialColorGlhost : BaseEnemy  {
         _myAgent = GetComponent<NavMeshAgent>();
         _mySpawner = _spawner;
         _spawnPoint = transform.position;
+        _myAnimations = GetComponent<Animator>();
 
         _myBody = transform.GetChild(2).gameObject;
         _myRenderer = _myBody.GetComponent<SkinnedMeshRenderer>();
@@ -19,6 +20,8 @@ public class TutorialColorGlhost : BaseEnemy  {
 
         _mySpookiness.color = _myColor;
         _myRenderer.materials[1] = _mySpookiness;
+
+        _speaker = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame

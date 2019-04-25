@@ -16469,7 +16469,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1817129121254502}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -20.10014, y: 0.13, z: 76.99986}
+  m_LocalPosition: {x: -20.10014, y: -3.6844242e-17, z: 76.99986}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children:
   - {fileID: 4493951419155828}
@@ -19581,8 +19581,8 @@ MonoBehaviour:
   _timeBetweenAttacks: 1
   _stunnedDuration: 5
   _vertDetectOffset: 0.4
-  _startAngle: 0
-  _detectionAngle: 360
+  _startAngle: 45
+  _detectionAngle: 90
   _numOfCasts: 8
   _debug: 1
   _followPercentage: 10
@@ -19599,8 +19599,8 @@ MonoBehaviour:
   _chargeMoveSpeed: 10
   _chargeDetectionAngle: 45
   _chargeNumOfCasts: 3
-  _chargeSpawnAngle: 235
-  _chargeSpawnAngleOffset: 55
+  _chargeSpawnAngle: 45
+  _chargeSpawnAngleOffset: 90
   _hardColorsForMinions:
   - {r: 1, g: 0, b: 0, a: 1}
   - {r: 0, g: 0.1882353, b: 1, a: 1}
@@ -20318,7 +20318,7 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 7.009063
+  m_Height: 2.72
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4

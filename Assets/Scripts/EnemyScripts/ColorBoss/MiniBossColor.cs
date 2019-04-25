@@ -484,7 +484,8 @@ public class MiniBossColor : BossEnemy
         {
             if(_myAnimations.IsInTransition(0))
             {
-                _jumping = true; 
+                _jumping = true;
+                _jumpingFinished = false;
                 _startAttackTime = Time.time;
             }
         }
@@ -493,14 +494,6 @@ public class MiniBossColor : BossEnemy
             _currAttackTime = (Time.time - _startAttackTime) / _realBouncingAirtime;
             //Debug.Log("spinning");
 
-            Vector3 c01, c12, c012;
-
-            c01 = (1 - _currAttackTime) * c0 + _currAttackTime * c1;
-            c12 = (1 - _currAttackTime) * c1 + _currAttackTime * c2;
-
-            c012 = (1 - _currAttackTime) * c01 + _currAttackTime * c12;
-
-            transform.position = c012;
 
             if (_currAttackTime >= 1)
             {
@@ -536,7 +529,9 @@ public class MiniBossColor : BossEnemy
                     _currAttackTime = 1;
 
                     if (!_speaker.isPlaying)
+                    {
                         _speaker.PlayOneShot(bossBounce, volSFX);
+                    }
 
                     _calcAngle = _startAngle;
 
@@ -546,7 +541,7 @@ public class MiniBossColor : BossEnemy
                         _myAnimations.Play("EndJump", 0);
                         _jumpingFinished = true;
                     }
-                    else if (_myAnimations.IsInTransition(0))
+                    else if (_myAnimations.GetCurrentAnimatorStateInfo(0).IsName("StartJump"))
                     {
                         _currBounces++;
                         c0 = transform.position;
@@ -580,15 +575,16 @@ public class MiniBossColor : BossEnemy
                             hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
                         }
                     }
-
-                    if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), Vector3.down, out hit, _bossCollisionDetectDistance))
-                    {
-                        if (hit.collider.GetComponent<PlayerController>())
-                        {
-                            hit.collider.GetComponent<PlayerController>().TakeDamage(_bossDamage);
-                        }
-                    }
                 }
+
+                Vector3 c01, c12, c012;
+
+                c01 = (1 - _currAttackTime) * c0 + _currAttackTime * c1;
+                c12 = (1 - _currAttackTime) * c1 + _currAttackTime * c2;
+
+                c012 = (1 - _currAttackTime) * c01 + _currAttackTime * c12;
+
+                transform.position = c012;
             }
         }
     }
