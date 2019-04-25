@@ -200,7 +200,7 @@ public class DungeonMechanic : MonoBehaviour {
             case Mechanic.BREAKOUT:                                     //if breakout room
 
                 _breakRef = GetComponent<BreakoutManager>();            //set breakout reference
-                _breakRef.Init();                                       //initialize breakout room
+                _breakRef.Init(GetComponent<DungeonMechanic>());                                       //initialize breakout room
                 SpawnEnemy(0);                                          //spawn puck
                 break;
 
@@ -208,7 +208,7 @@ public class DungeonMechanic : MonoBehaviour {
 
                 //_PMRef.GetComponent<PM_Manager>();                      //set PACMAN reference
                 _PMRef.Init();                                          //initialize breakout room
-                
+                _PMRef.SetSpawner = this.GetComponent<DungeonMechanic>();
                 break;
 
             default:
@@ -359,6 +359,7 @@ public class DungeonMechanic : MonoBehaviour {
             case Mechanic.BREAKOUT:
 
                 spawnPos = _puckSpawnPoint.transform.position;                  //change spawn point to the puck spawn point           
+                
                 break;
 
             default:
@@ -368,6 +369,11 @@ public class DungeonMechanic : MonoBehaviour {
         spawnPos.y = 0;                                                         //set y pos of spawn to the floor (just in case)
         //Debug.Log(spawnPos);
         GameObject newEnemy = Instantiate<GameObject>(_enemyPreFab, spawnPos, _enemyPreFab.transform.rotation);     //spawn the new enemy and set spawned ghlost to reference
+
+        if (_roomMechanic == Mechanic.BREAKOUT)
+        {
+            _breakRef.SetPuck = newEnemy;
+        }
 
         switch (_roomMechanic)
         {
@@ -440,6 +446,29 @@ public class DungeonMechanic : MonoBehaviour {
             case Mechanic.BOSS:
 
                 EndAll();                                       //end the room
+                break;
+
+            case Mechanic.PACMAN:
+
+                EndAll();                                       
+                break;
+
+            case Mechanic.BREAKOUT:
+                bool roomClear = true;
+                for (int index = 0; index < _breakRef.GetBlocksInScene.Count; index++)
+                {
+                    if (_breakRef.GetBlocksInScene[index].gameObject.activeSelf == true)
+                    {
+                        roomClear = false;
+                    }
+                }
+
+                if (roomClear)
+                {
+                    EndAll();
+                    Debug.Log("Room End");
+                }
+                                                      
                 break;
 
             default:
@@ -598,9 +627,13 @@ public class DungeonMechanic : MonoBehaviour {
                 break;
 
             case Mechanic.PACMAN:
-
-
                 _PMRef.MyReset();
+                EndAll();
+                break;
+
+            case Mechanic.BREAKOUT:
+                _breakRef.ResetBreakout();
+                EndAll();
                 break;
 
             default:

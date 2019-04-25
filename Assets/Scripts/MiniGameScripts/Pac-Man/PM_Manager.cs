@@ -84,6 +84,7 @@ public class PM_Manager : MonoBehaviour
     int spawnCounter = 0;
     PlayerController _playerRef;
     bool _playerHasSpecialSword = false;
+    DungeonMechanic _mySpawner;
     PHASES _pmPhase = PHASES.NONE;
 
     // Use this for initialization
@@ -270,6 +271,7 @@ public class PM_Manager : MonoBehaviour
             {
                 _playerRef.gameObject.transform.GetChild(0).transform.GetChild(5).GetComponent<SkinnedMeshRenderer>().material.color = _initialSwordMat;
                 Debug.Log("Level Complete");
+                _mySpawner.CheckForEnd();
             }
         }
         
@@ -350,4 +352,5 @@ public class PM_Manager : MonoBehaviour
 
     public List<GameObject> GetTargetPoints { get { return _targetPoints; } }
     public bool PlayerHasSpecialSword { get { return _playerHasSpecialSword; } }
+    public DungeonMechanic SetSpawner { set { _mySpawner = value; } }
 }

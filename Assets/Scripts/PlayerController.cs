@@ -587,7 +587,7 @@ public class PlayerController : MonoBehaviour
             {
                 _move = Vector3.zero;
             }
-            else if (thingHit.GetComponent<BaseEnemy>())                                                //else if the player hit a base enemy
+            else if (thingHit.GetComponent<BaseEnemy>() && !thingHit.GetComponent<BreakoutGhlost>())   //else if the player hit a base enemy
             {
                 TakeDamage(thingHit.GetComponent<BaseEnemy>().GetDamage);                               //have the player take damage
             }
