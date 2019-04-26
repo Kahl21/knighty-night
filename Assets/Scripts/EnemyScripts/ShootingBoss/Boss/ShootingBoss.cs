@@ -58,6 +58,8 @@ public class ShootingBoss : BossEnemy
     [Header("Color Attack Variables")]
     [SerializeField]
     float _colorDamageToBoss;                                       //Damage to boss from same colored ghlosts
+    [SerializeField]
+    Color _initColor;
 
     [Header("Special Attack Variables")]
     [SerializeField]
@@ -88,7 +90,6 @@ public class ShootingBoss : BossEnemy
     List<GameObject> _absorbedGhlosts;                              //List of absorbed ghlosts
     bool _specialPulseAttack = false;                               //Check for determing if the absorb attack should go throguh
 
-    Vector3 _ogCamPos;
     bool _cameraInPosition;
     float _startTimer;
     float _currentTime;
@@ -151,6 +152,8 @@ public class ShootingBoss : BossEnemy
             }
         }
 
+        _attachedShooter.GetGhostAnimator = _myAnimations;
+
         //_ogCamPos = _cameraRef.transform.position;
         cam0 = _cameraRef.transform.position;
         cam1 = transform.position + _camOffset;
@@ -177,6 +180,14 @@ public class ShootingBoss : BossEnemy
             _calcAngle = _startAngle;
             _absorbingGhlosts = new List<GameObject>();
             _absorbedGhlosts = new List<GameObject>();
+
+            _rotationAngle = 0;
+            _ghlostsShot = 0;
+            _invinciblesAddad = false;
+            _specialPulseAttack = false;
+            _attackInProgress = false;
+
+            _initColor = _mySkinRenderer.materials[1].color;
         }
         _myAI = BossAI.FIGHTING;
         _init = true;
@@ -253,6 +264,7 @@ public class ShootingBoss : BossEnemy
             }
             else
             {
+                _myAnimations.Play("Movement", 0);
                 _MyState = SHOOTERSTATES.STUNNED;                           //No secondary attack so he is stunned
                 _startTimer = Time.time;
             }
@@ -264,6 +276,7 @@ public class ShootingBoss : BossEnemy
         float timeTaken = Time.time - _startTimer;
         if (timeTaken >= _stunnedTime)
         {
+            _myAnimations.Play("Movement", 0);
             _MyState = SHOOTERSTATES.FOLLOWING;
             _startTimer = Time.time;
         }
@@ -496,8 +509,35 @@ public class ShootingBoss : BossEnemy
         _cameraInPosition = false;
         _endingPlaying = true;
 
+        _attachedShooter.MyReset();
+        ResetAttack();
+
         _myAI = BossAI.OUTRO;
     }
+
+
+    void ResetAttack()
+    {
+        for (int index = 0; index < _absorbingGhlosts.Count; index++)
+        {
+            GameObject objRef;
+            objRef = _absorbingGhlosts[index];
+            Destroy(objRef);
+        }
+
+        for (int index = 0; index < _absorbedGhlosts.Count; index++)
+        {
+            GameObject objRef;
+            objRef = _absorbedGhlosts[index];
+            Destroy(objRef);
+        }
+        _absorbingGhlosts = new List<GameObject>();
+        _absorbedGhlosts = new List<GameObject>();
+
+        _myAI = BossAI.NONE;
+            _MyState = SHOOTERSTATES.FOLLOWING;
+    }
+    
 
     //plays ending cutscene
     protected override void PlayEnd()
@@ -577,12 +617,16 @@ public class ShootingBoss : BossEnemy
     {
         if (_init)
         {
+            ResetAttack();
+            _attachedShooter.enabled = true;
             _attachedShooter.MyReset();
+
+
             gameObject.SetActive(true);
             _mySkinRenderer.enabled = true;
             _myColor.a = 1;
-            _myMaterial.color = _myColor;
-            _mySkinRenderer.materials[1] = _myMaterial;
+            //_myMaterial.color = _inir;
+            _mySkinRenderer.materials[1].color = _initColor;
 
             _enemyAgent.enabled = false;
             Debug.Log("Boss Reset");
@@ -607,6 +651,7 @@ public class ShootingBoss : BossEnemy
             _MyState = SHOOTERSTATES.FOLLOWING;
             _init = false;
         }
+        
     }
 
     public float GetDamageToBoss { get { return _damageToBoss; } }

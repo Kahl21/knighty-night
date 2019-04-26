@@ -3499,7 +3499,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef6f14e600f1f61419c8689b7d3190ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _glhostDamage: 1.25
+  _glhostDamage: 1.5
   _damageRange: 0.7
   _deathTimer: 6
   _collisionCheckDist: 1
@@ -3507,14 +3507,14 @@ MonoBehaviour:
   _spookyOffset: 7.5
   _cheatingDistance: 0
   _cheatingSensitivity: 0
-  ghostDeath: {fileID: 8300000, guid: 7a4cb9b5e8464f2499a7e8e792a90357, type: 3}
-  ghostHit: {fileID: 8300000, guid: ba749a754642ba0468e65a795cb333d1, type: 3}
-  colorGhostCorrect: {fileID: 8300000, guid: def8498054f7e6e488a69dd074edc7a3, type: 3}
+  ghostDeath: {fileID: 8300000, guid: 77cc3850855847444b4b9a400d5af9cd, type: 3}
+  ghostHit: {fileID: 8300000, guid: 7b80a8e3ffe59c74fb6c7ca934d9023e, type: 3}
+  colorGhostCorrect: {fileID: 8300000, guid: 372d3022eb60045d3a5df39655f0b92b, type: 3}
   _invincibleColor: {r: 0, g: 0, b: 0, a: 1}
   _particle: {fileID: 1496576594527614}
   _invincibleChangeDuration: 1
   _changedDamage: 0.5
-  _changedSpeed: 3
+  _changedSpeed: 5
   _alwaysInvincible: 1
   _doesNotChangeSpookieness: 1
 --- !u!136 &136152425730835960

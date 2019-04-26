@@ -28,6 +28,7 @@ public class GhlostBossShooter : MonoBehaviour
     public bool attackInProgress = false;
     [SerializeField]
     float _SpawnedDistAway;
+    Animator _ghostAnimations;
 
     //[Header("Pulse Attack variables")]
     //[SerializeField]
@@ -178,12 +179,14 @@ public class GhlostBossShooter : MonoBehaviour
             _nextAttack = Random.Range(0, _totalPulsePercentage);
             if (_nextAttack > 0 && _nextAttack <= _regularPulsePercentage)
             {
+                _ghostAnimations.Play("ShootStart", 0);
                 _attackState = ATTACKSTATE.PULSEHARDATK;
                 _currentPulse = 0;
                 _variedCurrentPulse = 0;
             }
             else
             {
+                _ghostAnimations.Play("ShootStart", 0);
                 gameObject.GetComponent<ShootingBoss>().SetSpecialPulseAttack = true;
                 _attackState = ATTACKSTATE.PULSEHARDATK;
                 _currentPulse = 0;
@@ -193,12 +196,14 @@ public class GhlostBossShooter : MonoBehaviour
         else if (_nextAttack > _pulseAttackPercentage && _nextAttack <= (_pulseAttackPercentage + _lineAttackPercentage))
         {
             Debug.Log("Line Attack");
+            _ghostAnimations.Play("ShootStart", 0);
             _startingAngle = transform.eulerAngles;
             _attackState = ATTACKSTATE.LINEATK;
         }
         else
         {
             Debug.Log("Spiral Attack");
+            _ghostAnimations.Play("ShootStart", 0);
             _attackState = ATTACKSTATE.SPIRALATK;
         }
         startTime = Time.time;
@@ -391,10 +396,14 @@ public class GhlostBossShooter : MonoBehaviour
         {
             GameObject ghlostRef;
             ghlostRef = _ghlostsInScene[index];
-            _ghlostsInScene.Remove(ghlostRef);
+            //_ghlostsInScene.Remove(ghlostRef);
+            Destroy(ghlostRef);
         }
+        _ghlostsInScene = new List<GameObject>();
+        GhlostsCast = 0;
     }
 
     public List<GameObject> GetGhlostsInScene { get { return _ghlostsInScene; } }
     public List<Color> GetGhlostColors { get { return _colorsForMinions; } }
+    public Animator GetGhostAnimator { get { return _ghostAnimations; } set { _ghostAnimations = value; } }
 }

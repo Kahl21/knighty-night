@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 4871240313527016}
   - component: {fileID: 33455591782076566}
   - component: {fileID: 23610709309172312}
+  - component: {fileID: 65282039659893144}
   m_Layer: 0
   m_Name: floor_carpet_corner_asset
   m_TagString: Untagged
@@ -35,7 +36,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1077634144594834}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -17.9992, y: -0.000044465065, z: 5.6133003}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -83,3 +84,15 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1077634144594834}
   m_Mesh: {fileID: 4300000, guid: 9955f81fd4003ab46be344479f4c1d3d, type: 3}
+--- !u!65 &65282039659893144
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1077634144594834}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 4, y: 0, z: 4}
+  m_Center: {x: 0, y: 0, z: 0}

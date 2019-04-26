@@ -57,7 +57,9 @@ public class GraveyardDoorMovement : DoorMovement
         if(leftDoor.transform.localEulerAngles.y <= _leftGoTo.y)
         {
             if (!_speaker.isPlaying)
+            {
                 _speaker.PlayOneShot(gateClose);
+            }
             leftDoor.transform.Rotate(Vector3.up * _doorSpeed);
             rightDoor.transform.Rotate(Vector3.down * _doorSpeed);
         }

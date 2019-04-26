@@ -85,6 +85,7 @@ public class BaseEnemy : MonoBehaviour {
 
         _Audio = GameObject.Find("AudioManager");
         _audioManager = _Audio.GetComponent<AudioManager>();
+        _speaker = GetComponent<AudioSource>();
         volSFX = _audioManager.volSFX;
     }
 
@@ -182,7 +183,9 @@ public class BaseEnemy : MonoBehaviour {
     {
         _speaker.Stop();
         if (!_speaker.isPlaying)
-        _speaker.PlayOneShot(ghostDeath, volSFX);
+        {
+            _speaker.PlayOneShot(ghostDeath, volSFX);
+        }
         _actualDead = true;
         _myAnimations.Play("Death");
         Destroy(gameObject, 1f);

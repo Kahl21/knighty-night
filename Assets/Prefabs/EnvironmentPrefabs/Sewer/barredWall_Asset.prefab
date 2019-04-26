@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 33315972161016964}
   - component: {fileID: 23677441874752466}
   - component: {fileID: 65844906087912108}
+  - component: {fileID: 114116163086811982}
   m_Layer: 0
   m_Name: barredWall_Asset
   m_TagString: Untagged
@@ -96,3 +97,14 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 400, y: 399.70285, z: 18.776833}
   m_Center: {x: 195.0405, y: 199.85143, z: 0}
+--- !u!114 &114116163086811982
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1193332299041140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c783ba1a10e63c47bd22218847ad1cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

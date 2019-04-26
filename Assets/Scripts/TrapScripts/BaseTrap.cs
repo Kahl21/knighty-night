@@ -35,6 +35,7 @@ public class BaseTrap : MonoBehaviour {
         _Audio = GameObject.Find("AudioManager");
         _audioManager = _Audio.GetComponent<AudioManager>();
         volSFX = _audioManager.volSFX;
+        _speaker = GetComponent<AudioSource>();
 
     }
 
