@@ -43,10 +43,13 @@ public class PM_Manager : MonoBehaviour
 
     [Header("Score Variables")]
     [SerializeField]
+    GameObject _scorePrefab;
+    GameObject _scoreCanvasInstance;
+    [SerializeField]
     int _coinValue;
     [SerializeField]
     int _currentScore = 0;
-    [SerializeField]
+    //[SerializeField]
     Text _scoreText;
 
     [Header("Phase 1 Variables")]
@@ -158,6 +161,8 @@ public class PM_Manager : MonoBehaviour
             _teleporters[index].SetActive(true);
         }
 
+        _scoreCanvasInstance = Instantiate(_scorePrefab);
+        _scoreText = _scoreCanvasInstance.transform.GetChild(0).GetComponent<Text>();
         _pmPhase = PHASES.INITPHASE;
     }
 
@@ -272,6 +277,7 @@ public class PM_Manager : MonoBehaviour
                 _playerRef.gameObject.transform.GetChild(0).transform.GetChild(5).GetComponent<SkinnedMeshRenderer>().material.color = _initialSwordMat;
                 Debug.Log("Level Complete");
                 _mySpawner.CheckForEnd();
+                Destroy(_scoreCanvasInstance);
             }
         }
         
@@ -343,7 +349,7 @@ public class PM_Manager : MonoBehaviour
 
         _currentScore = 0;
         _scoreText.text = "Score: " + _currentScore + "/" + _initialScoreNeeded;
-
+        Destroy(_scoreCanvasInstance);
 
 
         Debug.Log("RESET PACMAN");
