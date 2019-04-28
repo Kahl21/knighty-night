@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -20901,7 +20901,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4757104646598970, guid: 5d82c0110a981e14f9440cc7f62f9b4b, type: 2}
       propertyPath: m_LocalPosition.x
-      value: -20.10014
+      value: -6.02
       objectReference: {fileID: 0}
     - target: {fileID: 4757104646598970, guid: 5d82c0110a981e14f9440cc7f62f9b4b, type: 2}
       propertyPath: m_LocalPosition.y
@@ -20931,10 +20931,18 @@ Prefab:
       propertyPath: m_RootOrder
       value: 13
       objectReference: {fileID: 0}
-    - target: {fileID: 114905924889827544, guid: 5d82c0110a981e14f9440cc7f62f9b4b,
+    - target: {fileID: 4772671625830680, guid: 5d82c0110a981e14f9440cc7f62f9b4b, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: -5.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4772671625830680, guid: 5d82c0110a981e14f9440cc7f62f9b4b, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 20996978699023248, guid: 5d82c0110a981e14f9440cc7f62f9b4b,
         type: 2}
-      propertyPath: _chargeSpawnAngle
-      value: 225
+      propertyPath: orthographic
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5d82c0110a981e14f9440cc7f62f9b4b, type: 2}
@@ -29808,11 +29816,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4044726921736820, guid: 4edeb138c9cd28e46af9b45022c1c919, type: 2}
       propertyPath: m_LocalPosition.z
-      value: 12043
+      value: 7240
       objectReference: {fileID: 0}
     - target: {fileID: 4044726921736820, guid: 4edeb138c9cd28e46af9b45022c1c919, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 14
+      value: 328
       objectReference: {fileID: 0}
     - target: {fileID: 114380845075744368, guid: 4edeb138c9cd28e46af9b45022c1c919,
         type: 2}

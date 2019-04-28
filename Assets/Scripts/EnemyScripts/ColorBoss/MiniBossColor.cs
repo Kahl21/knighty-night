@@ -17,19 +17,10 @@ public class MiniBossColor : BossEnemy
 
     [Header("Color Boss Intro Variables")]
     [SerializeField]
-    float _introMoveSpeed;
-    [SerializeField]
-    float _introJumpBackDistance;
-    [SerializeField]
-    float _introJumpBackDuration;
-    [SerializeField]
-    float _introJumpBackHeight;
-    [SerializeField]
-    GameObject _colorIntroGlhosts;
-    List<ColorIntroGlhost> _introGlhostList;
+    GameObject _colorIntroGlhost;
     bool _cameraInPosition = false;
-    bool _glhostsDone = false;
-    bool _eatingFinished = false;
+    bool _animating = false;
+    bool _breakfastEaten = false;
     bool _jumpingFinished = false;
 
     [Header("Color Boss Variables")]
@@ -131,141 +122,48 @@ public class MiniBossColor : BossEnemy
     {
         if (!_cameraInPosition)
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            if (_currAttackTime >= 1)
+            if (_cameraRef.MoveCamera())
             {
-                _currAttackTime = 1;
-                if (!_glhostsDone)
-                {
-                    for (int i = 0; i < _introGlhostList.Count; i++)
-                    {
-                        _introGlhostList[i].Init();
-                    }
-                    _glhostsDone = true;
-                }
+                _cameraInPosition = true;
+            }
+            else
+            {
+                _myAnimations.Play("MiniIntro", 0);
             }
 
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
         }
-        else if (!_eatingFinished)
+        else if (!_animating)
         {
-            Vector3 run = transform.forward * Time.deltaTime * _introMoveSpeed;
-            if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), run, out hit, _bossCollisionDetectDistance))
+            if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .9f)
             {
-                if (hit.collider.GetComponent<ColorIntroGlhost>())
-                {
-                    _myColor = hit.collider.GetComponent<ColorIntroGlhost>().GotEaten();
-                    _myMaterial.color = _myColor;
-                    _mySkinRenderer.materials[1] = _myMaterial;
-                    if (CheckForIntroEatingDone())
-                    {
-                        if (_colorIntroGlhosts.activeInHierarchy)
-                        {
-                            for (int i = 0; i < _introGlhostList.Count; i++)
-                            {
-                                _introGlhostList[i].ParentYouself();
-                            }
-                            _colorIntroGlhosts.SetActive(false);
-                        }
-
-                        c0 = transform.position;
-                        c2 = transform.position - (transform.forward * _introJumpBackDistance);
-                        c1 = ((c0 + c2) / 2) + (Vector3.up * _introJumpBackHeight);
-                        _startAttackTime = Time.time;
-                        _eatingFinished = true;
-                    }
-                }
-            }
-
-            transform.position += run;
-        }
-        else if (!_jumpingFinished)
-        {
-            _currAttackTime = (Time.time - _startAttackTime) / _introJumpBackDuration;
-
-            if (_currAttackTime >= 1)
-            {
-                _currAttackTime = 1;
 
                 cam0 = _cameraRef.transform.position;
                 cam1 = _ogCamPos;
+                rot0 = _cameraRef.transform.localEulerAngles;
+                rot1 = _ogCamRot;
 
-                _startAttackTime = Time.time;
-                transform.LookAt(transform.position + Vector3.back);
+                _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
 
                 _myMaterial.color = _basicColor;
                 _mySkinRenderer.materials[1] = _myMaterial;
-
-                _jumpingFinished = true;
+                _animating = true;
             }
-            else if (_currAttackTime >= .5f)
+            else if(_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .25f && !_breakfastEaten)
             {
-                transform.LookAt(transform.position + Vector3.back);
+                _colorIntroGlhost.SetActive(false);
+                _myMaterial.color = _colorIntroGlhost.GetComponent<MiniColorCutsceneGhost>().GetColor;
+                _mySkinRenderer.materials[1] = _myMaterial;
+                _breakfastEaten = true;
             }
-
-            Vector3 c01, c12, c012;
-
-            c01 = (1 - _currAttackTime) * c0 + _currAttackTime * c1;
-            c12 = (1 - _currAttackTime) * c1 + _currAttackTime * c2;
-
-            c012 = (1 - _currAttackTime) * c01 + _currAttackTime * c12;
-
-            transform.position = c012;
         }
         else
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
-
-            if (_currAttackTime >= 1)
+            if (_cameraRef.MoveCamera())
             {
-                _currAttackTime = 1;
-                _startAttackTime = Time.time;
                 _playerRef.AmInCutscene = false;
                 StartFight();
             }
         }
-    }
-
-    //called when any other objects for the cutscene are done with their intros
-    public override void CheckForIntroEnd()
-    {
-        for (int i = 0; i < _introGlhostList.Count; i++)
-        {
-            if (!_introGlhostList[i].LookingIsDone)
-            {
-                //Debug.Log("returned");
-                return;
-            }
-        }
-
-        //Debug.Log("falling started");
-        _startAttackTime = Time.time;
-        _cameraInPosition = true;
-    }
-
-    //checks when the boss is done eating the ghosts on screen
-    private bool CheckForIntroEatingDone()
-    {
-        for (int i = 0; i < _introGlhostList.Count; i++)
-        {
-            if (!_introGlhostList[i].AmEaten)
-            {
-                //Debug.Log("returned");
-                return false;
-            }
-        }
-        return true;
     }
 
     //called for Init, after the cutscene
@@ -304,34 +202,25 @@ public class MiniBossColor : BossEnemy
             }
 
             _ColorsLeft = _realColorsForMinions;
-
-            _introGlhostList = new List<ColorIntroGlhost>();
-
-            for (int i = 0; i < _colorIntroGlhosts.transform.childCount; i++)
-            {
-                _introGlhostList.Add(_colorIntroGlhosts.transform.GetChild(i).GetComponent<ColorIntroGlhost>());
-            }
+            
         }
 
         _ogCamPos = _cameraRef.transform.position;
+        _ogCamRot = _cameraRef.transform.localEulerAngles;
         cam0 = _cameraRef.transform.position;
-        cam1 = transform.position + _camOffset;
-        cam1.y = _cameraRef.transform.position.y;
-        float _midpoint = 0;
-        for (int i = 0; i < _introGlhostList.Count; i++)
-        {
-            _midpoint += _introGlhostList[i].transform.position.x;
-        }
+        cam1 = _bossCamera.transform.position;
+        rot0 = _cameraRef.transform.localEulerAngles;
+        rot1 = _bossCamera.transform.localEulerAngles;
+        _cameraRef.AmFollowingPlayer = false;
 
         _speaker = this.transform.GetComponent<AudioSource>();
 
-        cam1.x = _midpoint / _introGlhostList.Count;
-        _cameraRef.AmFollowingPlayer = false;
-
         _totalPercentage = _realFollowPercentage + _realBouncePercentage;
+        
+        _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration/4);
 
-        _startAttackTime = Time.time;
         _myAI = BossAI.INTRO;
+
     }
 
     //called when init and cutscene are done
@@ -345,6 +234,8 @@ public class MiniBossColor : BossEnemy
         _enemyAgent.enabled = true;
         _cameraRef.AmFollowingPlayer = true;
         _calcAngle = _startAngle;
+        _myAnimations.Play("Movement", 0);
+        transform.LookAt(_playerRef.transform.position);
 
         _myAI = BossAI.FIGHTING;
         _init = true;
@@ -807,11 +698,7 @@ public class MiniBossColor : BossEnemy
             //Debug.Log("Boss Reset");
             transform.position = _startPos;
             transform.rotation = _startRot;
-            _colorIntroGlhosts.SetActive(true);
-            for (int i = 0; i < _introGlhostList.Count; i++)
-            {
-                _introGlhostList[i].ResetCutscene();
-            }
+            _colorIntroGlhost.SetActive(true);
 
             _currBossHealth = _actualMaxHealth;
             _laggedBossHealthBar.fillAmount = 1;
@@ -819,8 +706,8 @@ public class MiniBossColor : BossEnemy
 
             _bossBar.SetActive(false);
             _cameraInPosition = false;
-            _glhostsDone = false;
-            _eatingFinished = false;
+            _animating = false;
+            _breakfastEaten = false;
             _jumpingFinished = false;
 
             _endingPlaying = false;
