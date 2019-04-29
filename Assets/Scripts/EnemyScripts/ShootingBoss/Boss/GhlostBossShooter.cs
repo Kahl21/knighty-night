@@ -30,68 +30,74 @@ public class GhlostBossShooter : MonoBehaviour
     float _SpawnedDistAway;
     Animator _ghostAnimations;
 
-    //[Header("Pulse Attack variables")]
-    //[SerializeField]
-    int _howManyPulses;
-    int _currentPulse = 0;
-    //[SerializeField]
-    float _pulseDelay;
-    //[SerializeField]
-    float _pulseGhlostTravelSpeed;
-    //[SerializeField]
-    int _amountPerRing;
-
     [Header("Varied Pulse Attack variables")]
     [SerializeField]
     int _variedHowManyPulses;
+    int _realVariedHowManyPulses;
     int _variedCurrentPulse = 0;
     [SerializeField]
     float _variedPulseDelay;
+    float _realVariedPulseDelay;
     [SerializeField]
     float _variedGhlostTravelSpeed;
+    float _realVariedGhlostTravelSpeed;
     [SerializeField]
     int _variedAmountPerRing;
+    int _realVariedAmountPerRing;
 
     [Header("Line Attack Variables")]
     [SerializeField]
     float _lineCastTime;
+    float _realLineCastTime;
     [SerializeField]
     int _degreeOfCastCone;
+    int _realDegreeOfCastCone;
     [SerializeField]
     float _lineSpawnRate;
+    float _realLineSpawnRate;
     [SerializeField]
     float _lineRotateSpeed;
+    float _realLineRotateSpeed;
     [SerializeField]
     float _lineGhlostTravelSpeed;
+    float _realLineGhlostTravelSpeed;
     int GhlostsCast = 0;
     Vector3 _startingAngle;
 
     [Header("Spiral Attack Variables")]
     [SerializeField]
     float _spiralCastTime;
+    float _realSpiralCastTime;
     [SerializeField]
     float _spiralSpawnRate;
+    float _realSpiralSpawnRate;
     [SerializeField]
     float _spiralRotateSpeed;
+    float _realSpiralRotateSpeed;
     [SerializeField]
     float _spiralGhlostTravelSpeed;
+    float _realSpiralGhlostTravelSpeed;
 
     [Header("Attack Percentages")]
     [SerializeField]
     float _pulseAttackPercentage;
-    //[SerializeField]
-    float _variedPulseAttackPercentage;
+    float _realPulseAttackPercentage;
     [SerializeField]
     float _lineAttackPercentage;
+    float _realLineAttackPercentage;
     [SerializeField]
     float _spiralAttackPercentage;
+    float _realSpiralAttackPercentage;
+
     float _totalAttackPercentages;
 
     [Header("Special Pulse Percentages")]
     [SerializeField]
-    float _specialPulsePercentage;
+    float _specialPulseAttackPercentage;
+    float _realSpecialPulseAttackPercentage;
     [SerializeField]
-    float _regularPulsePercentage;
+    float _regularPulseAttackPercentage;
+    float _realRegularPulseAttackPercentage;
     float _totalPulsePercentage;
 
 
@@ -100,17 +106,18 @@ public class GhlostBossShooter : MonoBehaviour
     bool _specialGhlosts;
     [SerializeField]
     float _coloredSpawnPercentage;
+    float _realColoredSpawnPercentage;
     [SerializeField]
     float _invincibleSpawnPercentage;
+    float _realInvincibleSpawnPercentage;
     [SerializeField]
     float _normalSpawnPercentage;
+    float _realNormalSpawnPercentage;
     float _totalSpawnPercentage;
 
     [Header("Colored Ghlost Variables")]
     [SerializeField]
     List<Color> _colorsForMinions;
-    [SerializeField]
-    float _maxColorTravelDistance;
 
     [Header("Invincible Ghlost Variables")]
     [SerializeField]
@@ -118,13 +125,132 @@ public class GhlostBossShooter : MonoBehaviour
     [SerializeField]
     GameObject _immuneParticles;
 
+    [Header("Hard Pulse Attack variables")]
+    [SerializeField]
+    int _hardVariedHowManyPulses;
+    [SerializeField]
+    float _hardVariedPulseDelay;
+    [SerializeField]
+    float _hardVariedPulseGhlostTravelSpeed;
+    [SerializeField]
+    int _hardVariedAmountPerRing;
+
+    [Header("Hard Line Attack Variables")]
+    [SerializeField]
+    float _hardLineCastTime;
+    [SerializeField]
+    int _hardDegreeOfCastCone;
+    [SerializeField]
+    float _hardLineSpawnRate;
+    [SerializeField]
+    float _hardLineRotateSpeed;
+    [SerializeField]
+    float _hardLineGhlostTravelSpeed;
+
+    [Header("Hard Spiral Attack Variables")]
+    [SerializeField]
+    float _hardSpiralCastTime;
+    [SerializeField]
+    float _hardSpiralSpawnRate;
+    [SerializeField]
+    float _hardSpiralRotateSpeed;
+    [SerializeField]
+    float _hardSpiralGhlostTravelSpeed;
+
+    [Header("Hard Attack Percentages")]
+    [SerializeField]
+    float _hardPulseAttackPercentage;
+    [SerializeField]
+    float _hardLineAttackPercentage;
+    [SerializeField]
+    float _hardSpiralAttackPercentage;
+
+    [Header("Hard Special Attack Percentages")]
+    [SerializeField]
+    float _hardSpecialPulseAttackPercentage;
+    [SerializeField]
+    float _hardRegularPulseAttackPercentage;
+
+
+    [Header("Hard Special Ghlost Variables")]
+    [SerializeField]
+    float _hardColoredSpawnPercentage;
+    [SerializeField]
+    float _hardInvincibleSpawnPercentage;
+    [SerializeField]
+    float _hardNormalSpawnPercentage;
+
     List<GameObject> _ghlostsInScene = new List<GameObject>();
 
     ATTACKSTATE _attackState = ATTACKSTATE.WAITFORATK;
     float startTime;
-	
-	// Update is called once per frame
-	protected void Update ()
+
+    public void Init()
+    {
+        if (!GameManager.Instance.HardModeOn)
+        {
+            //Add hard Variebales
+
+            _realLineAttackPercentage = _lineAttackPercentage;
+            _realLineCastTime = _lineCastTime;
+            _realLineGhlostTravelSpeed = _lineGhlostTravelSpeed;
+            _realLineRotateSpeed = _lineRotateSpeed;
+            _realLineSpawnRate = _lineSpawnRate;
+            _realDegreeOfCastCone = _degreeOfCastCone;
+
+            _realPulseAttackPercentage = _pulseAttackPercentage;
+            _realVariedPulseDelay = _variedPulseDelay;
+            _realVariedGhlostTravelSpeed = _variedGhlostTravelSpeed;
+            _realVariedAmountPerRing = _variedAmountPerRing;
+            _realVariedHowManyPulses = _variedHowManyPulses;
+
+            _realSpiralAttackPercentage = _spiralAttackPercentage;
+            _realSpiralCastTime = _spiralCastTime;
+            _realSpiralGhlostTravelSpeed = _spiralGhlostTravelSpeed;
+            _realSpiralRotateSpeed = _spiralRotateSpeed;
+            _realSpiralSpawnRate = _spiralSpawnRate;
+
+            _realSpecialPulseAttackPercentage = _specialPulseAttackPercentage;
+            _realRegularPulseAttackPercentage = _regularPulseAttackPercentage;
+
+            _realColoredSpawnPercentage = _coloredSpawnPercentage;
+            _realInvincibleSpawnPercentage = _invincibleSpawnPercentage;
+            _realNormalSpawnPercentage = _normalSpawnPercentage;
+        }
+        else
+        {
+            _realLineAttackPercentage = _hardLineAttackPercentage;
+            _realLineCastTime = _hardLineCastTime;
+            _realLineGhlostTravelSpeed = _hardLineGhlostTravelSpeed;
+            _realLineRotateSpeed = _hardLineRotateSpeed;
+            _realLineSpawnRate = _hardLineSpawnRate;
+            _realDegreeOfCastCone = _hardDegreeOfCastCone;
+
+            _realPulseAttackPercentage = _hardPulseAttackPercentage;
+            _realVariedPulseDelay = _hardVariedPulseDelay;
+            _realVariedGhlostTravelSpeed = _hardVariedPulseGhlostTravelSpeed;
+            _realVariedAmountPerRing = _hardVariedAmountPerRing;
+            _realVariedHowManyPulses = _hardVariedHowManyPulses;
+
+            _realSpiralAttackPercentage = _hardSpiralAttackPercentage;
+            _realSpiralCastTime = _hardSpiralCastTime;
+            _realSpiralGhlostTravelSpeed = _hardSpiralGhlostTravelSpeed;
+            _realSpiralRotateSpeed = _hardSpiralRotateSpeed;
+            _realSpiralSpawnRate = _hardSpiralSpawnRate;
+
+            _realSpecialPulseAttackPercentage = _hardSpecialPulseAttackPercentage;
+            _realRegularPulseAttackPercentage = _hardRegularPulseAttackPercentage;
+
+            _realColoredSpawnPercentage = _hardColoredSpawnPercentage;
+            _realInvincibleSpawnPercentage = _hardInvincibleSpawnPercentage;
+            _realNormalSpawnPercentage = _hardNormalSpawnPercentage;
+
+            Debug.Log("Hard Variables Set");
+        }
+    }
+
+    // Update is called once per frame
+    protected void Update ()
     {
 		switch(_attackState)
         {
@@ -139,9 +265,6 @@ public class GhlostBossShooter : MonoBehaviour
                 break;
             case ATTACKSTATE.SPIRALATK:
                 spiralAttack();
-                break;
-            case ATTACKSTATE.PULSEATK:
-                PulseAttack();
                 break;
             case ATTACKSTATE.PULSEHARDATK:
                 PulseHardAttack();
@@ -169,19 +292,19 @@ public class GhlostBossShooter : MonoBehaviour
     {
         Debug.Log("New Attack");
         GhlostsCast = 0;
-        _totalAttackPercentages = _pulseAttackPercentage + _spiralAttackPercentage + _lineAttackPercentage;
+        _totalAttackPercentages = _realPulseAttackPercentage + _realSpiralAttackPercentage + _realLineAttackPercentage;
         float _nextAttack = Random.Range(0, _totalAttackPercentages);
         Debug.Log("Next attack: " + _nextAttack);
-        if (_nextAttack > 0 && _nextAttack <= _pulseAttackPercentage)
+        if (_nextAttack > 0 && _nextAttack <= _realPulseAttackPercentage)
         {
             Debug.Log("Pulse Attack");
-            _totalPulsePercentage = _specialPulsePercentage + _regularPulsePercentage;
+            _totalPulsePercentage = _realSpecialPulseAttackPercentage + _realRegularPulseAttackPercentage;
             _nextAttack = Random.Range(0, _totalPulsePercentage);
-            if (_nextAttack > 0 && _nextAttack <= _regularPulsePercentage)
+            if (_nextAttack > 0 && _nextAttack <= _realRegularPulseAttackPercentage)
             {
                 _ghostAnimations.Play("ShootStart", 0);
                 _attackState = ATTACKSTATE.PULSEHARDATK;
-                _currentPulse = 0;
+                _variedCurrentPulse = 0;
                 _variedCurrentPulse = 0;
             }
             else
@@ -189,11 +312,11 @@ public class GhlostBossShooter : MonoBehaviour
                 _ghostAnimations.Play("ShootStart", 0);
                 gameObject.GetComponent<ShootingBoss>().SetSpecialPulseAttack = true;
                 _attackState = ATTACKSTATE.PULSEHARDATK;
-                _currentPulse = 0;
+                _variedCurrentPulse = 0;
                 _variedCurrentPulse = 0;
             }
         }
-        else if (_nextAttack > _pulseAttackPercentage && _nextAttack <= (_pulseAttackPercentage + _lineAttackPercentage))
+        else if (_nextAttack > _realPulseAttackPercentage && _nextAttack <= (_realPulseAttackPercentage + _realLineAttackPercentage))
         {
             Debug.Log("Line Attack");
             _ghostAnimations.Play("ShootStart", 0);
@@ -214,16 +337,16 @@ public class GhlostBossShooter : MonoBehaviour
         GameObject ghlostObj;
         float timeTaken = Time.time - startTime;
 
-        if (timeTaken < _spiralCastTime)
+        if (timeTaken < _realSpiralCastTime)
         {
-            transform.eulerAngles += new Vector3(0, 1 * _spiralRotateSpeed * Time.deltaTime, 0);
+            transform.eulerAngles += new Vector3(0, 1 * _realSpiralRotateSpeed * Time.deltaTime, 0);
 
-            if (timeTaken >= _spiralSpawnRate * GhlostsCast)
+            if (timeTaken >= _realSpiralSpawnRate * GhlostsCast)
             {
                 //Debug.Log(timeTaken + " VS. " + _spiralSpawnRate * GhlostsCast);
                 GhlostsCast += 1;
                 ghlostObj = SpawnGhlost();
-                ghlostObj.GetComponent<DumbBossGlhost>().GetSpeed = _spiralGhlostTravelSpeed;
+                ghlostObj.GetComponent<DumbBossGlhost>().GetSpeed = _realSpiralGhlostTravelSpeed;
             }
         }
         else
@@ -238,20 +361,20 @@ public class GhlostBossShooter : MonoBehaviour
         GameObject ghlostObj;
         float timeTaken = Time.time - startTime;
         
-        if (timeTaken < _lineCastTime)
+        if (timeTaken < _realLineCastTime)
         {
             //Rotates back and forth through the cone angle / 2 * -1 and 1
-            float angle = Mathf.Sin(Time.time * _lineRotateSpeed) * ((_degreeOfCastCone / 2));
+            float angle = Mathf.Sin(Time.time * _realLineRotateSpeed) * ((_realDegreeOfCastCone / 2));
             gameObject.transform.LookAt(GetComponent<ShootingBoss>().GetPlayerRef.gameObject.transform);
             transform.rotation = Quaternion.AngleAxis(angle + transform.eulerAngles.y, Vector3.up);
 
             //Spawns a new glhost based on the spawnrate
-            if (timeTaken >= _lineSpawnRate * GhlostsCast)
+            if (timeTaken >= _realLineSpawnRate * GhlostsCast)
             {
                 //Debug.Log(timeTaken + " VS. " + _lineSpawnRate * GhlostsCast);
                 GhlostsCast+= 1;
                 ghlostObj = SpawnGhlost();
-                ghlostObj.GetComponent<DumbBossGlhost>().GetSpeed = _lineGhlostTravelSpeed;
+                ghlostObj.GetComponent<DumbBossGlhost>().GetSpeed = _realLineGhlostTravelSpeed;
             }
         }
         else
@@ -261,47 +384,24 @@ public class GhlostBossShooter : MonoBehaviour
         }
     }
 
-    private void PulseAttack()
-    {
-        
-        float timeTaken = Time.time - startTime;
-        if (timeTaken > _pulseDelay * _currentPulse)
-        {
-            int spacingAngle = 360 / _amountPerRing;
-            GameObject ghlostObj;
-            for (int i = 0; i < _amountPerRing; i++)
-            {
-                transform.eulerAngles += new Vector3(0, spacingAngle, 0);
-                ghlostObj = SpawnGhlost();
-                ghlostObj.GetComponent<DumbBossGlhost>().GetSpeed = _pulseGhlostTravelSpeed;
-            }
-            _currentPulse++;
-        }
-        if (_currentPulse == _howManyPulses)
-        {
-            _attackState = ATTACKSTATE.WAITFORATK;
-            Debug.Log("stop pulsing");
-        }
-    }
-
     private void PulseHardAttack()
     {
         float timeTaken = Time.time - startTime;
-        if (timeTaken > _variedPulseDelay * _variedCurrentPulse)
+        if (timeTaken > _realVariedPulseDelay * _variedCurrentPulse)
         {
-            int spacingAngle = 360 / _variedAmountPerRing;
+            int spacingAngle = 360 / _realVariedAmountPerRing;
             GameObject ghlostObj;
-            for (int i = 0; i < _variedAmountPerRing; i++)
+            for (int i = 0; i < _realVariedAmountPerRing; i++)
             {
                 transform.eulerAngles += new Vector3(0, spacingAngle + (spacingAngle / 2 * (_variedCurrentPulse % 2)), 0);
                 //print(transform.rotation.ToString());
                 ghlostObj = SpawnGhlost();
                 //ghlostObj.GetComponent<BaseEnemy>().Init(gameObject.GetComponent<ShootingMiniBoss>().SetMyRoom, Mechanic.BOSS);
-                ghlostObj.GetComponent<DumbBossGlhost>().GetSpeed = _variedGhlostTravelSpeed;
+                ghlostObj.GetComponent<DumbBossGlhost>().GetSpeed = _realVariedGhlostTravelSpeed;
             }
             _variedCurrentPulse++;
         }
-        if (_variedCurrentPulse == _variedHowManyPulses)
+        if (_variedCurrentPulse == _realVariedHowManyPulses)
         {
             _attackState = ATTACKSTATE.WAITFORATK;
             Debug.Log("stop pulsing");
@@ -313,15 +413,15 @@ public class GhlostBossShooter : MonoBehaviour
     {
         if (_specialGhlosts)
         {
-            _totalSpawnPercentage = _invincibleSpawnPercentage + _normalSpawnPercentage + _coloredSpawnPercentage;
+            _totalSpawnPercentage = _realInvincibleSpawnPercentage + _realNormalSpawnPercentage + _realColoredSpawnPercentage;
             float _ghlostToSpawn = Random.Range(0, _totalSpawnPercentage);
-            if (_ghlostToSpawn > 0 && _ghlostToSpawn <= _normalSpawnPercentage)
+            if (_ghlostToSpawn > 0 && _ghlostToSpawn <= _realNormalSpawnPercentage)
             {
                 GameObject newNormalGhlost = InstantiateGhlost(_normalGhlostPrefab, Mechanic.NONE);
                 _ghlostsInScene.Add(newNormalGhlost);
                 return newNormalGhlost;
             }
-            else if (_ghlostToSpawn > _normalSpawnPercentage && _ghlostToSpawn <= (_normalSpawnPercentage + _invincibleSpawnPercentage))
+            else if (_ghlostToSpawn > _realNormalSpawnPercentage && _ghlostToSpawn <= (_realNormalSpawnPercentage + _realInvincibleSpawnPercentage))
             {
                 GameObject newInvincibleGhlost = InstantiateGhlost(_InvincibleGhlostPrefab, Mechanic.CHASE);
                 //GameObject newImmunePS = Instantiate(_immuneParticles);
@@ -341,7 +441,6 @@ public class GhlostBossShooter : MonoBehaviour
             else
             {
                 GameObject newColorGlhost = InstantiateGhlost(_normalGhlostPrefab, Mechanic.COLOR);
-                newColorGlhost.GetComponent<DumbBossGlhost>().SetMaxTravelTime = _maxColorTravelDistance;
                 _ghlostsInScene.Add(newColorGlhost);
                 return newColorGlhost;
             }

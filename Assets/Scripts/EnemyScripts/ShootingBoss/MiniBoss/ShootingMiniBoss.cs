@@ -40,19 +40,25 @@ public class ShootingMiniBoss : BossEnemy
     [Header("Base Spawned Enemies")]
     [SerializeField]
     float _damageToBoss;
+    float _realDamageToBoss;
     [SerializeField]
     float _damageToPlayer;
+    float _realDamageToPlayer;
 
     [Header("Follow Player Varibales")]
     [SerializeField]
     float _followDuration;
     float _realFollowDuration;
 
+    [Header("Hard Base Spawned Enemies")]
+    [SerializeField]
+    float _hardDamageToBoss;
+    [SerializeField]
+    float _hardDamageToPlayer;
+
     [Header("Hard Follow Player Varibales")]
     [SerializeField]
     float _hardFollowDuration;
-    [SerializeField]
-    float _hardTimeBetweenAttacks;
 
     Vector3 _ogCamPos;
     bool _cameraInPosition;
@@ -103,16 +109,20 @@ public class ShootingMiniBoss : BossEnemy
         {
             base.Init();
             _attachedShooter = gameObject.GetComponent<GhlostShooter>();
+            _attachedShooter.Init();
 
             if (!_managerRef.HardModeOn)
             {
-                _realTimeBetweenAttacks = _timeBetweenAttacks;
+                //_realTimeBetweenAttacks = _timeBetweenAttacks;
                 _realFollowDuration = _followDuration;
+                _realDamageToBoss = _damageToBoss;
+                _realDamageToPlayer = _damageToPlayer;
             }
             else
             {
-                _realTimeBetweenAttacks = _hardTimeBetweenAttacks;
                 _realFollowDuration = _hardFollowDuration;
+                _realDamageToBoss = _hardDamageToBoss;
+                _realDamageToPlayer = _hardDamageToPlayer;
             }
         }
 
@@ -451,7 +461,7 @@ public class ShootingMiniBoss : BossEnemy
         }
     }
 
-    public float GetDamageToBoss { get { return _damageToBoss; } }
-    public float GetDamageToPlayer { get { return _damageToPlayer; } }
+    public float GetDamageToBoss { get { return _realDamageToBoss; } }
+    public float GetDamageToPlayer { get { return _realDamageToPlayer; } }
     public PlayerController GetPlayerRef { get { return _playerRef; } }
 }

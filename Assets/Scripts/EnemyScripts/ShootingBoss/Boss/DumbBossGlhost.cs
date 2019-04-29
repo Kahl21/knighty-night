@@ -21,8 +21,6 @@ public class DumbBossGlhost : BaseEnemy
     [SerializeField]
     float _DamageToPlayer;
     [SerializeField]
-    float _maxTravelTime;
-    [SerializeField]
     GhlostBossShooter _shooterRef;
 
     DUMBSTATE _myDumbState = DUMBSTATE.NONE;
@@ -141,19 +139,6 @@ public class DumbBossGlhost : BaseEnemy
         _canMove = true;
         transform.LookAt(_shooterRef.transform);
         _myDumbState = DUMBSTATE.NONE;
-    }
-
-    protected void ColorMove()
-    {
-        _currTime = Time.time - _startTime;
-        if (_currTime <= _maxTravelTime)
-        {
-            transform.position += transform.forward * moveSpeed * Time.deltaTime;
-        }
-        else
-        {
-            moveSpeed = 0;
-        }
     }
 
     void MoveToBoss()
@@ -277,7 +262,6 @@ public class DumbBossGlhost : BaseEnemy
     public float GetSpeed { get { return moveSpeed; } set { moveSpeed = value; } }
     public float SetDamageToBoss { set { _DamageToBoss = value; } }
     public float SetDamageToPlayer { set { _DamageToPlayer = value; } }
-    public float SetMaxTravelTime { set { _maxTravelTime = value; } }
     public GhlostBossShooter SetShooterRef { set { _shooterRef = value; } }
     public Mechanic GetMyMechanic { get { return _myMechanic; } set { _myMechanic = value; } }
     public DUMBSTATE setMyState { set { _myDumbState = value; } }

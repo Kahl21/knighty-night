@@ -41,44 +41,65 @@ public class ShootingBoss : BossEnemy
     [Header("Base Spawned Enemies")]
     [SerializeField]
     float _damageToBoss;                                            //Damage to boss from reflected ghlosts
+    float _realDamageToBoss;
     [SerializeField]
     float _damageToPlayer;                                          //Damage to player from reflected ghlosts
+    float _realDamageToPlayer;
 
     [Header("Follow Player Varibales")]
     [SerializeField]
     float _followDuration;                                          //Duration the boss follows player
     float _realFollowDuration;
 
-    [Header("Hard Follow Player Varibales")]
-    [SerializeField]
-    float _hardFollowDuration;
-    [SerializeField]
-    float _hardTimeBetweenAttacks;
-
     [Header("Color Attack Variables")]
     [SerializeField]
     float _colorDamageToBoss;                                       //Damage to boss from same colored ghlosts
+    float _realColorDamageToBoss;
     [SerializeField]
     Color _initColor;
-
-    [Header("Special Attack Variables")]
-    [SerializeField]
-    float _absorbAttackPercentage;                                  //How often the absorb happens
-    [SerializeField]
-    float _normalAtttackPercentage;                                 //The rest of the percentage
 
     [Header("Absorb Attack Variables")]
     [SerializeField]
     float _absorbDelay;                                             //Delay the boss waits before absorbing the ghlosts
+    float _realAbsorbDelay;
     [SerializeField]
     float _absorbSpeed;                                             //How fast ghlosts are absorbed
+    float _realAbsorbSpeed;
     [SerializeField]
     float _rotateSpeed;                                             //How fas the boss rotates while absorbing
+    float _realRotateSpeed;
     [SerializeField]
     float _shootingFollowOffset;                                    //How much the boss lags behind the player movement while shooting
+    float _realShootingFollowOffset;
     [SerializeField]
     float _shootRate;                                               //How often the boss shoots them out
+    float _realShootRate;
 
+    [Header("Hard Base Spawned Enemies")]
+    [SerializeField]
+    float _hardDamageToBoss;                                            //Damage to boss from reflected ghlosts
+    [SerializeField]
+    float _hardDamageToPlayer;                                          //Damage to player from reflected ghlosts
+
+    [Header("Hard Follow Player Varibales")]
+    [SerializeField]
+    float _hardFollowDuration;
+
+    [Header("Hard Color Attack Variables")]
+    [SerializeField]
+    float _hardColorDamageToBoss;                                       //Damage to boss from same colored ghlosts
+
+    [Header("Hard Absorb Attack Variables")]
+    [SerializeField]
+    float _hardAbsorbDelay;                                             //Delay the boss waits before absorbing the ghlosts
+    [SerializeField]
+    float _hardAbsorbSpeed;                                             //How fast ghlosts are absorbed
+    [SerializeField]
+    float _hardRotateSpeed;                                             //How fas the boss rotates while absorbing
+    [SerializeField]
+    float _hardShootingFollowOffset;                                    //How much the boss lags behind the player movement while shooting
+    [SerializeField]
+    float _hardShootRate;                                               //How often the boss shoots them out
 
     float _rotationAngle = 0;                                       //Current angle of rotation
 
@@ -139,16 +160,41 @@ public class ShootingBoss : BossEnemy
         {
             base.Init();
             _attachedShooter = gameObject.GetComponent<GhlostBossShooter>();
+            _attachedShooter.Init();
 
             if (!_managerRef.HardModeOn)
             {
                 //_realTimeBetweenAttacks = _timeBetweenAttacks;
                 _realFollowDuration = _followDuration;
+
+                _realAbsorbDelay = _absorbDelay;
+                _realAbsorbSpeed = _absorbSpeed;
+                _realRotateSpeed = _rotateSpeed;
+                _realShootingFollowOffset = _shootingFollowOffset;
+                _realShootRate = _shootRate;
+
+                _realColorDamageToBoss = _colorDamageToBoss;
+                _realDamageToBoss = _damageToBoss;
+                _realDamageToPlayer = _damageToPlayer;
+
+
             }
             else
             {
                 //_realTimeBetweenAttacks = _hardTimeBetweenAttacks;
                 _realFollowDuration = _hardFollowDuration;
+
+                _realAbsorbDelay = _hardAbsorbDelay;
+                _realAbsorbSpeed = _hardAbsorbSpeed;
+                _realRotateSpeed = _hardRotateSpeed;
+                _realShootingFollowOffset = _hardShootingFollowOffset;
+                _realShootRate = _hardShootRate;
+
+                _realColorDamageToBoss = _hardColorDamageToBoss;
+                _realDamageToBoss = _hardDamageToBoss;
+                _realDamageToPlayer = _hardDamageToPlayer;
+
+                Debug.Log("Hard Variables Set");
             }
         }
 
@@ -287,7 +333,7 @@ public class ShootingBoss : BossEnemy
     private void CheckForCanAbsorb()                            
     {
         float timeTaken = Time.time - _startTimer;
-        if (timeTaken > _absorbDelay)                                       //After the absorb delay start absorbing
+        if (timeTaken > _realAbsorbDelay)                                       //After the absorb delay start absorbing
         {
             _absorbingGhlosts = new List<GameObject>();                     //Reset lists of ghlosts
             _absorbedGhlosts = new List<GameObject>();
@@ -306,7 +352,7 @@ public class ShootingBoss : BossEnemy
     */
     private void AbsorbAtk()
     {
-        _rotationAngle += 1 * _rotateSpeed * Time.deltaTime;
+        _rotationAngle += 1 * _realRotateSpeed * Time.deltaTime;
         transform.eulerAngles = new Vector3(0, transform.eulerAngles.y+ _rotationAngle, 0);
         if (_invinciblesAddad == false)
         {
@@ -315,7 +361,7 @@ public class ShootingBoss : BossEnemy
                 if (_attachedShooter.GetGhlostsInScene[index].GetComponent<DumbBossGlhost>().GetMyMechanic == Mechanic.CHASE)
                 {
                     DumbBossGlhost ghlostRef = _attachedShooter.GetGhlostsInScene[index].GetComponent<DumbBossGlhost>();
-                    ghlostRef.GetSpeed = _absorbSpeed;
+                    ghlostRef.GetSpeed = _realAbsorbSpeed;
                     ghlostRef.setMove(transform.eulerAngles);                           //Rotates ghlosts towards boss and moves them towards him
                     _absorbingGhlosts.Add(_attachedShooter.GetGhlostsInScene[index]);   //Adds each ghlosts to a list
                 }
@@ -324,7 +370,7 @@ public class ShootingBoss : BossEnemy
         }
         else if(_absorbingGhlosts.Count != _absorbedGhlosts.Count)          //While not all of the ghlosts are in the scene
         {                                                                   
-            _rotationAngle += 1 + _rotateSpeed * Time.deltaTime;            //The boss spins at a designated speed
+            _rotationAngle += 1 + _realRotateSpeed * Time.deltaTime;            //The boss spins at a designated speed
             transform.eulerAngles = new Vector3(0, _rotationAngle, 0);
         }
         else if (_absorbingGhlosts.Count == _absorbedGhlosts.Count)         //After all ghlosts are absorbed
@@ -349,7 +395,7 @@ public class ShootingBoss : BossEnemy
             gameObject.transform.LookAt(_playerRef.transform);              //Boss looks at player
 
             //Spawns a new glhost based on the spawnrate
-            if (timeTaken >= _shootRate * _ghlostsShot)                     //Shoots at a rate specified
+            if (timeTaken >= _realShootRate * _ghlostsShot)                     //Shoots at a rate specified
             {
                 DumbBossGlhost ghlostRef = _absorbedGhlosts[_ghlostsShot].GetComponent<DumbBossGlhost>();
                 ghlostRef.transform.rotation = transform.rotation;          //Shot ghlost's rotation is set to the bosses
@@ -435,7 +481,7 @@ public class ShootingBoss : BossEnemy
     {
         if (_incColor == _myColor)
         {
-            GotHit(_colorDamageToBoss);
+            GotHit(_realColorDamageToBoss);
             return true;
         }
         else
@@ -654,8 +700,8 @@ public class ShootingBoss : BossEnemy
         
     }
 
-    public float GetDamageToBoss { get { return _damageToBoss; } }
-    public float GetDamageToPlayer { get { return _damageToPlayer; } }
+    public float GetDamageToBoss { get { return _realDamageToBoss; } }
+    public float GetDamageToPlayer { get { return _realDamageToPlayer; } }
     public PlayerController GetPlayerRef { get { return _playerRef; } }
     public bool SetSpecialPulseAttack { get { return _specialPulseAttack; } set { _specialPulseAttack = value; } }
 }
