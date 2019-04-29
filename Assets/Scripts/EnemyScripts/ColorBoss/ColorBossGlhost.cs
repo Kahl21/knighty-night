@@ -873,7 +873,12 @@ public class ColorBossGlhost : BossEnemy {
         cam0 = _cameraRef.transform.position;
         cam1 = transform.position + _camOffset;
         cam1.y = _cameraRef.transform.position.y;
+        rot0 = _cameraRef.transform.localEulerAngles;
+        rot1 = _cameraRef.transform.localEulerAngles;
         _cameraRef.AmFollowingPlayer = false;
+
+
+        _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
 
         _speaker.PlayOneShot(bossDeath, volSFX);
 
@@ -890,34 +895,25 @@ public class ColorBossGlhost : BossEnemy {
     {
         if (!_cameraInPosition)
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            if (_currAttackTime >= 1)
+            if (_cameraRef.MoveCamera())
             {
-                _currAttackTime = 1;
-
-                _startAttackTime = Time.time;
-                _cameraInPosition = true;
+                if (_myAnimations.IsInTransition(0))
+                {
+                    _cameraInPosition = true;
+                }
             }
 
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
         }
         else if (!_showingDeath)
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _deathDuration;
             //Debug.Log("showing death");
 
-
-            if (_currAttackTime > 1)
+            if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .98f)
             {
-                _currAttackTime = 1;
-
                 cam0 = _cameraRef.transform.position;
                 cam1 = _ogCamPos;
+
+                _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
 
                 _mySkinRenderer.enabled = false;
 
@@ -925,23 +921,16 @@ public class ColorBossGlhost : BossEnemy {
                 _showingDeath = true;
             }
 
-            _myColor.a = 1 - _currAttackTime;
+            _myColor.a = 1 - _myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime;
             _myMaterial.color = _myColor;
             _mySkinRenderer.materials[1] = _myMaterial;
             _mySkinRenderer.materials[0] = _myMaterial;
         }
         else
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
             //Debug.Log("putting camera back");
 
-            if (_currAttackTime >= 1)
+            if (_cameraRef.MoveCamera())
             {
                 //Debug.Log("camera put back");
                 _currAttackTime = 1;

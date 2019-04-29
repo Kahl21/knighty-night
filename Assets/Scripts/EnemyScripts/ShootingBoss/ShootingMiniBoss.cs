@@ -13,10 +13,15 @@ public class ShootingMiniBoss : BossEnemy
         ATTACKING,
         FOLLOWING
     }
-    
+
+    [Header("Shoot Boss Intro Variables")]
+    [SerializeField]
+    GameObject _cutsceneGhostHolder;
+    List<ShootCutsceneGhost> _cutsceneGhosts;
+    bool _animating = false;
 
     [Header("Shooting Boss Variables")]
-    //[SerializeField]
+    [SerializeField]
     float _timeBetweenAttacks;
     float _realTimeBetweenAttacks;
     [SerializeField]
@@ -53,8 +58,7 @@ public class ShootingMiniBoss : BossEnemy
     float _hardFollowDuration;
     [SerializeField]
     float _hardTimeBetweenAttacks;
-
-    Vector3 _ogCamPos;
+    
     bool _cameraInPosition;
     float _startTimer;
     float _currentTime;
@@ -71,10 +75,43 @@ public class ShootingMiniBoss : BossEnemy
     
     protected override void PlayIntro()
     {
-        _playerRef.AmInCutscene = false;
-        _cameraInPosition = true;
-        StartFight();
-        
+        if (!_cameraInPosition)
+        {
+            if (_cameraRef.MoveCamera())
+            {
+                _cameraInPosition = true;
+            }
+
+        }
+        else if (!_animating)
+        {
+            if (_myAnimations.IsInTransition(0))
+            {
+                for (int i = 0; i < _cutsceneGhosts.Count; i++)
+                {
+                    _cutsceneGhosts[i].HideThineSelf();
+                }
+
+                cam0 = _cameraRef.transform.position;
+                cam1 = _ogCamPos;
+                rot0 = _cameraRef.transform.localEulerAngles;
+                rot1 = _ogCamRot;
+
+
+                _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+
+                _animating = true;
+            }
+        }
+        else
+        {
+            if (_cameraRef.MoveCamera())
+            {
+                _playerRef.AmInCutscene = false;
+                StartFight();
+            }
+        }
+
     }
 
     /*
@@ -114,18 +151,31 @@ public class ShootingMiniBoss : BossEnemy
                 _realTimeBetweenAttacks = _hardTimeBetweenAttacks;
                 _realFollowDuration = _hardFollowDuration;
             }
+            
+            _cutsceneGhosts = new List<ShootCutsceneGhost>();
+            for (int i = 0; i < _cutsceneGhostHolder.transform.childCount; i++)
+            {
+                _cutsceneGhosts.Add(_cutsceneGhostHolder.transform.GetChild(i).GetComponent<ShootCutsceneGhost>());
+            }
         }
 
         _attachedShooter.GetBossAnimator = _myAnimations;
 
-        //_ogCamPos = _cameraRef.transform.position;
+        _ogCamPos = _cameraRef.transform.position;
+        _ogCamRot = _cameraRef.transform.localEulerAngles;
         cam0 = _cameraRef.transform.position;
-        cam1 = transform.position + _camOffset;
-        cam1.y = _cameraRef.transform.position.y;
+        cam1 = _bossCameraPos;
+        rot0 = _cameraRef.transform.localEulerAngles;
+        rot1 = _bossCameraRot;
         _cameraRef.AmFollowingPlayer = false;
+
+        _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
 
         _startTimer = Time.time;
         _myAI = BossAI.INTRO;
+
+        _myAnimations.Play("MiniIntro", 0);
+        StartCoroutine(StartCutsceneGhosts());
     }
 
     //called when init and cutscene are done
@@ -307,10 +357,23 @@ public class ShootingMiniBoss : BossEnemy
         }
     }
 
+    private IEnumerator StartCutsceneGhosts()
+    {
+        WaitForSeconds wait = new WaitForSeconds(.3f);
+        for (int i = 0; i < _cutsceneGhosts.Count; i++)
+        {
+            _cutsceneGhosts[i].StartSmallBoss();
+            yield return wait;
+        }
+        StopCoroutine(StartCutsceneGhosts());
+    }
+
     //called once the boss is defeated
     protected override void Die()
     {
         _myRoom.CheckForEnd();
+
+        _myAnimations.Play("Idle", 0);
 
         _enemyAgent.enabled = false;
         _attachedShooter.enabled = false;
@@ -320,12 +383,17 @@ public class ShootingMiniBoss : BossEnemy
         cam0 = _cameraRef.transform.position;
         cam1 = transform.position + _camOffset;
         cam1.y = _cameraRef.transform.position.y;
+        rot0 = _cameraRef.transform.localEulerAngles;
+        rot1 = _cameraRef.transform.localEulerAngles;
         _cameraRef.AmFollowingPlayer = false;
 
+        _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
 
         _startAttackTime = Time.time;
         _cameraInPosition = false;
         _endingPlaying = true;
+
+        _attachedShooter.MyReset();
 
         _myAI = BossAI.OUTRO;
     }
@@ -335,34 +403,25 @@ public class ShootingMiniBoss : BossEnemy
     {
         if (!_cameraInPosition)
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            if (_currAttackTime >= 1)
+            if (_cameraRef.MoveCamera())
             {
-                _currAttackTime = 1;
-
-                _startAttackTime = Time.time;
-                _cameraInPosition = true;
+                if (_myAnimations.IsInTransition(0))
+                {
+                    _cameraInPosition = true;
+                }
             }
 
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
         }
         else if (!_showingDeath)
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _deathDuration;
             //Debug.Log("showing death");
 
-
-            if (_currAttackTime > 1)
+            if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .98f)
             {
-                _currAttackTime = 1;
-
                 cam0 = _cameraRef.transform.position;
                 cam1 = _ogCamPos;
+
+                _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
 
                 _mySkinRenderer.enabled = false;
 
@@ -370,23 +429,16 @@ public class ShootingMiniBoss : BossEnemy
                 _showingDeath = true;
             }
 
-            _myColor.a = 1 - _currAttackTime;
+            _myColor.a = 1 - _myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime;
             _myMaterial.color = _myColor;
             _mySkinRenderer.materials[1] = _myMaterial;
             _mySkinRenderer.materials[0] = _myMaterial;
         }
         else
         {
-            _currAttackTime = (Time.time - _startAttackTime) / _cameraIntroDuration;
-
-            Vector3 cam01;
-
-            cam01 = (1 - _currAttackTime) * cam0 + _currAttackTime * cam1;
-
-            _cameraRef.transform.position = cam01;
             //Debug.Log("putting camera back");
 
-            if (_currAttackTime >= 1)
+            if (_cameraRef.MoveCamera())
             {
                 //Debug.Log("camera put back");
                 _currAttackTime = 1;
@@ -397,7 +449,6 @@ public class ShootingMiniBoss : BossEnemy
                 _endingPlaying = false;
 
                 //Debug.Log("dead");
-                _myRoom.EndAll();
                 gameObject.SetActive(false);
             }
         }
@@ -421,19 +472,19 @@ public class ShootingMiniBoss : BossEnemy
             Debug.Log("Boss Reset");
             transform.position = _startPos;
             transform.rotation = _startRot;
-            /*
-            _enemiesToCrush.SetActive(true);
-            for (int i = 0; i < _GlhostsUnderMe.Count; i++)
+
+            for (int i = 0; i < _cutsceneGhosts.Count; i++)
             {
-                _GlhostsUnderMe[i].ResetCutscene();
+                _cutsceneGhosts[i].MyReset();
             }
-            */
+
             _currBossHealth = _actualMaxHealth;
             _laggedBossHealthBar.fillAmount = 1;
             _actualBossHealthBar.fillAmount = 1;
 
             _bossBar.SetActive(false);
             _cameraInPosition = false;
+            _animating = false;
             //_fallFinished = false;
             //_turnToPlayerFinished = false;
             //_glhostsCrushed = false;

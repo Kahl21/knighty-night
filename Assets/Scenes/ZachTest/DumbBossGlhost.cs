@@ -46,7 +46,7 @@ public class DumbBossGlhost : BaseEnemy
         _myRenderer.materials[1] = _mySpookiness;
 
         _myAnimations = GetComponent<Animator>();
-        _myAnimations.Play("Moving", 0);
+        _myAnimations.Play("Movement", 0);
         _startTime = Time.time;
     }
 

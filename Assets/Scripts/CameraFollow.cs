@@ -64,7 +64,7 @@ public class CameraFollow : MonoBehaviour {
 
             cam01 = (1 - _currIntroTime) * cam0 + _currIntroTime * cam1;
 
-            transform.localEulerAngles = Vector3.Slerp(rot0, rot1, _currIntroTime);
+            transform.localEulerAngles = AngleLerp(rot0, rot1, _currIntroTime);
             transform.position = cam01;
             return true;
         }

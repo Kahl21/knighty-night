@@ -765,20 +765,24 @@ public class TrapBossGlhost : BossEnemy
     {
         _myRoom.CheckForEnd();
 
+        _myAnimations.Play("Idle");
+
         _enemyAgent.enabled = false;
         _enteringTrap = false;
 
         _playerRef.GoingToOutroCutscene();
 
+        _ogCamPos = _cameraRef.transform.position;
         cam0 = _cameraRef.transform.position;
-        cam1 = _bossCameraPos;
+        cam1 = transform.position + _camOffset;
+        cam1.y = _cameraRef.transform.position.y;
         rot0 = _cameraRef.transform.localEulerAngles;
-        rot1 = _bossCameraRot;
+        rot1 = _cameraRef.transform.localEulerAngles;
         _cameraRef.AmFollowingPlayer = false;
 
         _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
 
-
+        
         _startAttackTime = Time.time;
         _cameraInPosition = false;
         _endingPlaying = true;
@@ -808,8 +812,6 @@ public class TrapBossGlhost : BossEnemy
             {
                 cam0 = _cameraRef.transform.position;
                 cam1 = _ogCamPos;
-                rot0 = _cameraRef.transform.localEulerAngles;
-                rot1 = _ogCamRot;
 
                 _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
 
