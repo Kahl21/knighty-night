@@ -326,12 +326,10 @@ public class PlayerController : MonoBehaviour
             float _updown = Input.GetAxis("VertMove");      //updown is equal to vertical movement
             if (_updown > 0.5f)                              //if there is some vert movement greater than 0.5
             {
-                //AudioManager.instance.ButtonMoving();
                 _menuRef.MenuUpOrDown(true);                //MenuUpOrDown from the Menuing Script is true
             }
             else if (_updown < -0.5f)                        //else if its less than -0.05f
             {
-               // AudioManager.instance.ButtonMoving();
                 _menuRef.MenuUpOrDown(false);               //MenuUpOrDown from the Menuing Script is false
             }
         }
@@ -340,12 +338,10 @@ public class PlayerController : MonoBehaviour
             float _leftright = Input.GetAxis("HorizMove");  //_leftright equals horizontal movement
             if (_leftright > 0.5f)                           //if leftright is greater than or equal to 0.5f
             {
-                //AudioManager.instance.ButtonMoving();
                 _menuRef.MenuUpOrDown(true);                //the MenuUpOrDown from menuing script is true
             }
             else if (_leftright < -0.5f)                    //else if leftright is left than 0.5f
             {
-                //AudioManager.instance.ButtonMoving();
                 _menuRef.MenuUpOrDown(false);               //MenuUpOrDown from the Menuing Script is false
             }
         }
@@ -743,7 +739,8 @@ public class PlayerController : MonoBehaviour
             _myAnimations.Play("SwordSwing", 0);                                                                                    //play the sword swing animation
             IncSpecialMeter(_MaxSpecialAmount, false);                                                                              //empty the special meter
             _doingSomething = true;                                                                                                 //player is set to do something
-            Instantiate<GameObject>(BWPrefab, transform.position + transform.forward + Vector3.up, transform.rotation);             //creates an instance of the special attack prefab
+            GameObject _newWave = Instantiate<GameObject>(BWPrefab, transform.position + transform.forward + Vector3.up, transform.rotation);             //creates an instance of the special attack prefab
+            _newWave.GetComponent<BacklashWave>().Init();
             _SwingStartTime = Time.time;                                                                                            //start the time for the swing
             _whatImDoing = Interactions.WAVESPECIAL;                                                                                //player is using the special slash
             AudioManager.instance.FireAttack();                                                                                     //play the sound of the fire slash
@@ -837,6 +834,10 @@ public class PlayerController : MonoBehaviour
                         {
                             thingHit.GetComponent<SecretLever>().StartRotation();
                         }
+                        else if(thingHit.GetComponent<BreakableObject>())
+                        {
+                            thingHit.GetComponent<BreakableObject>().BreakObject();
+                        }
                     }
                 }
                 break;
@@ -869,7 +870,7 @@ public class PlayerController : MonoBehaviour
     //damages the player
     public void TakeDamage(float _damageTaken)
     {
-        if (!_invincible && !_inCutscene)
+        if (!_invincible)
         {
             AudioManager.instance.PlayerDamaged();
             _invincible = true;
@@ -881,7 +882,6 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                AudioManager.instance.PlayerDied();
                 _myAnimations.Play("Death");
                 EndLevel(false);
             }

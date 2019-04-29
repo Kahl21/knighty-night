@@ -247,6 +247,8 @@ public class SpikeTrap : BaseTrap {
     //reset function
     public override void ResetTrap()
     {
+        _spikes = transform.GetChild(0).gameObject;
+        _spikeStartPos = _spikes.transform.localPosition;
         _spikes.transform.localPosition = _spikeStartPos;
         myState = SpikeState.NONE;
     }

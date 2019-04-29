@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 4157544829337628}
   - component: {fileID: 33604002950457792}
   - component: {fileID: 23784884061873748}
+  - component: {fileID: 65668435275910392}
   m_Layer: 0
   m_Name: floor_carpet_closed_asset
   m_TagString: Untagged
@@ -35,7 +36,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1957304153367056}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -21.9992, y: -0.000044465065, z: 5.6133003}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -83,3 +84,15 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1957304153367056}
   m_Mesh: {fileID: 4300000, guid: bc6d4c179854f9b448e1a1caa21726a3, type: 3}
+--- !u!65 &65668435275910392
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1957304153367056}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 4, y: 0, z: 4}
+  m_Center: {x: 0, y: 0, z: -0.00000011920929}

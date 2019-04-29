@@ -113,6 +113,7 @@
     <Compile Include="Assets\Scripts\AudioManager.cs" />
     <Compile Include="Assets\Scripts\BacklashWave.cs" />
     <Compile Include="Assets\Scripts\BossWall.cs" />
+    <Compile Include="Assets\Scripts\BreakableObject.cs" />
     <Compile Include="Assets\Scripts\CameraFollow.cs" />
     <Compile Include="Assets\Scripts\ColoredBlock.cs" />
     <Compile Include="Assets\Scripts\DoorMovement.cs" />
@@ -130,6 +131,8 @@
     <Compile Include="Assets\Scripts\EnemyScripts\FatherScripts\BaseEnemy.cs" />
     <Compile Include="Assets\Scripts\EnemyScripts\FatherScripts\BossEnemy.cs" />
     <Compile Include="Assets\Scripts\EnemyScripts\GraveyardGlhost.cs" />
+    <Compile Include="Assets\Scripts\EnemyScripts\SecretBoss\ChosenLight.cs" />
+    <Compile Include="Assets\Scripts\EnemyScripts\SecretBoss\SecretBoss.cs" />
     <Compile Include="Assets\Scripts\EnemyScripts\ShootingBoss\GhlostBossShooter.cs" />
     <Compile Include="Assets\Scripts\EnemyScripts\ShootingBoss\GhlostShooter.cs" />
     <Compile Include="Assets\Scripts\EnemyScripts\ShootingBoss\ShootingBoss.cs" />
@@ -145,11 +148,14 @@
     <Compile Include="Assets\Scripts\HazardFloor.cs" />
     <Compile Include="Assets\Scripts\HealingGrace.cs" />
     <Compile Include="Assets\Scripts\HealthTracker.cs" />
+    <Compile Include="Assets\Scripts\LoadingAndSavingTools.cs" />
     <Compile Include="Assets\Scripts\MazeCheckpoint.cs" />
     <Compile Include="Assets\Scripts\Menuing.cs" />
     <Compile Include="Assets\Scripts\MiniGameScripts\BreakoutBlock.cs" />
     <Compile Include="Assets\Scripts\MiniGameScripts\BreakoutGhlost.cs" />
     <Compile Include="Assets\Scripts\MiniGameScripts\BreakoutManager.cs" />
+    <Compile Include="Assets\Scripts\MiniGameScripts\Pac-Man\Collectable.cs" />
+    <Compile Include="Assets\Scripts\MiniGameScripts\Pac-Man\PM_ColoredGhlost.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\TrapScripts\BaseTrap.cs" />
     <Compile Include="Assets\Scripts\TrapScripts\BossFireStatueTrap.cs" />
@@ -157,7 +163,9 @@
     <Compile Include="Assets\Scripts\TrapScripts\DartMovement.cs" />
     <Compile Include="Assets\Scripts\TrapScripts\DartTrap.cs" />
     <Compile Include="Assets\Scripts\TrapScripts\EmptyBossTrap.cs" />
+    <Compile Include="Assets\Scripts\TrapScripts\FireParticleTrigger.cs" />
     <Compile Include="Assets\Scripts\TrapScripts\FireStatueTrap.cs" />
+    <Compile Include="Assets\Scripts\TrapScripts\SecretLever.cs" />
     <Compile Include="Assets\Scripts\TrapScripts\SpikeTrap.cs" />
     <Compile Include="Assets\Scripts\TrapScripts\TrapLever.cs" />
     <Compile Include="Assets\Scripts\WinScript.cs" />
@@ -203,22 +211,22 @@
     <None Include="Assets\PostProcessing\Resources\Shaders\AmbientOcclusion.cginc" />
     <None Include="Assets\PostProcessing\Editor Resources\Monitors\WaveformCompute.compute" />
     <Reference Include="UnityEditor.StandardEvents">
-      <HintPath>C:/Users/CAGD-user/Desktop/BM/knighty-night/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
+      <HintPath>C:/Users/CAGD-user/Desktop/knighty-night/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>C:/Users/CAGD-user/Desktop/BM/knighty-night/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+      <HintPath>C:/Users/CAGD-user/Desktop/knighty-night/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.PackageManagerUI.Editor">
-      <HintPath>C:/Users/CAGD-user/Desktop/BM/knighty-night/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+      <HintPath>C:/Users/CAGD-user/Desktop/knighty-night/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Postprocessing.Editor">
-      <HintPath>C:/Users/CAGD-user/Desktop/BM/knighty-night/Library/ScriptAssemblies/Unity.Postprocessing.Editor.dll</HintPath>
+      <HintPath>C:/Users/CAGD-user/Desktop/knighty-night/Library/ScriptAssemblies/Unity.Postprocessing.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Postprocessing.Runtime">
-      <HintPath>C:/Users/CAGD-user/Desktop/BM/knighty-night/Library/ScriptAssemblies/Unity.Postprocessing.Runtime.dll</HintPath>
+      <HintPath>C:/Users/CAGD-user/Desktop/knighty-night/Library/ScriptAssemblies/Unity.Postprocessing.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>C:/Users/CAGD-user/Desktop/BM/knighty-night/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+      <HintPath>C:/Users/CAGD-user/Desktop/knighty-night/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -398,7 +406,7 @@
       <HintPath>C:/Program Files/Unity/Editor/Data/Managed/Unity.Locator.dll</HintPath>
     </Reference>
     <Reference Include="Facebook.Unity.Settings">
-      <HintPath>C:/Users/CAGD-user/Desktop/BM/knighty-night/Library/FacebookSDK/Facebook.Unity.Settings.dll</HintPath>
+      <HintPath>C:/Users/CAGD-user/Desktop/knighty-night/Library/FacebookSDK/Facebook.Unity.Settings.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

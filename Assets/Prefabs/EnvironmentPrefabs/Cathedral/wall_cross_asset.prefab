@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 4338415167184014}
   - component: {fileID: 33202780348899160}
   - component: {fileID: 23697209972976762}
+  - component: {fileID: 65704044813994374}
   m_Layer: 0
   m_Name: wall_cross_asset
   m_TagString: Untagged
@@ -83,3 +84,15 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1560374685437566}
   m_Mesh: {fileID: 4300000, guid: 70b2d4f185a19c34cac503de9286c587, type: 3}
+--- !u!65 &65704044813994374
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1560374685437566}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 4.0000024, y: 3.997112, z: 0.91265076}
+  m_Center: {x: 0, y: 0, z: 0}

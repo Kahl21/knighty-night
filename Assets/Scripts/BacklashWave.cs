@@ -27,6 +27,8 @@ public class BacklashWave : MonoBehaviour {
     [SerializeField]
     float _waveUpScaleInc;
     float _currWaveUpScale;
+    bool _init = false;
+    bool _amEvil = false;
 
     [Header("Detection Variables")]
     [SerializeField]
@@ -47,7 +49,7 @@ public class BacklashWave : MonoBehaviour {
     List<GameObject> _effectsObjs;
 
     //Init
-    private void Awake()
+    public void Init()
     {
         _caster = transform.GetChild(0).gameObject;
         _effectsObjs = new List<GameObject>();
@@ -56,13 +58,39 @@ public class BacklashWave : MonoBehaviour {
         _currWaveUpScale = 1f + _waveUpScaleInc;
         _stopSize = transform.localScale * _scaleMultiply;
         _calcAngle = 0;
+        _amEvil = true;
         _startTime = Time.time;
+        _init = true;
+    }
+
+    public void Init(float damage, float speed, float largestSize, float scaleSpeed, float lifetime)
+    {
+        _waveDamage = damage;
+        _waveSpeed = speed;
+        _scaleMultiply = largestSize;
+        _waveUpScaleInc = scaleSpeed;
+        _waveLifetime = lifetime;
+
+        _caster = transform.GetChild(0).gameObject;
+        _effectsObjs = new List<GameObject>();
+        _effectsObjs.Add(transform.GetChild(1).gameObject);
+        _effectsObjs.Add(transform.GetChild(2).gameObject);
+        _currWaveUpScale = 1f + _waveUpScaleInc;
+        _stopSize = transform.localScale * _scaleMultiply;
+        _calcAngle = 0;
+        _amEvil = false;
+
+        _startTime = Time.time;
+        _init = true;
     }
 
     private void Update()
     {
-        Move();
-        Expand();
+        if(_init)
+        {
+            Move();
+            Expand();
+        }
     }
 
     //once spawned in
@@ -90,22 +118,32 @@ public class BacklashWave : MonoBehaviour {
             {
                 Debug.Log("hit something");
                 GameObject thingHit = _hit.collider.gameObject;
-
-                if (thingHit.GetComponent<BaseEnemy>())
+                if(_amEvil)
                 {
-                    thingHit.GetComponent<BaseEnemy>().GotHit(RayDir, _waveKnockBack);
+                    if (thingHit.GetComponent<BaseEnemy>())
+                    {
+                        thingHit.GetComponent<BaseEnemy>().GotHit(RayDir, _waveKnockBack);
+                    }
+                    else if (thingHit.GetComponent<BossEnemy>())
+                    {
+                        if (thingHit.GetComponent<ColorBossGlhost>() || thingHit.GetComponent<MiniBossColor>())
+                        {
+                            thingHit.GetComponent<BossEnemy>().GotHit(_waveDamage / _waveDamageDivideOffsetForSpecialBosses);
+                        }
+                        else
+                        {
+                            thingHit.GetComponent<BossEnemy>().GotHit(_waveDamage);
+                        }
+                    }
                 }
-                else if (thingHit.GetComponent<BossEnemy>())
+                else
                 {
-                    if(thingHit.GetComponent<ColorBossGlhost>() || thingHit.GetComponent<MiniBossColor>())
+                    if (thingHit.GetComponent<PlayerController>())
                     {
-                        thingHit.GetComponent<BossEnemy>().GotHit(_waveDamage/_waveDamageDivideOffsetForSpecialBosses);
-                    }
-                    else
-                    {
-                        thingHit.GetComponent<BossEnemy>().GotHit(_waveDamage);
+                        thingHit.GetComponent<PlayerController>().TakeDamage(_waveDamage);
                     }
                 }
+               
             }
         }
 
@@ -139,7 +177,8 @@ public class BacklashWave : MonoBehaviour {
                 _increasing = false;
             }
         }
-        
     }
+
+
 
 }
