@@ -199,6 +199,9 @@ public class TrapBossGlhost : BossEnemy
 
     protected override void Awake()
     {
+        _mySkinRenderer = gameObject.transform.GetChild(2).GetComponent<SkinnedMeshRenderer>();
+        _mySkinRenderer.enabled = false;
+
         base.Awake();
         _additionalCam1.transform.parent = null;
         _additionalPos1 = _additionalCam1.transform.position;
@@ -222,6 +225,8 @@ public class TrapBossGlhost : BossEnemy
         {
             if (_cameraRef.MoveCamera())
             {
+                _mySkinRenderer.enabled = true;
+
                 _cameraInPosition = true;
 
                 _myAnimations.Play("BigIntro1", 0);
@@ -850,7 +855,7 @@ public class TrapBossGlhost : BossEnemy
         if (_init)
         {
             gameObject.SetActive(true);
-            _mySkinRenderer.enabled = true;
+            _mySkinRenderer.enabled = false;
             _myColor.a = 1;
             _myMaterial.color = _myColor;
             _mySkinRenderer.materials[1] = _myMaterial;
@@ -863,6 +868,20 @@ public class TrapBossGlhost : BossEnemy
             _laggedBossHealthBar.fillAmount = 1;
             _actualBossHealthBar.fillAmount = 1;
 
+            for (int i = 0; i < _quadFireTrapsInScene.Count; i++)
+            {
+                for (int index = 0; index < 4; index++)
+                {
+                    _quadFireTrapsInScene[i].transform.GetChild(index).GetComponent<BossFireStatueTrap>().ResetTrap();
+                }
+            }
+
+            for (int j = 0; j < _regularFireTrapsInScene.Count; j++)
+            {
+                Destroy(_regularFireTrapsInScene[j]);
+            }
+
+            _regularFireTrapsInScene.Clear();
 
             _cameraInPosition = false;
             _animating = false;

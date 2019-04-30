@@ -204,6 +204,8 @@ public class BossSpikeTrap : SpikeTrap {
         _realAttackSpeed = _attackSpeed;
         _realRetreatSpeed = _retreatSpeed;
         transform.position = _startPos;
+        _spikes.transform.localPosition = _spikeStartPos;
+        //base.ResetTrap();
         myState = SpikeState.NONE;
     }
 }

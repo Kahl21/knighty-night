@@ -293,6 +293,7 @@ public class BossFireStatueTrap : BaseTrap {
     //reset function
     public override void ResetTrap()
     {
+        _myFire.Stop();
         _mystate = FireState.NONE;
     }
 
