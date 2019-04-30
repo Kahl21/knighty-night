@@ -193,6 +193,14 @@ public class TrapBossGlhost : BossEnemy
     //[SerializeField]
     //float _hardFollowDuration;
 
+    //sound variables
+    public AudioClip trapPossess;
+    public AudioClip fireShoot;
+    public AudioClip spikeShoot;
+    public AudioClip arrowShoot;
+    public AudioClip ghostDeath;
+
+
     TRAPSTRATS _MyAttack = TRAPSTRATS.FINDTRAP;
 
     //intro cutscene function
@@ -214,6 +222,9 @@ public class TrapBossGlhost : BossEnemy
         _additionalPos3 = _additionalCam3.transform.position;
         _additionalRot3 = _additionalCam3.transform.localEulerAngles;
         _additionalCam3.gameObject.SetActive(false);
+
+
+        
     }
 
     protected override void PlayIntro()
@@ -377,6 +388,8 @@ public class TrapBossGlhost : BossEnemy
                 _realSpikeAttackSpeed = _hardSpikeAttackSpeed;
                 _realSpikeRetreatSpeed = _hardSpikeRetreatSpeed;
             }
+
+
         }
 
         _introTrap.transform.parent = null;
@@ -401,6 +414,8 @@ public class TrapBossGlhost : BossEnemy
         _totalPercentageFireTrap = _realQuadFirePercentage + _realXAttackPercentage;
 
         _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+
+        _speaker = this.GetComponent<AudioSource>();
 
         _startAttackTime = Time.time;
         _myAI = BossAI.INTRO;
@@ -767,6 +782,10 @@ public class TrapBossGlhost : BossEnemy
 
         _enemyAgent.enabled = false;
         _enteringTrap = false;
+
+        _speaker.Stop();
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(ghostDeath);
 
         _playerRef.GoingToOutroCutscene();
 

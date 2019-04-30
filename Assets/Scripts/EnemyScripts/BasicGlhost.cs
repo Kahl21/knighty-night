@@ -109,6 +109,7 @@ public class BasicGlhost : BaseEnemy
     {
         if (!_hit)
         {
+            _speaker.Stop();
             _speaker.PlayOneShot(ghostHit, volSFX);
             _myAnimations.Play("Dazed_Start",0);
             _hit = true;
