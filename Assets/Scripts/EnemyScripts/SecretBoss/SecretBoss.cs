@@ -173,6 +173,8 @@ public class SecretBoss : BossEnemy {
     float _realDashFlameLifetime;
 
     [Header("Chosen Light Attack Variables")]
+    [SerializeField]
+    GameObject _InvincibleParticle;
     [Tooltip("How many lightnings to spawn until the ability stops")]
     [SerializeField]
     float _numberOfSmitingLights;
@@ -185,17 +187,18 @@ public class SecretBoss : BossEnemy {
     [SerializeField]
     float _lightDamage;
     float _realLightDamage;
-    [Tooltip("Time in between lightning spawns (must be >0)")]
+    [Tooltip("How much time is between spawning lightning bolts")]
     [SerializeField]
     float _lightSpawnOffset;
     float _realLightSpawnOffset;
-    [Tooltip("How high up in the air the lightning starts at")]
+    [Tooltip("How long until the light will strike and deal damage")]
     [SerializeField]
-    float _lightVertSpawnOffset;
-    [Tooltip("How fast the lightning falls")]
+    float _lightStrikingDelay;
+    float _realLightStrikingDelay;
+    [Tooltip("How long until the light will disappear completely")]
     [SerializeField]
-    float _lightFallSpeed;
-    float _realLightFallSpeed;
+    float _lightLifeTime;
+    float _realLightLifeTime;
 
     [Header("Secret Boss Hard Variables")]
     [SerializeField]
@@ -263,7 +266,9 @@ public class SecretBoss : BossEnemy {
     [SerializeField]
     float _hardLightSpawnOffset;
     [SerializeField]
-    float _hardLightFallSpeed;
+    float _hardLightStrikingDelay;
+    [SerializeField]
+    float _hardLightLifeTime;
 
     //[Header("Sound Variables")]
 
@@ -365,7 +370,8 @@ public class SecretBoss : BossEnemy {
                 _realCheatTargetPlayerOffset = _cheatTargetPlayerOffset;
                 _realLightDamage = _lightDamage;
                 _realLightSpawnOffset = _lightSpawnOffset;
-                _realLightFallSpeed = _lightFallSpeed;
+                _realLightStrikingDelay = _lightStrikingDelay;
+                _realLightLifeTime = _lightLifeTime;
             }
             else
             {
@@ -396,11 +402,15 @@ public class SecretBoss : BossEnemy {
                 _realCheatTargetPlayerOffset = _hardCheatTargetPlayerOffset;
                 _realLightDamage = _hardLightDamage;
                 _realLightSpawnOffset = _hardLightSpawnOffset;
-                _realLightFallSpeed = _hardLightFallSpeed;
+                _realLightStrikingDelay = _hardLightStrikingDelay;
+                _realLightLifeTime = _hardLightLifeTime;
             }
 
             _hasInit = true;
         }
+
+        _InvincibleParticle.SetActive(false);
+        _dashParticle.Stop();
 
         _ogCamPos = _cameraRef.transform.position;
         _ogCamRot = _cameraRef.transform.localEulerAngles;
@@ -570,6 +580,8 @@ public class SecretBoss : BossEnemy {
             {
                 if (_lastAttack != SECRETSTRATS.CHOSENLIGHT)
                 {
+                    _InvincibleParticle.SetActive(true);
+                    _InvincibleParticle.GetComponent<ParticleSystem>().Play();
                     _currFlamesSpawned = 0;
                     //Debug.Log("pinball Chosen");
                     _enemyAgent.enabled = false;
@@ -787,13 +799,16 @@ public class SecretBoss : BossEnemy {
                 lightPos.z = Random.Range(_ZMin, _ZMax);
             }
 
-            lightPos.y = _lightVertSpawnOffset;
+            lightPos.y = transform.position.y;
 
             GameObject _newLight = Instantiate<GameObject>(_ChosenLightPrefab, lightPos, transform.rotation);
-            _newLight.GetComponent<ChosenLight>().Init(_realLightDamage, _realLightFallSpeed);
+            _newLight.GetComponent<ChosenLight>().Init(_realLightDamage, _realLightStrikingDelay, _realLightLifeTime);
             _currFlamesSpawned++;
             if (_currFlamesSpawned >= _realNumberOfSmitingLights)
             {
+                _InvincibleParticle.GetComponent<ParticleSystem>().Stop();
+                _InvincibleParticle.SetActive(false);
+
                 _currFlamesSpawned = 0;
                 _myAnimations.Play("StandingIdle");
                 _invincible = false;

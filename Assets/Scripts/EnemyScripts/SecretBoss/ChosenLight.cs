@@ -4,49 +4,76 @@ using UnityEngine;
 
 public class ChosenLight : MonoBehaviour {
 
-    float _fallSpeed;
     float _damage;
     [SerializeField]
     float _detectionDistance;
     [SerializeField]
     bool _debug;
-    RaycastHit hit;
     bool _init;
 
+    float _lightningStrikeDelay;
+    float _lightningLifeTime;
+
+    float _currAttackDelay;
+    float _startAttackDelay;
+    float _currLifeTime;
+    float _startLifeTime;
+
+    ParticleSystem _myParticle;
+
+    PlayerController _playerRef;
+
 	// Use this for initialization
-	public void Init (float damage, float speed) {
+	public void Init (float damage, float attackDelay, float lifeTime)
+    {
+        _myParticle = GetComponent<ParticleSystem>();
+
         _damage = damage;
-        _fallSpeed = speed;
+        _lightningStrikeDelay = attackDelay;
+        _lightningLifeTime = lifeTime;
+        _playerRef = PlayerController.Instance;
+        _startAttackDelay = Time.time;
+        _startLifeTime = Time.time;
         _init = true;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-        if(_init)
-        {
-            Fall();
-        }
-	}
 
-    void Fall()
+    private void OnDrawGizmos()
     {
         if(_debug)
         {
-            Debug.DrawRay(transform.position, transform.position + Vector3.down * _detectionDistance);
+            Gizmos.DrawWireSphere(transform.position, _detectionDistance);
         }
+    }
 
-        if (Physics.Raycast(transform.position, Vector3.down, out hit, _detectionDistance))
+    // Update is called once per frame
+    void Update () {
+        if(_init)
         {
-            if (hit.collider.GetComponent<PlayerController>())
+            Delay();
+        }
+	}
+
+    void Delay()
+    {
+
+        _currAttackDelay = (Time.time - _startAttackDelay) / _lightningStrikeDelay;
+        _currLifeTime = (Time.time - _startLifeTime) / _lightningLifeTime;
+        if(_currAttackDelay >= 1f)
+        {
+            if(!_myParticle.isPlaying)
             {
-                hit.collider.GetComponent<PlayerController>().TakeDamage(_damage);
-                Destroy(gameObject);
+                _myParticle.Play();
             }
-            else
+
+            if(Vector3.Distance(transform.position, _playerRef.transform.position) <= _detectionDistance)
+            {
+                _playerRef.TakeDamage(_damage);
+            }
+
+            if(_currLifeTime >= 1f)
             {
                 Destroy(gameObject);
             }
         }
-        transform.position += Vector3.down * _fallSpeed * Time.deltaTime;
     }
 }
