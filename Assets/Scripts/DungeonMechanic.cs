@@ -449,7 +449,7 @@ public class DungeonMechanic : MonoBehaviour {
                 break;
 
             case Mechanic.PACMAN:
-
+                _PMRef.EndMinigame();
                 EndAll();                                       
                 break;
 
@@ -466,6 +466,7 @@ public class DungeonMechanic : MonoBehaviour {
                 if (roomClear)
                 {
                     EndAll();
+                    _breakRef.EndRoom();
                     Debug.Log("Room End");
                 }
                                                       

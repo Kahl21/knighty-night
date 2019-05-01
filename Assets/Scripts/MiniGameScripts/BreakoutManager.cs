@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BreakoutManager : MonoBehaviour {
+public class BreakoutManager : MonoBehaviour
+{
 
     [Header("Breakout Blocks Variables")]
     [SerializeField]
@@ -25,6 +26,20 @@ public class BreakoutManager : MonoBehaviour {
     DungeonMechanic _myRoom;
     GameObject _puck;
 
+    [Header("Camera Variables")]
+    [SerializeField]
+    CameraFollow _sceneCamera;
+    Vector3 _initCamPosition;
+    Vector3 _initCamEuler;
+    [SerializeField]
+    GameObject _minigameCamPos;
+    Vector3 _minigameCamEuler;
+    [SerializeField]
+    float _animatedCamMoveDuration;
+
+    bool started = false;
+    bool ended = false;
+
     public void Init(DungeonMechanic dungeonMechanic)
     {
         _spawnPos = transform.position;
@@ -35,6 +50,37 @@ public class BreakoutManager : MonoBehaviour {
             SpawnRowOfBlocks(_rowsOfColors[row]);
         }
         SpawnDeathPillars();
+
+        _initCamPosition = _sceneCamera.transform.position;
+        _initCamEuler = _sceneCamera.transform.eulerAngles;
+
+        _minigameCamEuler = _minigameCamPos.transform.eulerAngles;
+
+        _sceneCamera.AmFollowingPlayer = false;
+        _sceneCamera.GetComponent<CameraFollow>().BossIntroActive(_initCamPosition, _minigameCamPos.transform.position, _initCamEuler, _minigameCamEuler, _animatedCamMoveDuration);
+
+
+        started = true;
+    }
+
+    private void Update()
+    {
+        if (started)
+        {
+            if (_sceneCamera.MoveCamera())
+            {
+                started = false;
+            }
+        }
+
+        if (ended)
+        {
+            if (_sceneCamera.MoveCamera())
+            {
+                _sceneCamera.AmFollowingPlayer = true;
+                ended = false;
+            }
+        }
     }
 
     private void SpawnRowOfBlocks(Color spawnColor)
@@ -72,6 +118,8 @@ public class BreakoutManager : MonoBehaviour {
             pillarObj = _deathBlocksInScene[index].gameObject;
             Destroy(pillarObj);
         }
+        _sceneCamera.BossIntroActive(_sceneCamera.transform.position, PlayerController.Instance.transform.position + _sceneCamera.GetOffset, _sceneCamera.transform.eulerAngles, _initCamEuler, _animatedCamMoveDuration);
+        ended = true;
         _deathBlocksInScene.Clear();
         Destroy(_puck);
     }
@@ -85,6 +133,8 @@ public class BreakoutManager : MonoBehaviour {
             Destroy(pillarObj);
         }
         _blocksInScene.Clear();
+        _sceneCamera.AmFollowingPlayer = true;
+        _sceneCamera.transform.eulerAngles = _initCamEuler;
 
         for (int index = 0; index < _deathBlocksInScene.Count; index++)
         {

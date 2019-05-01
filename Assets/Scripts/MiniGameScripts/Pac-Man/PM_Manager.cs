@@ -9,6 +9,7 @@ public class PM_Manager : MonoBehaviour
     private enum PHASES
     {
         NONE,
+        MOVECAMERA,
         START,
         INITPHASE,
         COLOREDPHASE,
@@ -40,6 +41,17 @@ public class PM_Manager : MonoBehaviour
     float _ghostSpawnDelay;
     [SerializeField]
     int _maxInitialGhostsInScene;
+
+    [Header("Camera Variables")]
+    [SerializeField]
+    CameraFollow _sceneCamera;
+    Vector3 _initCamPosition;
+    Vector3 _initCamEuler;
+    [SerializeField]
+    GameObject _minigameCamPos;
+    Vector3 _minigameCamEuler;
+    [SerializeField]
+    float _animatedCamMoveDuration;
 
     [Header("Score Variables")]
     [SerializeField]
@@ -87,6 +99,7 @@ public class PM_Manager : MonoBehaviour
     int spawnCounter = 0;
     PlayerController _playerRef;
     bool _playerHasSpecialSword = false;
+    bool _ended = false;
     DungeonMechanic _mySpawner;
     PHASES _pmPhase = PHASES.NONE;
 
@@ -130,6 +143,10 @@ public class PM_Manager : MonoBehaviour
             case PHASES.NONE:
                 break;
 
+            case PHASES.MOVECAMERA:
+                MoveCamera();
+                break;
+
             case PHASES.START:
                 Init();
                 break;
@@ -161,9 +178,32 @@ public class PM_Manager : MonoBehaviour
             _teleporters[index].SetActive(true);
         }
 
+        _initCamPosition = _sceneCamera.transform.position;
+        _initCamEuler = _sceneCamera.transform.eulerAngles;
+
+        _minigameCamEuler = _minigameCamPos.transform.eulerAngles;
+
+        _sceneCamera.AmFollowingPlayer = false;
+
+        _sceneCamera.GetComponent<CameraFollow>().BossIntroActive(_initCamPosition, _minigameCamPos.transform.position, _initCamEuler, _minigameCamEuler, _animatedCamMoveDuration);
+
         _scoreCanvasInstance = Instantiate(_scorePrefab);
         _scoreText = _scoreCanvasInstance.transform.GetChild(0).GetComponent<Text>();
-        _pmPhase = PHASES.INITPHASE;
+        
+        _pmPhase = PHASES.MOVECAMERA;
+    }
+
+    private void MoveCamera()
+    {
+        if (_sceneCamera.MoveCamera() && _ended == false)
+        {
+            _pmPhase = PHASES.INITPHASE;
+        }
+        else if (_sceneCamera.MoveCamera() && _ended == true)
+        {
+            _sceneCamera.AmFollowingPlayer = true;
+            _pmPhase = PHASES.NONE;
+        }
     }
 
     //Needs to be setup for different spawn points
@@ -276,7 +316,9 @@ public class PM_Manager : MonoBehaviour
             {
                 _playerRef.gameObject.transform.GetChild(0).transform.GetChild(5).GetComponent<SkinnedMeshRenderer>().material.color = _initialSwordMat;
                 Debug.Log("Level Complete");
+                _ended = true;
                 _mySpawner.CheckForEnd();
+                _sceneCamera.BossIntroActive(_sceneCamera.transform.position, PlayerController.Instance.transform.position + _sceneCamera.GetOffset, _sceneCamera.transform.eulerAngles, _initCamEuler, _animatedCamMoveDuration);
                 Destroy(_scoreCanvasInstance);
             }
         }
@@ -332,6 +374,11 @@ public class PM_Manager : MonoBehaviour
         }
     }
 
+    public void EndMinigame()
+    {
+        _pmPhase = PHASES.MOVECAMERA;
+    }
+
     public void MyReset()
     {
         for (int index = 0; index < _ghostsInScene.Count; index++)
@@ -351,6 +398,7 @@ public class PM_Manager : MonoBehaviour
         _scoreText.text = "Score: " + _currentScore + "/" + _initialScoreNeeded;
         Destroy(_scoreCanvasInstance);
 
+        _sceneCamera.AmFollowingPlayer = true;
 
         Debug.Log("RESET PACMAN");
         Start();

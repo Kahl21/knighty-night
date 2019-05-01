@@ -265,6 +265,7 @@ public class PlayerController : MonoBehaviour
                 if (Input.GetButtonDown("MenuSelect"))      //if the player presses down menu select
                 {
                     _menuRef.StopCredits();                 //stop credits function in the menuing script
+                    _menuRef.LoadSpecificLevel(14);         //load Secret Boss
                 }
             }
 
