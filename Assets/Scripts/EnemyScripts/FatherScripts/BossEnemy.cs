@@ -121,7 +121,7 @@ public class BossEnemy : MonoBehaviour {
 
     //if the cutscene requires other objects
     //objects will call this once they are done with their setup
-    public virtual void CheckForIntroEnd()
+    public virtual bool CheckForIntroEnd()
     {
 
     }

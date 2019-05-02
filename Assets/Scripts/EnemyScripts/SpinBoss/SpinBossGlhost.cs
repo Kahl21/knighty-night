@@ -210,23 +210,6 @@ public class SpinBossGlhost : BossEnemy
         }
     }
 
-    //called when any other objects for the cutscene are done with their intros
-    public override void CheckForIntroEnd()
-    {
-        for (int i = 0; i < _GlhostsUnderMe.Count; i++)
-        {
-            if (!_GlhostsUnderMe[i].AmDone)
-            {
-                //Debug.Log("returned");
-                return;
-            }
-        }
-
-        //Debug.Log("falling started");
-        _startAttackTime = Time.time;
-        _cameraInPosition = true;
-    }
-
     //called for Init, after the cutscene
     public override void Init()
     {

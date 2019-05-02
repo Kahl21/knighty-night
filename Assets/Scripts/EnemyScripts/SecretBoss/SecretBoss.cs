@@ -16,8 +16,15 @@ public class SecretBoss : BossEnemy {
         STUNNED
     }
 
-    //[Header("Secret Boss Intro Variables")]
+    [Header("Secret Boss Intro Variables")]
+    [SerializeField]
+    GameObject _bossHolder;
+    List<SecretBossCutsceneBosses> _listOfIntroBosses;
+    [SerializeField]
+    Camera _additionalCamera1;
+    Vector3 _additionalPos1, _additionalRot1;
     bool _cameraInPosition = false;
+    bool _animatingBosses = false;
 
 
     [Header("Secret Boss Variables")]
@@ -174,7 +181,7 @@ public class SecretBoss : BossEnemy {
 
     [Header("Chosen Light Attack Variables")]
     [SerializeField]
-    GameObject _InvincibleParticle;
+    ParticleSystem _InvincibleParticle;
     [Tooltip("How many lightnings to spawn until the ability stops")]
     [SerializeField]
     float _numberOfSmitingLights;
@@ -277,15 +284,53 @@ public class SecretBoss : BossEnemy {
     {
         base.Awake();
         _dashParticle.Stop();
+        _InvincibleParticle.Stop();
     }
 
     //function that is called once the player enters the room
     //plays the intro cutscene
     protected override void PlayIntro()
     {
-        _playerRef.AmInCutscene = false;
-        _cameraRef.AmFollowingPlayer = true;
-        StartFight();
+
+        if(!_cameraInPosition)
+        {
+            if(_cameraRef.MoveCamera())
+            {
+
+            }
+        }
+        else if(!_animatingBosses)
+        {
+            if (_cameraRef.MoveCamera())
+            {
+                if(CheckForIntroEnd())
+                {
+
+                }
+            }
+        }
+        else
+        {
+            if (_cameraRef.MoveCamera())
+            {
+                _playerRef.AmInCutscene = false;
+                _cameraRef.AmFollowingPlayer = true;
+                StartFight();
+            }
+        }
+    }
+
+    public override bool CheckForIntroEnd()
+    {
+        for (int i = 0; i < _listOfIntroBosses.Count; i++)
+        {
+            if(!_listOfIntroBosses[i].AmDone)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     //called for Init, after the cutscene
@@ -409,7 +454,7 @@ public class SecretBoss : BossEnemy {
             _hasInit = true;
         }
 
-        _InvincibleParticle.SetActive(false);
+        _InvincibleParticle.gameObject.SetActive(false);
         _dashParticle.Stop();
 
         _ogCamPos = _cameraRef.transform.position;
@@ -580,7 +625,7 @@ public class SecretBoss : BossEnemy {
             {
                 if (_lastAttack != SECRETSTRATS.CHOSENLIGHT)
                 {
-                    _InvincibleParticle.SetActive(true);
+                    _InvincibleParticle.gameObject.SetActive(true);
                     _InvincibleParticle.GetComponent<ParticleSystem>().Play();
                     _currFlamesSpawned = 0;
                     //Debug.Log("pinball Chosen");
@@ -807,7 +852,7 @@ public class SecretBoss : BossEnemy {
             if (_currFlamesSpawned >= _realNumberOfSmitingLights)
             {
                 _InvincibleParticle.GetComponent<ParticleSystem>().Stop();
-                _InvincibleParticle.SetActive(false);
+                _InvincibleParticle.gameObject.SetActive(false);
 
                 _currFlamesSpawned = 0;
                 _myAnimations.Play("StandingIdle");
@@ -961,6 +1006,12 @@ public class SecretBoss : BossEnemy {
             _currBossHealth = _actualMaxHealth;
             _laggedBossHealthBar.fillAmount = 1;
             _actualBossHealthBar.fillAmount = 1;
+
+            for (int i = 0; i < _listOfIntroBosses.Count; i++)
+            {
+                _listOfIntroBosses[i].gameObject.SetActive(true);
+                _listOfIntroBosses[i].ResetMe();
+            }
 
             _bossBar.SetActive(false);
 
