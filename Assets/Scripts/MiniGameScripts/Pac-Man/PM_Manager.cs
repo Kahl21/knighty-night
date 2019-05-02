@@ -116,6 +116,9 @@ public class PM_Manager : MonoBehaviour
             _coloredPillars[index].SetActive(false);
         }
 
+        _scoreCanvasInstance = Instantiate(_scorePrefab);
+        _scoreText = _scoreCanvasInstance.transform.GetChild(0).GetComponent<Text>();
+
         _scoreText.text = "Score: " + _currentScore + "/" + _initialScoreNeeded;
         _startTimer = Time.time;
         _ghostsInScene = new List<GameObject>();
@@ -187,9 +190,8 @@ public class PM_Manager : MonoBehaviour
 
         _sceneCamera.GetComponent<CameraFollow>().BossIntroActive(_initCamPosition, _minigameCamPos.transform.position, _initCamEuler, _minigameCamEuler, _animatedCamMoveDuration);
 
-        _scoreCanvasInstance = Instantiate(_scorePrefab);
-        _scoreText = _scoreCanvasInstance.transform.GetChild(0).GetComponent<Text>();
-        
+        PlayerController.Instance.AmInCutscene = true;
+
         _pmPhase = PHASES.MOVECAMERA;
     }
 
@@ -197,11 +199,13 @@ public class PM_Manager : MonoBehaviour
     {
         if (_sceneCamera.MoveCamera() && _ended == false)
         {
+            PlayerController.Instance.AmInCutscene = false;
             _pmPhase = PHASES.INITPHASE;
         }
         else if (_sceneCamera.MoveCamera() && _ended == true)
         {
             _sceneCamera.AmFollowingPlayer = true;
+            PlayerController.Instance.AmInCutscene = false;
             _pmPhase = PHASES.NONE;
         }
     }
@@ -377,6 +381,7 @@ public class PM_Manager : MonoBehaviour
     public void EndMinigame()
     {
         _pmPhase = PHASES.MOVECAMERA;
+        PlayerController.Instance.AmInCutscene = true;
     }
 
     public void MyReset()

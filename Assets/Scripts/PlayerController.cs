@@ -823,7 +823,7 @@ public class PlayerController : MonoBehaviour
                         }
                         else if (thingHit.GetComponent<CathedralProjectile>())
                         {
-                            thingHit.GetComponent<CathedralProjectile>().HitProjectile(transform.forward,_swordSwingKnockback);
+                            thingHit.GetComponent<CathedralProjectile>().HitProjectile(transform.forward,_swordSwingKnockback,transform.eulerAngles);
                         }
                         else if (thingHit.GetComponent<TrapLever>())
                         {

@@ -21,6 +21,8 @@ GameObject:
   - component: {fileID: 4568647020787492}
   - component: {fileID: 33824523501638060}
   - component: {fileID: 23722071005699444}
+  - component: {fileID: 65065095521690626}
+  - component: {fileID: 114120227796714784}
   m_Layer: 0
   m_Name: PowerUpSword
   m_TagString: Untagged
@@ -83,3 +85,27 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1687317019576736}
   m_Mesh: {fileID: 4300000, guid: e938816a9fddfb3418012ce3cfec0221, type: 3}
+--- !u!65 &65065095521690626
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1687317019576736}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 81.20827, y: 11.077092, z: 268.8086}
+  m_Center: {x: 0.0000028256077, y: 0.000008942137, z: 94.81168}
+--- !u!114 &114120227796714784
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1687317019576736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e754834194d5b644a28a4f796eb8c9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isSword: 1

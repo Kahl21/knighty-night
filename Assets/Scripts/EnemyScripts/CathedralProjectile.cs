@@ -91,13 +91,13 @@ public class CathedralProjectile : MonoBehaviour {
 
     //called when the enemy gets hit
     //deals damage to the enemy
-    public void HitProjectile(Vector3 flyDir, float knockBackForce)
+    public void HitProjectile(Vector3 flyDir, float knockBackForce, Vector3 knockbackEuler)
     {
         if (!_hit)
         {
             _hit = true;
             _projKnockback = knockBackForce;
-            transform.eulerAngles += new Vector3(0, 180f, 0);
+            transform.eulerAngles = knockbackEuler;
             _deathDirection = flyDir;
             _deathDirection.y = 0;
             _startTime = Time.time;
@@ -108,6 +108,8 @@ public class CathedralProjectile : MonoBehaviour {
     //called while the ghost is dying;
     void Die()
     {
+
+        
         _currTime = (Time.time - _startTime) / _deathTimer;
 
         Vector3 _newDeathDirection = _deathDirection;
@@ -148,8 +150,8 @@ public class CathedralProjectile : MonoBehaviour {
         {
             if (hit.collider.GetComponent<CathedralGlhost>())
             {
-                _myPillar.GetComponent<CathedralGlhost>().RemoveProj(this);
                 hit.collider.GetComponent<BaseEnemy>().GotHit(_newDeathDirection, _projKnockback);
+                Stop();
             }
             else if (!hit.collider.GetComponent<BaseEnemy>() || !hit.collider.GetComponent<PlayerController>())
             {

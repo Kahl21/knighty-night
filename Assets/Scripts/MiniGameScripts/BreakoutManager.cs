@@ -56,6 +56,7 @@ public class BreakoutManager : MonoBehaviour
 
         _minigameCamEuler = _minigameCamPos.transform.eulerAngles;
 
+        PlayerController.Instance.AmInCutscene = true;
         _sceneCamera.AmFollowingPlayer = false;
         _sceneCamera.GetComponent<CameraFollow>().BossIntroActive(_initCamPosition, _minigameCamPos.transform.position, _initCamEuler, _minigameCamEuler, _animatedCamMoveDuration);
 
@@ -70,6 +71,7 @@ public class BreakoutManager : MonoBehaviour
             if (_sceneCamera.MoveCamera())
             {
                 started = false;
+                PlayerController.Instance.AmInCutscene = false;
             }
         }
 
@@ -78,6 +80,7 @@ public class BreakoutManager : MonoBehaviour
             if (_sceneCamera.MoveCamera())
             {
                 _sceneCamera.AmFollowingPlayer = true;
+                PlayerController.Instance.AmInCutscene = false;
                 ended = false;
             }
         }
@@ -119,6 +122,7 @@ public class BreakoutManager : MonoBehaviour
             Destroy(pillarObj);
         }
         _sceneCamera.BossIntroActive(_sceneCamera.transform.position, PlayerController.Instance.transform.position + _sceneCamera.GetOffset, _sceneCamera.transform.eulerAngles, _initCamEuler, _animatedCamMoveDuration);
+        PlayerController.Instance.AmInCutscene = true;
         ended = true;
         _deathBlocksInScene.Clear();
         Destroy(_puck);
