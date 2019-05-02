@@ -131,6 +131,8 @@ public class PM_Manager : MonoBehaviour
         _currentCoins = Instantiate(_coinLayoutPrefab);
         _currentCoins.SetActive(true);
 
+        _scoreCanvasInstance.SetActive(false);
+
         foreach (Transform item in _targetPointContainer.transform.GetComponentsInChildren<Transform>())
         {
             _targetPoints.Add(item.gameObject);
