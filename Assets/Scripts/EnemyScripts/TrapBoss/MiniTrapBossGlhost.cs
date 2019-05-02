@@ -112,7 +112,19 @@ public class MiniTrapBossGlhost : BossEnemy
     [Header("Hard Follow Player Varibales")]
     [SerializeField]
     float _hardFollowDuration;
-    
+
+
+    [Header("Sound Variables")]
+    [SerializeField]
+    AudioClip bossPossess;
+    [SerializeField]
+    AudioClip bossDeath;
+    [SerializeField]
+    AudioClip fireAttack;
+
+
+
+
     bool _cameraInPosition;
 
     TRAPSTRATS _MyAttack = TRAPSTRATS.FINDTRAP;
@@ -231,6 +243,8 @@ public class MiniTrapBossGlhost : BossEnemy
         _totalPercentageFireTrap = _realQuadFirePercentage + _realXAttackPercentage;
 
         _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+
+        _speaker = this.GetComponent<AudioSource>();
 
 
         _myAnimations.Play("MiniIntro1", 0);
@@ -382,6 +396,7 @@ public class MiniTrapBossGlhost : BossEnemy
 
         if (trapComplete)
         {
+            _speaker.Stop();
             _xAttack = false;
             _mySkinRenderer.enabled = true;
             gameObject.GetComponent<CapsuleCollider>().enabled = true;
@@ -399,6 +414,10 @@ public class MiniTrapBossGlhost : BossEnemy
         {
             if (_enteringTrap)
             {
+                _speaker.Stop();
+                if (!_speaker.isPlaying)
+                    _speaker.PlayOneShot(bossPossess, volSFX);
+
                 _myAnimations.Play("Dive", 0);
                 _enteringTrap = false;
             }
@@ -407,7 +426,8 @@ public class MiniTrapBossGlhost : BossEnemy
                 //Moves all the variables from the boss to each fire trap gameobject
                 for (int z = 0; z < 4; z++)
                 {
-
+                    if(!_speaker.isPlaying)
+                    _speaker.PlayOneShot(fireAttack, volSFX);
                     BossFireStatueTrap possessedTrap = currentTrap.GetComponent<Transform>().GetChild(z).GetComponent<BossFireStatueTrap>();
 
                     if (_xAttack)
@@ -457,6 +477,11 @@ public class MiniTrapBossGlhost : BossEnemy
     //called once the boss is defeated
     protected override void Die()
     {
+
+        _speaker.Stop();
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(bossDeath, volSFX);
+
         _myRoom.CheckForEnd();
 
         _enemyAgent.enabled = false;

@@ -29,6 +29,7 @@ public class HealingGrace : MonoBehaviour {
     [Header("Which Checkpoint Is This?")]
     public float checkpointNumber;
 
+
     protected GameObject _Audio;
     protected AudioSource _speaker;
     protected AudioManager _audioManager;
@@ -45,10 +46,12 @@ public class HealingGrace : MonoBehaviour {
         _usedHealingAmount = _healingAmount;
         _currHealingAmount = _healingAmount;
 
+
         _Audio = GameObject.Find("AudioManager");
         _audioManager = _Audio.GetComponent<AudioManager>();
         volSFX = _audioManager.volSFX;
         _speaker = this.transform.GetComponent<AudioSource>();
+
 
     }
 

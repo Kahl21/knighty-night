@@ -20,6 +20,7 @@ public class TrapLever : MonoBehaviour {
 
     DungeonMechanic _myRoom;
 
+
     GameObject _Audio;
     AudioSource _speaker;
     AudioManager _audioManager;
@@ -39,6 +40,7 @@ public class TrapLever : MonoBehaviour {
         _audioManager = _Audio.GetComponent<AudioManager>();
         volSFX = _audioManager.volSFX;
         _speaker = this.transform.GetComponent<AudioSource>();
+
     }
 
     private void Update()
@@ -65,6 +67,7 @@ public class TrapLever : MonoBehaviour {
     {
         if (!_speaker.isPlaying)
             _speaker.PlayOneShot(leverHit, volSFX);
+
 
         _currRotate = (Time.time - _startRotate) / _rotateDuration;
 

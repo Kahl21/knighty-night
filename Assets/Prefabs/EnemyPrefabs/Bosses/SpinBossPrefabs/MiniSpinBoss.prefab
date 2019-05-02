@@ -1810,7 +1810,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1595682523147230}
   m_LocalRotation: {x: 0.0000001791241, y: 0.7071068, z: -0.7071068, w: 0.0000001791241}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.527, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4425021250217544}
@@ -2436,8 +2436,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1698123324289944}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: -30.1, y: 0.84, z: 82.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -30.1, y: -0.07, z: 82.5}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children:
   - {fileID: 4941178121117412}
   - {fileID: 4179591142218702}
@@ -3094,7 +3094,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1640484604646932}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.87, y: 0, z: 12.82}
+  m_LocalPosition: {x: 0.96, y: 0, z: 7.28}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4425021250217544}
@@ -3276,7 +3276,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 30
+  MaxDistance: 50
   Pan2D: 0
   rolloffMode: 1
   BypassEffects: 0
@@ -3458,8 +3458,8 @@ MonoBehaviour:
   _hardPinballTellDuration: 1
   _hardPinballAttackDuration: 5
   bossSpin: {fileID: 8300000, guid: e79fc549b0b512a48811a83e6a3262b1, type: 3}
-  bossDazed: {fileID: 8300000, guid: ab44d15d30e530e469ea695b5923092c, type: 3}
-  bossDeath: {fileID: 8300000, guid: 7a4cb9b5e8464f2499a7e8e792a90357, type: 3}
+  bossDazed: {fileID: 8300000, guid: 7d281896964875447952f990dfa65081, type: 3}
+  bossDeath: {fileID: 8300000, guid: 45b856e525c72ed44911c7df15870114, type: 3}
 --- !u!136 &136317569419810160
 CapsuleCollider:
   m_ObjectHideFlags: 1

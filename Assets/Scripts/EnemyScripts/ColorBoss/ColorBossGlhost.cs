@@ -153,11 +153,18 @@ public class ColorBossGlhost : BossEnemy {
 
 
     [Header("Sound Options")]
-    public AudioClip bossDeath;
-    public AudioClip bossDazed;
-    public AudioClip bossBounce;
-    public AudioClip bossCharge;
-    public AudioClip ghostSpawn;
+    [SerializeField]
+    AudioClip bossDeath;
+    [SerializeField]
+    AudioClip bossDazed;
+    [SerializeField]
+    AudioClip bossBounce;
+    [SerializeField]
+    AudioClip bossCharge;
+    [SerializeField]
+    AudioClip ghostSpawn;
+    [SerializeField]
+    AudioClip succClip;
 
 
     ColorStrats _myAttack = ColorStrats.FOLLOW;
@@ -744,6 +751,8 @@ public class ColorBossGlhost : BossEnemy {
         _calcAngle = _spawnAngle;
         _currColors = new List<Color>();
 
+
+        if(!_speaker.isPlaying)
         _speaker.PlayOneShot(ghostSpawn, volSFX);
 
 
@@ -775,13 +784,16 @@ public class ColorBossGlhost : BossEnemy {
     {
         _currAttackTime = (Time.time - _startAttackTime) / _realStunnedDuration;
 
+        _speaker.Stop();
+        //if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(bossDazed, volSFX);
         //Debug.Log("stunned");
 
         if (_currAttackTime >= 1)
         {
-            if (!_speaker.isPlaying)
-                _speaker.PlayOneShot(bossDazed, volSFX);
-
+            _speaker.Stop();
+            if(!_speaker.isPlaying)
+                _speaker.PlayOneShot(succClip);
             _myAnimations.Play("SuckUp", 0);
             _myColor = _basicColor;
             _myMaterial.color = _myColor;

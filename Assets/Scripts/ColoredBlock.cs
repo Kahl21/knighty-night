@@ -19,7 +19,6 @@ public class ColoredBlock : MonoBehaviour {
 
     public virtual void CorrectMatch()
     {
-        AudioManager.instance.GhostColorCorrect();
         gameObject.SetActive(false);
         _spawner.CheckForEnd();
     }

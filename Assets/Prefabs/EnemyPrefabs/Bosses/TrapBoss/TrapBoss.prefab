@@ -2836,8 +2836,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1164556738789036}
-  m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
-  m_LocalPosition: {x: -17.56, y: 0.34, z: 235.27}
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.00000058114523}
+  m_LocalPosition: {x: -17.55, y: 0.33, z: 235.28}
   m_LocalScale: {x: 3, y: 4, z: 3}
   m_Children:
   - {fileID: 4998722601927340}
@@ -3154,13 +3154,13 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1133306513575520}
-  m_LocalRotation: {x: 0.010034555, y: 0.9895974, z: -0.1141333, w: 0.087005}
-  m_LocalPosition: {x: -1.351, y: 1.007, z: 1.664}
+  m_LocalRotation: {x: 0.022572313, y: 0.973945, z: -0.11232805, w: 0.19571413}
+  m_LocalPosition: {x: -1.3509998, y: 1.007, z: 1.663998}
   m_LocalScale: {x: 1.0000001, y: 1.0265455, z: 1.0156332}
   m_Children: []
   m_Father: {fileID: 4580672866343944}
   m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 13.158001, y: -10.049001, z: 0}
+  m_LocalEulerAnglesHint: {x: 13.158001, y: 157.27501, z: 0}
 --- !u!4 &4713449057131426
 Transform:
   m_ObjectHideFlags: 1
@@ -3327,7 +3327,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1965786611528328}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 4.478}
+  m_LocalPosition: {x: 0.32, y: -1, z: 3.23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4580672866343944}
@@ -3775,7 +3775,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 30
+  MaxDistance: 50
   Pan2D: 0
   rolloffMode: 1
   BypassEffects: 0
@@ -3895,7 +3895,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 2
-  m_Color: {r: 0, g: 0.85711694, b: 1, a: 0.6784314}
+  m_Color: {r: 1, g: 0, b: 0.93442965, a: 0.6784314}
   m_Intensity: 1.5
   m_Range: 10
   m_SpotAngle: 30
@@ -3932,7 +3932,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 2
-  m_Color: {r: 0, g: 0.85711694, b: 1, a: 0.6784314}
+  m_Color: {r: 1, g: 0, b: 0.93442965, a: 0.6784314}
   m_Intensity: 1.5
   m_Range: 10
   m_SpotAngle: 30
@@ -3969,7 +3969,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 2
-  m_Color: {r: 0, g: 0.85711694, b: 1, a: 0.6784314}
+  m_Color: {r: 1, g: 0, b: 0.93442965, a: 0.6784314}
   m_Intensity: 1.5
   m_Range: 10
   m_SpotAngle: 30
@@ -4022,7 +4022,7 @@ MonoBehaviour:
   _bossCollisionDetectDistance: 1
   _InvincibleDuration: 1
   _maxHardBossHealth: 20
-  _bossHardDefaultSpeed: 2.5
+  _bossHardDefaultSpeed: 3
   _additionalCam1: {fileID: 20072765165955122}
   _additionalCam2: {fileID: 20887825260962124}
   _additionalCam3: {fileID: 20774309562745034}
@@ -4044,27 +4044,34 @@ MonoBehaviour:
   _xAttackPercentage: 50
   _quadFirePercentage: 50
   _quadTrapDamage: 1
-  _quadShootDist: 1.75
-  _quadDetectDist: 9.5
+  _quadShootDist: 1.25
+  _quadDetectDist: 30
   _quadFireStartDelay: 1
   _quadBurnDuration: 5
+  _quadRotateSpeed: 0.3
+  _regularFireTrapPrefab: {fileID: 1875060388093014, guid: 7f6288db9a8e54542937a21d6c6ff1eb,
+    type: 2}
   _hardStunnedDuration: 0
-  _hardXAttackPercentage: 0
-  _hardQuadFirePercentage: 0
-  _hardSpikeFollowSpeed: 0
-  _hardSpikePossessTime: 0
-  _hardSpikeAttackDelay: 0
-  _hardSpikeAttackSpeed: 0
-  _hardSpikeRetreatSpeed: 0
-  _hardDartShooterMoveSpeed: 0
-  _hardDartPossessTime: 0
-  _hardDartFireDelay: 0
-  _hardDartSpawnDelay: 0
-  _hardQuadTrapDamage: 0
-  _hardQuadShootDist: 0
-  _hardQuadDetectDist: 0
-  _hardQuadFireStartDelay: 0
-  _hardQuadBurnDuration: 0
+  _hardXAttackPercentage: 50
+  _hardQuadFirePercentage: 50
+  _hardSpikeFollowSpeed: 6
+  _hardSpikePossessTime: 6
+  _hardSpikeAttackDelay: 0.05
+  _hardSpikeAttackSpeed: 30
+  _hardSpikeRetreatSpeed: 30
+  _hardDartShooterMoveSpeed: 8
+  _hardDartPossessTime: 8
+  _hardDartFireDelay: 0.2
+  _hardDartSpawnDelay: 0.2
+  _hardQuadTrapDamage: 1.5
+  _hardQuadShootDist: 1.25
+  _hardQuadDetectDist: 30
+  _hardQuadFireStartDelay: 0.5
+  _hardQuadBurnDuration: 5
+  bossDazed: {fileID: 8300000, guid: ab44d15d30e530e469ea695b5923092c, type: 3}
+  bossDeath: {fileID: 8300000, guid: eabad7a03804bc744a50b165bce1e241, type: 3}
+  bossPossess: {fileID: 8300000, guid: 83685967c526c5c4180c8d641a72680d, type: 3}
+  fireAttack: {fileID: 8300000, guid: c9a65e60bbaced94f8eac7cc46e8f346, type: 3}
 --- !u!136 &136209426405389820
 CapsuleCollider:
   m_ObjectHideFlags: 1
@@ -4093,7 +4100,7 @@ SkinnedMeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 1ce58c7903727ba4ca4f31e33ac13357, type: 2}
+  - {fileID: 2100000, guid: 0d7ba8033516bb14db0d48ff2677ce53, type: 2}
   - {fileID: 2100000, guid: 661a4c8c873cdb249a3097a1991137c4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0

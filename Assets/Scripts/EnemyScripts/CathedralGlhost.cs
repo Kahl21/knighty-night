@@ -17,11 +17,16 @@ public class CathedralGlhost : BasicGlhost {
     List<CathedralProjectile> _myProjectiles;
     bool _firing;
 
+    [SerializeField]
+    AudioClip shootClip;
+
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
         base.Init(_spawner, _incomingMech);
         _myAnimations.Play("Idle", 0);
         _myProjectiles = new List<CathedralProjectile>();
+
+        _speaker = this.GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -106,8 +111,12 @@ public class CathedralGlhost : BasicGlhost {
         //_myAnimations.Play("Shoot", 0);
         _currProjSpawn = (Time.time - _startTime) / _projectileSpawnWaitTime;
 
+        
+
         if(_currProjSpawn >=1)
         {
+            _speaker.Stop();
+            _speaker.PlayOneShot(shootClip, volSFX);
             _myAnimations.Play("Shoot", 0);
             _currProjSpawn = 0;
             _startTime = Time.time;

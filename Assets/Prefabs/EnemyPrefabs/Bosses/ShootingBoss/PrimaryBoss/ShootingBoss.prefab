@@ -2468,8 +2468,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1215174008572448}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.4000136, y: 29.7, z: 2.5997307}
-  m_LocalScale: {x: 0.99993753, y: 0.99993753, z: 0.99993753}
+  m_LocalPosition: {x: 0, y: 0.47, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4975201834673934}
   m_RootOrder: 2
@@ -2758,7 +2758,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1580641199016564}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.4000002, y: 147.3, z: 75.199615}
+  m_LocalPosition: {x: 0, y: 0.47, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4975201834673934}
@@ -2931,7 +2931,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1892504173598538}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -3.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4823640271212752}
@@ -3011,7 +3011,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1742726182689384}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.18627882, y: -0.1, z: 141.1807}
+  m_LocalPosition: {x: 0.18627882, y: 0.79, z: 141.1807}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_Children:
   - {fileID: 4735131765970296}
@@ -3136,8 +3136,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1332947303281146}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.4000136, y: 77.3, z: 75.199615}
-  m_LocalScale: {x: 0.99993753, y: 0.99993753, z: 0.99993753}
+  m_LocalPosition: {x: 0, y: 0.47, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4975201834673934}
   m_RootOrder: 1
@@ -3289,7 +3289,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 30
+  MaxDistance: 50
   Pan2D: 0
   rolloffMode: 1
   BypassEffects: 0
@@ -3391,7 +3391,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 2
-  m_Color: {r: 0, g: 0.85711694, b: 1, a: 0.6784314}
+  m_Color: {r: 1, g: 0.77250254, b: 0, a: 0.6784314}
   m_Intensity: 1.5
   m_Range: 10
   m_SpotAngle: 30
@@ -3428,7 +3428,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 2
-  m_Color: {r: 0, g: 0.85711694, b: 1, a: 0.6784314}
+  m_Color: {r: 1, g: 0.77250254, b: 0, a: 0.6784314}
   m_Intensity: 1.5
   m_Range: 10
   m_SpotAngle: 30
@@ -3465,7 +3465,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 2
-  m_Color: {r: 0, g: 0.85711694, b: 1, a: 0.6784314}
+  m_Color: {r: 1, g: 0.77250254, b: 0, a: 0.6784314}
   m_Intensity: 1.5
   m_Range: 10
   m_SpotAngle: 30
@@ -3530,17 +3530,18 @@ MonoBehaviour:
   _specialPulsePercentage: 70
   _regularPulsePercentage: 30
   _specialGhlosts: 1
-  _coloredSpawnPercentage: 20
+  _coloredSpawnPercentage: 25
   _invincibleSpawnPercentage: 30
-  _normalSpawnPercentage: 50
+  _normalSpawnPercentage: 45
   _colorsForMinions:
   - {r: 1, g: 0, b: 0, a: 1}
   - {r: 0, g: 0.043819427, b: 1, a: 1}
   - {r: 0.06587124, g: 1, b: 0, a: 1}
   - {r: 1, g: 0.86321163, b: 0, a: 1}
   _maxColorTravelDistance: 2
-  _invincibleColor: {r: 1, g: 1, b: 1, a: 0.6156863}
+  _invincibleColor: {r: 0, g: 0, b: 0, a: 0.6156863}
   _immuneParticles: {fileID: 0}
+  shootingClip: {fileID: 8300000, guid: fbad8ab8aebf34f1084c74d43c3a1aa7, type: 3}
 --- !u!114 &114791497173859414
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3560,7 +3561,7 @@ MonoBehaviour:
   _playerIntroPos: {fileID: 1892504173598538}
   _cameraIntroDuration: 1
   _deathDuration: 3
-  _maxBossHealth: 25
+  _maxBossHealth: 30
   _bossDamage: 0.5
   _bossDefaultSpeed: 2
   _bossCollisionDetectDistance: 1
@@ -3576,7 +3577,7 @@ MonoBehaviour:
   _detectDistance: 1.5
   _damageToBoss: 0.5
   _damageToPlayer: 0.5
-  _followDuration: 1
+  _followDuration: 2
   _hardFollowDuration: 0
   _hardTimeBetweenAttacks: 0
   _colorDamageToBoss: 1
@@ -3603,7 +3604,7 @@ CapsuleCollider:
   m_Radius: 0.5514181
   m_Height: 3
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.89, z: 0}
 --- !u!137 &137921535255501036
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
@@ -3619,7 +3620,7 @@ SkinnedMeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 1ce58c7903727ba4ca4f31e33ac13357, type: 2}
+  - {fileID: 2100000, guid: a8ed6151bf374bf4b8495e9c1c732d53, type: 2}
   - {fileID: 2100000, guid: 661a4c8c873cdb249a3097a1991137c4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0

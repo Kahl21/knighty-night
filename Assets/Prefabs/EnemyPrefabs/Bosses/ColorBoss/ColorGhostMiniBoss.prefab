@@ -6993,7 +6993,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1439387063597318}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 23.42, y: 0, z: 95}
+  m_LocalPosition: {x: 23.42, y: -0.04, z: 95}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_Children:
   - {fileID: 4422254312015504}
@@ -9637,7 +9637,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 3
+  MaxDistance: 50
   Pan2D: 0
   rolloffMode: 1
   BypassEffects: 0
@@ -9949,17 +9949,16 @@ MonoBehaviour:
   _hardColorsForMinions:
   - {r: 1, g: 0, b: 0, a: 1}
   - {r: 0, g: 0.050980397, b: 1, a: 1}
-  - {r: 0, g: 1, b: 0.020182133, a: 1}
   _hardTimeBetweenAttacks: 0.75
   _hardStunnedDuration: 4
   _hardFollowPercentage: 5
   _hardBouncePercentage: 60
   _hardFollowDuration: 5
-  _hardNumofBounces: 3
-  _hardBounceAirtime: 1.5
-  bossDeath: {fileID: 8300000, guid: ce9f3e7bc76414346b33e7bad0799d35, type: 3}
+  _hardNumofBounces: 4
+  _hardBounceAirtime: 1
+  bossDeath: {fileID: 8300000, guid: 45b856e525c72ed44911c7df15870114, type: 3}
   bossDazed: {fileID: 8300000, guid: ab44d15d30e530e469ea695b5923092c, type: 3}
-  bossBounce: {fileID: 8300000, guid: 6e8611389fca76a478435cf5aa290465, type: 3}
+  bossBounce: {fileID: 8300000, guid: 626025395328dd44ca45d6d5640f9187, type: 3}
   ghostSpawn: {fileID: 8300000, guid: f493c94272fb3dc49b789f0d9f23dcf2, type: 3}
 --- !u!114 &114941287179893998
 MonoBehaviour:

@@ -58,9 +58,17 @@ public class BreakoutGhlost : BaseEnemy {
             GameObject thingHit = hit.collider.gameObject;
 
             //Debug.Log("reflected");
-            if(thingHit.GetComponent<BreakoutBlock>())
+            if(thingHit.GetComponent<BreakoutBlock>() && !thingHit.GetComponent<BreakoutBlock>().SetDeathPillar)
             {
                 _moveDir = Vector3.Reflect(checkDir, hit.normal);
+                thingHit.GetComponent<BreakoutBlock>().CorrectMatch();
+                _hit = false;
+            }
+            else if (thingHit.GetComponent<BreakoutBlock>() && thingHit.GetComponent<BreakoutBlock>().SetDeathPillar)
+            {
+                thingHit.GetComponent<BreakoutBlock>().DamagePlayer();
+                _moveDir = new Vector3(0, 0, 0);
+                transform.position = _startPos;
                 _hit = false;
             }
             else if (!thingHit.GetComponent<BaseEnemy>())
@@ -68,6 +76,7 @@ public class BreakoutGhlost : BaseEnemy {
                 _moveDir = Vector3.Reflect(checkDir, hit.normal);
                 _hit = false;
             }
+            
 
         }
     }

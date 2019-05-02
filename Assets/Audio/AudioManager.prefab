@@ -81,7 +81,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -273,26 +273,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SFXPlayer: {fileID: 82823853632141712}
-  MusicPlayer: {fileID: 0}
-  SwingClip: {fileID: 8300000, guid: 86838dbb8ecca644daf678854fbeccc7, type: 3}
+  MusicPlayer: {fileID: 82814101626574406}
+  SwingClip: {fileID: 8300000, guid: f6a371b84cd739e4ea04463b7a8d0ecc, type: 3}
   GateOpenClip: {fileID: 8300000, guid: 6fd79753fb9e9ad48b7ed751483767d0, type: 3}
   GateCloseClip: {fileID: 8300000, guid: c61e4005b21915a418bcc1503297fd47, type: 3}
   FireClip: {fileID: 8300000, guid: 500b9dee2ca752943a98f5cd8192d127, type: 3}
   PlayerDamageClip: {fileID: 8300000, guid: 56044195cd64865429bb0c6a6d869f1b, type: 3}
-  PlayerDead: {fileID: 8300000, guid: 94daa4f5cda87b04683b67c738b49006, type: 3}
-  BubblesClip: {fileID: 8300000, guid: 1e2f8f62ca5b360419feee5580f6c3ad, type: 3}
+  PlayerDead: {fileID: 8300000, guid: a1ce1f921a765764386c51902e599f1c, type: 3}
+  BubblesClip: {fileID: 8300000, guid: c39528c832d7cb44ca002ff41abfcb92, type: 3}
   RoomCompleteClip: {fileID: 8300000, guid: 256dd6fab29c1dc48931aa25080b4382, type: 3}
-  ButtonPressedClip: {fileID: 8300000, guid: 38f2420e83ffc9c459245af69288d6e2, type: 3}
-  ButtonMovedClip: {fileID: 8300000, guid: bbc9e129a7033bd4a81166a15cb4753f, type: 3}
-  ColorGhostCorrectClip: {fileID: 8300000, guid: def8498054f7e6e488a69dd074edc7a3,
+  ButtonPressedClip: {fileID: 8300000, guid: b528fcd072c226a4da544057b74ff3f1, type: 3}
+  ButtonMovedClip: {fileID: 8300000, guid: 6980e8c08fe61df499e893a15cca3e61, type: 3}
+  ColorGhostCorrectClip: {fileID: 8300000, guid: 372d3022eb60045d3a5df39655f0b92b,
     type: 3}
-  BGMDungeon: {fileID: 8300000, guid: e928a8064d5dc514e9b1851de00dc31d, type: 3}
-  BGMSewer: {fileID: 8300000, guid: 093ff2cc63ad19d4ebf954d727c4b3d5, type: 3}
-  BGMGraveyard: {fileID: 8300000, guid: 549197f42884ab644b8742b8034974f5, type: 3}
-  BGMCathedral: {fileID: 8300000, guid: f2051367655f790419ab0f3c1b8edf01, type: 3}
+  BGMDungeon: {fileID: 8300000, guid: 61e110100533941ddb9bf52ee65d1892, type: 3}
+  BGMSewer: {fileID: 8300000, guid: 6dd5f942d6e3c4405861a09396bd4e6a, type: 3}
+  BGMGraveyard: {fileID: 8300000, guid: 9d099cbe6057244a7b1f032ca032f572, type: 3}
+  BGMCathedral: {fileID: 8300000, guid: ce7a5a9e4e20a4cd49574a0d88a316cd, type: 3}
   BGMMenu: {fileID: 8300000, guid: f1443be0e6954e4458ad22d550aec10b, type: 3}
   BGMBoss: {fileID: 8300000, guid: 97420822de9698145b2005f0c609c257, type: 3}
   BGMChase: {fileID: 8300000, guid: 9bd2b612b852b8747b1b1e3402d4f4c9, type: 3}
+  BGMSecretBoss: {fileID: 0}
   volMaster: 10
   volMusic: 10
   volSFX: 10

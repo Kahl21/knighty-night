@@ -75,6 +75,8 @@ public class AudioManager : MonoBehaviour {
     AudioClip BGMBoss;
     [SerializeField]
     AudioClip BGMChase;
+    [SerializeField]
+    AudioClip BGMSecretBoss;
 
     //master volume value
     public float volMaster = 10;
@@ -92,6 +94,7 @@ public class AudioManager : MonoBehaviour {
 
     bool boss;
     bool chase;
+    bool secretBoss;
 
     public static AudioManager instance = null;
 
@@ -106,9 +109,10 @@ public class AudioManager : MonoBehaviour {
             Destroy(gameObject);
         }
 
-        
+
 
         MusicPlayer = this.transform.GetChild(0).GetComponent<AudioSource>();
+
 
         RestartMusic();
 
@@ -230,52 +234,67 @@ public class AudioManager : MonoBehaviour {
     {
         int currentScene = SceneManager.GetActiveScene().buildIndex;
 
-        if (!boss && !chase)
-        {
 
-            if (currentScene > 0 && currentScene <= 4)
+
+            if (!boss && !chase && !secretBoss)
             {
-                if (!MusicPlayer.isPlaying)
-                    MusicPlayer.PlayOneShot(BGMDungeon, volMusic / 10);
+
+                if (currentScene > 0 && currentScene <= 4)
+                {
+                    if (!MusicPlayer.isPlaying)
+                        MusicPlayer.PlayOneShot(BGMDungeon, volMusic / 10);
+                }
+
+                else if (currentScene > 4 && currentScene <= 7)
+                {
+                    if (!MusicPlayer.isPlaying)
+                        MusicPlayer.PlayOneShot(BGMSewer, volMusic / 10);
+                }
+
+                else if (currentScene > 7 && currentScene <= 10)
+                {
+                    if (!MusicPlayer.isPlaying)
+                        MusicPlayer.PlayOneShot(BGMGraveyard, volMusic / 10);
+                }
+
+                else if (currentScene > 10 && currentScene <= 13)
+                {
+                    if (!MusicPlayer.isPlaying)
+                        MusicPlayer.PlayOneShot(BGMCathedral, volMusic / 10);
+                }
+
+                else if (currentScene == 0)
+                    if (!MusicPlayer.isPlaying)
+                        MusicPlayer.PlayOneShot(BGMMenu, volMusic / 10);
             }
 
-            else if (currentScene > 4 && currentScene <= 7)
+            else if (boss && !chase && !secretBoss)
             {
                 if (!MusicPlayer.isPlaying)
-                    MusicPlayer.PlayOneShot(BGMSewer, volMusic / 10);
+                    MusicPlayer.PlayOneShot(BGMBoss, volMusic / 10);
             }
 
-            else if (currentScene > 7 && currentScene <= 10)
+            else if (!boss && chase && !secretBoss)
             {
                 if (!MusicPlayer.isPlaying)
-                    MusicPlayer.PlayOneShot(BGMGraveyard, volMusic / 10);
+                    MusicPlayer.PlayOneShot(BGMChase, volMusic / 10);
             }
 
-            else if (currentScene > 10 && currentScene <= 13)
+            else if (!boss && !chase && secretBoss)
             {
                 if (!MusicPlayer.isPlaying)
-                    MusicPlayer.PlayOneShot(BGMCathedral, volMusic / 10);
+                    MusicPlayer.PlayOneShot(BGMSecretBoss, volMusic / 10);
             }
 
-            else if (currentScene == 0)
-                if (!MusicPlayer.isPlaying)
-                    MusicPlayer.PlayOneShot(BGMMenu, volMusic / 10);
-        }
-
-        else if(boss && !chase)
-        {
-            if (!MusicPlayer.isPlaying)
-                MusicPlayer.PlayOneShot(BGMBoss, volMusic / 10);
-        }
-
-        else if(!boss && chase)
-        {
-            if (!MusicPlayer.isPlaying)
-                MusicPlayer.PlayOneShot(BGMChase, volMusic / 10);
-        }
+       
 
 
 
+    }
+
+    public virtual void StartMusic()
+    {
+        StartCoroutine(MusicStart());
     }
 
     public virtual void RestartMusic()
@@ -286,8 +305,21 @@ public class AudioManager : MonoBehaviour {
     }
 
 
+
+    IEnumerator MusicStart()
+    {
+        float fadeTime = 0;
+        RestartMusic();
+        MusicPlayer.volume = 0;
+        yield return new WaitForSeconds(2.5f);
+        MusicPlayer.volume = volSFX;
+
+    }
+
+
     public virtual void ChaseStart() { chase = true; RestartMusic(); }
     public virtual void ChaseStop() { chase = false; RestartMusic(); }
     public virtual void BossStart() { boss = true; RestartMusic(); }
-    public virtual void BossStop() { boss = false; RestartMusic(); }
+    public virtual void SecretBossStart() { secretBoss = true; RestartMusic(); }
+    public virtual void BossStop() { boss = false; secretBoss = false; RestartMusic(); }
 }

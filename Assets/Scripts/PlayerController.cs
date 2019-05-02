@@ -208,6 +208,8 @@ public class PlayerController : MonoBehaviour
         _specialBar.GetComponent<Image>().fillAmount = 0;
         currentCheckpoint = 0;
         dead = false;
+
+        
     }
 
     //Called to reset the Player Stats
@@ -587,7 +589,7 @@ public class PlayerController : MonoBehaviour
             {
                 _move = Vector3.zero;
             }
-            else if (thingHit.GetComponent<BaseEnemy>())                                                //else if the player hit a base enemy
+            else if (thingHit.GetComponent<BaseEnemy>() && !thingHit.GetComponent<BreakoutGhlost>())   //else if the player hit a base enemy
             {
                 TakeDamage(thingHit.GetComponent<BaseEnemy>().GetDamage);                               //have the player take damage
             }
@@ -599,7 +601,7 @@ public class PlayerController : MonoBehaviour
             {
                 thingHit.GetComponent<MazeCheckpoint>().CheckPointHit();                                //activate the checkpoint
             }
-            /*else if (thingHit.GetComponent<PM_Teleporter>())                                            //else if the player hits a teleporter
+            else if (thingHit.GetComponent<PM_Teleporter>())                                            //else if the player hits a teleporter
             {
                 thingHit.GetComponent<PM_Teleporter>().TriggerTeleport(gameObject.GetComponent<Collider>()); //Teleport the player across the arena
             }
@@ -607,7 +609,7 @@ public class PlayerController : MonoBehaviour
             {
                 Debug.Log("Hit Coin");
                 thingHit.GetComponent<Collectable>().AddToScore();                                      //Add to the score, Pacman only
-            }*/
+            }
             else if (!thingHit.GetComponent<HealingGrace>() || !thingHit.GetComponent<SpikeTrap>())      //else if the player did not hit any of the above and it isnt a spike trap or healing spot
             {
                 _move = Vector3.zero;                                                                   //you should probably stop cause i got not clue what you hit homeboy
@@ -739,8 +741,7 @@ public class PlayerController : MonoBehaviour
             _myAnimations.Play("SwordSwing", 0);                                                                                    //play the sword swing animation
             IncSpecialMeter(_MaxSpecialAmount, false);                                                                              //empty the special meter
             _doingSomething = true;                                                                                                 //player is set to do something
-            GameObject _newWave = Instantiate<GameObject>(BWPrefab, transform.position + transform.forward + Vector3.up, transform.rotation);             //creates an instance of the special attack prefab
-            _newWave.GetComponent<BacklashWave>().Init();
+            Instantiate<GameObject>(BWPrefab, transform.position + transform.forward + Vector3.up, transform.rotation);             //creates an instance of the special attack prefab
             _SwingStartTime = Time.time;                                                                                            //start the time for the swing
             _whatImDoing = Interactions.WAVESPECIAL;                                                                                //player is using the special slash
             AudioManager.instance.FireAttack();                                                                                     //play the sound of the fire slash
@@ -834,10 +835,6 @@ public class PlayerController : MonoBehaviour
                         {
                             thingHit.GetComponent<SecretLever>().StartRotation();
                         }
-                        else if(thingHit.GetComponent<BreakableObject>())
-                        {
-                            thingHit.GetComponent<BreakableObject>().BreakObject();
-                        }
                     }
                 }
                 break;
@@ -872,16 +869,18 @@ public class PlayerController : MonoBehaviour
     {
         if (!_invincible)
         {
-            AudioManager.instance.PlayerDamaged();
+            
             _invincible = true;
             IncHealthMeter(_damageTaken, false);
 
             if (_playerHealth > 0)
             {
+                AudioManager.instance.PlayerDamaged();
                 StartCoroutine(IFrames());
             }
             else
             {
+                AudioManager.instance.PlayerDied();
                 _myAnimations.Play("Death");
                 EndLevel(false);
             }

@@ -118,10 +118,14 @@ public class MiniBossColor : BossEnemy
     float _hardBounceAirtime;
 
     [Header("Sound Objects")]
-    public AudioClip bossDeath;
-    public AudioClip bossDazed;
-    public AudioClip bossBounce;
-    public AudioClip ghostSpawn;
+    [SerializeField]
+     AudioClip bossDeath;
+    [SerializeField]
+     AudioClip bossDazed;
+    [SerializeField]
+     AudioClip bossBounce;
+    [SerializeField]
+     AudioClip ghostSpawn;
 
 
     ColorStrats _myAttack = ColorStrats.FOLLOW;

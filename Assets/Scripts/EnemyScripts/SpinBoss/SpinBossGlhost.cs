@@ -470,12 +470,14 @@ public class SpinBossGlhost : BossEnemy
             _currAttackTime = (Time.time - _startAttackTime) / _realSpinAttackDuration;
             _currSpawnTime = (Time.time - _startSpawnTime) / _realSpawnDelayDuration;
 
-            if (!_speaker.isPlaying)
-                _speaker.PlayOneShot(bossSpin, volSFX);
+            
             // _myAnimations.Play("Spin");
 
             for (int i = 0; i <= _numOfCasts; i++)
             {
+                if (!_speaker.isPlaying)
+                    _speaker.PlayOneShot(bossSpin, volSFX);
+
                 float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
                 float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
 
@@ -557,6 +559,9 @@ public class SpinBossGlhost : BossEnemy
 
             for (int i = 0; i <= _pinballNumOfCasts; i++)
             {
+                if (!_speaker.isPlaying)
+                    _speaker.PlayOneShot(bossSpin, volSFX);
+
                 float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
                 float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
 
@@ -621,6 +626,7 @@ public class SpinBossGlhost : BossEnemy
         dazedParticle.SetActive(true);
         _currAttackTime = (Time.time - _startAttackTime) / _realStunnedDuration;
 
+        _speaker.Stop();
         if (!_speaker.isPlaying)
             _speaker.PlayOneShot(bossDazed, volSFX);
         //Debug.Log("stunned");
@@ -657,6 +663,7 @@ public class SpinBossGlhost : BossEnemy
     //called once the boss is defeated
     protected override void Die()
     {
+        _speaker.Stop();
         _myRoom.CheckForEnd();
 
         _enemyAgent.enabled = false;

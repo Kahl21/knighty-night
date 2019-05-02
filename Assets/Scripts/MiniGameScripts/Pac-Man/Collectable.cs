@@ -18,7 +18,16 @@ public class Collectable : MonoBehaviour
     {
         Debug.Log("Add to score");
         _pmGameManager.AddToScore(this.gameObject);
-        Destroy(this.gameObject);
+
+        if (!IsSword)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            gameObject.SetActive(false);
+        }
+        
     }
 
     public bool IsSword { get { return isSword; } }

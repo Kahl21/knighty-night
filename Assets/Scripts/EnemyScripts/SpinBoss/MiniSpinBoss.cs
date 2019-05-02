@@ -392,10 +392,7 @@ public class MiniSpinBoss : BossEnemy
         }
         else
         {
-            if (!_speaker.isPlaying)
-            {
-                _speaker.PlayOneShot(bossSpin, volSFX);
-            }
+
 
             _currAttackTime = (Time.time - _startAttackTime) / _realPinballAttackDuration;
 
@@ -403,6 +400,11 @@ public class MiniSpinBoss : BossEnemy
 
             for (int i = 0; i <= _pinballNumOfCasts; i++)
             {
+                if (!_speaker.isPlaying)
+                {
+                    _speaker.PlayOneShot(bossSpin, volSFX);
+                }
+
                 float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
                 float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
 
@@ -431,6 +433,11 @@ public class MiniSpinBoss : BossEnemy
 
             if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), _moveDir,out hit, _bossCollisionDetectDistance +1f))
             {
+                if (!_speaker.isPlaying)
+                {
+                    _speaker.PlayOneShot(bossSpin, volSFX);
+                }
+
                 Vector3 checkDir = _moveDir;
                 GameObject thingHit = hit.collider.gameObject;
 
@@ -462,7 +469,7 @@ public class MiniSpinBoss : BossEnemy
 
     private void Stunned()
     {
-
+        _speaker.Stop();
         if (!_speaker.isPlaying)
             _speaker.PlayOneShot(bossDazed, volSFX);
 
@@ -499,6 +506,7 @@ public class MiniSpinBoss : BossEnemy
 
     protected override void Die()
     {
+        _speaker.Stop();
         _speaker.PlayOneShot(bossDeath, volSFX);
 
         _myRoom.CheckForEnd();

@@ -288,13 +288,15 @@ public class Menuing : MonoBehaviour {
 
     public void NextLevel()
     {
-        AudioManager.instance.RoomComplete();
+       
         if (isLoading == false)
         {
             _menus[(int)WhichUIMenu.VIDEO].SetActive(true);
             StartCoroutine(LoadNewScene());
             
         }
+
+
 
         _managerRef.SetGameReset = _playerRef.ResetPlayer;
         _playerRef.GetCurrCheckpoint = 0;
@@ -906,9 +908,11 @@ public class Menuing : MonoBehaviour {
 
     IEnumerator LoadNewScene()
     {
+
         float time = 0;
         Color wantedColor = _fadeScreen.color;
         isLoading = true;
+        AudioManager.instance.RoomComplete();
         AsyncOperation asyncLoad  = SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex + 1);
         asyncLoad.allowSceneActivation = false;
         _audioManager.ChaseStop();
@@ -953,14 +957,16 @@ public class Menuing : MonoBehaviour {
 
     IEnumerator FadeIn()
     {
-        AudioManager.instance.RestartMusic();
+        AudioManager.instance.StartMusic();
         float time;
         if (!_paused)
             time = 0;
         else
             time = fadeTime;
         Color wantedColor = _fadeScreen.color;
+
         
+
         while (time < fadeTime)
         {
             yield return new WaitForSeconds(fadeUpdateTime);
@@ -975,6 +981,8 @@ public class Menuing : MonoBehaviour {
                 time = fadeTime + 1;
             }
         }
+
+        
     }
 
     IEnumerator FadeOut()

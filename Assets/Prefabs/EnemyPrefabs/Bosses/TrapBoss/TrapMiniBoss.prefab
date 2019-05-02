@@ -1790,7 +1790,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1891834581264188}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.54, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4172012433248018}
@@ -2941,7 +2941,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1122949136765908}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.1, y: -0.566, z: -4.33}
+  m_LocalPosition: {x: -0.11, y: -0.566, z: 2.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4330383025642224}
@@ -3443,7 +3443,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 30
+  MaxDistance: 50
   Pan2D: 0
   rolloffMode: 1
   BypassEffects: 0
@@ -3697,6 +3697,9 @@ MonoBehaviour:
   _hardQuadFireStartDelay: 0
   _hardQuadBurnDuration: 0
   _hardFollowDuration: 0
+  bossPossess: {fileID: 8300000, guid: 83685967c526c5c4180c8d641a72680d, type: 3}
+  bossDeath: {fileID: 8300000, guid: 7a4cb9b5e8464f2499a7e8e792a90357, type: 3}
+  fireAttack: {fileID: 8300000, guid: c9a65e60bbaced94f8eac7cc46e8f346, type: 3}
 --- !u!136 &136898106941440988
 CapsuleCollider:
   m_ObjectHideFlags: 1

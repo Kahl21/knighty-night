@@ -133,6 +133,8 @@ public class FireStatueTrap : BaseTrap {
     //plays fire animation after a delay
     void StartFire()
     {
+       
+
         _currDelay = (Time.time - _startDelay) / _fireDelay;
         if (_currDelay >= 1)
         {
@@ -150,6 +152,9 @@ public class FireStatueTrap : BaseTrap {
     //player will take damage if he walks through the fire
     void IncreaseFire()
     {
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(fireNoise);
+
         _currDelay = (Time.time - _startDelay) / _fireIncDuration;
 
         _currDetectDistance = _maxDetectDistance * _currDelay;
@@ -170,8 +175,7 @@ public class FireStatueTrap : BaseTrap {
     //Keeps the animation playing and damage raycasts up for a certain amount of time
     void BurnBabyBurn()
     {
-        if (!_speaker.isPlaying)
-            _speaker.PlayOneShot(fireNoise);
+        
 
         _currDelay = (Time.time - _startDelay) / _burningDuration;
         
@@ -193,6 +197,7 @@ public class FireStatueTrap : BaseTrap {
     //receeds raycasts with fire animation
     void StopFire()
     {
+        _speaker.Stop();
         _currDelay = (Time.time - _startDelay) / _fireIncDuration;
 
         _currDetectDistance = _maxDetectDistance * (1 - _currDelay);

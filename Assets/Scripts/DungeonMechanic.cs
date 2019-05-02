@@ -11,7 +11,8 @@ public enum Mechanic                                        //Enum for mechanic 
     TRAP,
     BOSS,
     HEAL,
-    BREAKOUT
+    BREAKOUT,
+    PACMAN
 }
 
 public class DungeonMechanic : MonoBehaviour {
@@ -90,6 +91,10 @@ public class DungeonMechanic : MonoBehaviour {
     GameObject _puckSpawnPoint;                             //gameobject on where to spawn the puck
     BreakoutManager _breakRef;                              //reference to the breakout manager
 
+    [Header("If PACMAN Room")]
+    [SerializeField]
+    PM_Manager _PMRef;
+
     GameManager _managerRef;                                //refernce to the main game manager
     BoxCollider _myCollider;                                //rooms collider
 
@@ -157,6 +162,7 @@ public class DungeonMechanic : MonoBehaviour {
 
                 for (int i = 0; i < _howManyGlhostsToSpawn; i++)        //check how many chase ghlosts to spawn
                 {
+                    AudioManager.instance.ChaseStart();
                     SpawnEnemy(0);                                      //spawn an enemy
                 }
 
@@ -185,9 +191,21 @@ public class DungeonMechanic : MonoBehaviour {
 
             case Mechanic.BOSS:
 
+
+
                 _BigBad = _enemyPreFab.GetComponent<BossEnemy>();       //set boss reference from enemy reference
                 _BigBad.SetMyRoom = this;                               //set boss's room to this            
                 _managerRef.GetPlayer.GoingToIntroCutscene(_BigBad);    //get the player and put him in cutscene mode, also passing him the reference to the current boss
+
+                if(_BigBad.name == "SecretBoss")
+                {
+                    AudioManager.instance.SecretBossStart();
+                }
+                else
+                {
+                    AudioManager.instance.BossStart();
+                }
+
                 break;
 
             case Mechanic.HEAL:                                         //if heal room
@@ -195,8 +213,15 @@ public class DungeonMechanic : MonoBehaviour {
             case Mechanic.BREAKOUT:                                     //if breakout room
 
                 _breakRef = GetComponent<BreakoutManager>();            //set breakout reference
-                _breakRef.Init();                                       //initialize breakout room
+                _breakRef.Init(GetComponent<DungeonMechanic>());                                       //initialize breakout room
                 SpawnEnemy(0);                                          //spawn puck
+                break;
+
+            case Mechanic.PACMAN:                                     //if PACMAN
+
+                //_PMRef.GetComponent<PM_Manager>();                      //set PACMAN reference
+                _PMRef.Init();                                          //initialize breakout room
+                _PMRef.SetSpawner = this.GetComponent<DungeonMechanic>();
                 break;
 
             default:
@@ -347,6 +372,7 @@ public class DungeonMechanic : MonoBehaviour {
             case Mechanic.BREAKOUT:
 
                 spawnPos = _puckSpawnPoint.transform.position;                  //change spawn point to the puck spawn point           
+                
                 break;
 
             default:
@@ -356,6 +382,11 @@ public class DungeonMechanic : MonoBehaviour {
         spawnPos.y = 0;                                                         //set y pos of spawn to the floor (just in case)
         //Debug.Log(spawnPos);
         GameObject newEnemy = Instantiate<GameObject>(_enemyPreFab, spawnPos, _enemyPreFab.transform.rotation);     //spawn the new enemy and set spawned ghlost to reference
+
+        if (_roomMechanic == Mechanic.BREAKOUT)
+        {
+            _breakRef.SetPuck = newEnemy;
+        }
 
         switch (_roomMechanic)
         {
@@ -430,6 +461,29 @@ public class DungeonMechanic : MonoBehaviour {
                 EndAll();                                       //end the room
                 break;
 
+            case Mechanic.PACMAN:
+
+                EndAll();                                       
+                break;
+
+            case Mechanic.BREAKOUT:
+                bool roomClear = true;
+                for (int index = 0; index < _breakRef.GetBlocksInScene.Count; index++)
+                {
+                    if (_breakRef.GetBlocksInScene[index].gameObject.activeSelf == true)
+                    {
+                        roomClear = false;
+                    }
+                }
+
+                if (roomClear)
+                {
+                    EndAll();
+                    Debug.Log("Room End");
+                }
+                                                      
+                break;
+
             default:
                 break;
         }
@@ -439,12 +493,14 @@ public class DungeonMechanic : MonoBehaviour {
     //ends the room
     public void EndAll()
     {
-        if(_roomMechanic == Mechanic.CHASE)
-        AudioManager.instance.ChaseStop();
-        if(_roomMechanic == Mechanic.BOSS)
-        AudioManager.instance.BossStop();
         _roomStarted = false;                                           //stop room working
         _spawning = false;                                              //stop room spawning
+
+        if (_roomMechanic == Mechanic.CHASE || _roomMechanic == Mechanic.BOSS)
+        {
+            AudioManager.instance.ChaseStop();
+            AudioManager.instance.BossStop();
+        }
 
         if (_roomMechanic != Mechanic.CHASE)                            //if the mechanic is not a chase room
         {
@@ -587,6 +643,16 @@ public class DungeonMechanic : MonoBehaviour {
 
                 _healObject.SetActive(true);                            //turns on the heal aura
                 _healObject.GetComponent<HealingGrace>().HealReset();   //resets the heal aura
+                break;
+
+            case Mechanic.PACMAN:
+                _PMRef.MyReset();
+                EndAll();
+                break;
+
+            case Mechanic.BREAKOUT:
+                _breakRef.ResetBreakout();
+                EndAll();
                 break;
 
             default:

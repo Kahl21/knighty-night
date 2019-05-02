@@ -265,9 +265,21 @@ public class SecretBoss : BossEnemy {
     [SerializeField]
     float _hardLightFallSpeed;
 
-    //[Header("Sound Variables")]
+    [Header("Sound Variables")]
+    [SerializeField]
+    AudioClip swingClip;
+    [SerializeField]
+    AudioClip fireClip;
+    [SerializeField]
+    AudioClip shootClip;
+    [SerializeField]
+    AudioClip lightningClip;
+    [SerializeField]
+    AudioClip hitClip;
+    [SerializeField]
+    AudioClip deathClip;
 
-        
+
     protected override void Awake()
     {
         base.Awake();
@@ -642,6 +654,7 @@ public class SecretBoss : BossEnemy {
             _currentSwingTime = 1;
             _swordCalcAngle = 0;
             _SwingStartTime = Time.time;
+            _speaker.PlayOneShot(swingClip, volSFX);
             _myAnimations.Play("SwordSwing", 0);
         }
         else
@@ -680,6 +693,7 @@ public class SecretBoss : BossEnemy {
 
             GameObject _newWave = Instantiate<GameObject>(_BWPrefab, transform.position + Vector3.up, transform.rotation);
             _newWave.GetComponent<BacklashWave>().Init(_realFlameDamage, _realFlameSpeed, _realFlameMaxScale, _realFlameScaleSpeed, _realFlameLifetime);
+            _speaker.PlayOneShot(fireClip, volSFX);
             _myAnimations.Play("SwordSwing", 0);
             _currFlamesSpawned++;
             if(_currFlamesSpawned>=_realHowManyFlames)
@@ -727,6 +741,7 @@ public class SecretBoss : BossEnemy {
 
             GameObject _newWave = Instantiate<GameObject>(_BWPrefab, transform.position + Vector3.up, transform.rotation);
             _newWave.GetComponent<BacklashWave>().Init(_realDashFlameDamage, _realDashFlameSpeed, _realDashFlameMaxScale, _realDashFlameScaleSpeed, _realDashFlameLifetime);
+            _speaker.PlayOneShot(fireClip, volSFX);
 
             _myAnimations.Play("SwordSwing", 0);
             _currFlamesSpawned++;
@@ -791,6 +806,7 @@ public class SecretBoss : BossEnemy {
 
             GameObject _newLight = Instantiate<GameObject>(_ChosenLightPrefab, lightPos, transform.rotation);
             _newLight.GetComponent<ChosenLight>().Init(_realLightDamage, _realLightFallSpeed);
+            _speaker.PlayOneShot(lightningClip, volSFX);
             _currFlamesSpawned++;
             if (_currFlamesSpawned >= _realNumberOfSmitingLights)
             {
@@ -812,12 +828,8 @@ public class SecretBoss : BossEnemy {
         //dazedParticle.SetActive(true);
         _currAttackTime = (Time.time - _startAttackTime) / _realStunnedDuration;
 
-        //if (!_speaker.isPlaying)
-       // {
-            
-            //_speaker.PlayOneShot(bossDazed, volSFX);
-            
-       // }
+        
+
 
         //Debug.Log("stunned");
 
@@ -839,6 +851,8 @@ public class SecretBoss : BossEnemy {
     {
         if (!_amHit && !_invincible)
         {
+            if (_speaker.isPlaying)
+                _speaker.PlayOneShot(hitClip, volSFX);
             //Debug.Log("got hit");
             base.GotHit(_damageTaken);
 
@@ -886,7 +900,8 @@ public class SecretBoss : BossEnemy {
         cam1.y = _cameraRef.transform.position.y;
         _cameraRef.AmFollowingPlayer = false;
 
-        //_speaker.PlayOneShot(bossDeath, volSFX);
+        _speaker.Stop();
+        _speaker.PlayOneShot(deathClip, volSFX);
 
         _startAttackTime = Time.time;
         //_cameraInPosition = false;

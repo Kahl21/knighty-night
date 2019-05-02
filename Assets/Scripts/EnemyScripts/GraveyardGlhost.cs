@@ -28,7 +28,9 @@ public class GraveyardGlhost : BasicGlhost {
     protected float _distanceToTransform;
     protected bool _canChange = false;
     protected GameObject _swarmChangePoint;
-    
+
+    [SerializeField]
+    AudioClip transformClip;
 
     public override void Init(DungeonMechanic _spawner, Mechanic _incomingMech)
     {
@@ -115,6 +117,7 @@ public class GraveyardGlhost : BasicGlhost {
             }
             else
             {
+                _speaker.PlayOneShot(transformClip);
                 _invincible = true;
                 _myAnimations.Play("Invincible", 0);
                 _particle.SetActive(true);
@@ -124,7 +127,6 @@ public class GraveyardGlhost : BasicGlhost {
 
         if(!_invincible)
         {
-            AudioManager.instance.ChaseStop();
             Color _inBetweenColor;
 
             _inBetweenColor = _invCurrTime * _invincibleColor + (1 - _invCurrTime) * _startingColor;

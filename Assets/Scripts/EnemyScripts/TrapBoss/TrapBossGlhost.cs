@@ -193,12 +193,15 @@ public class TrapBossGlhost : BossEnemy
     //[SerializeField]
     //float _hardFollowDuration;
 
-    //sound variables
-    public AudioClip trapPossess;
-    public AudioClip fireShoot;
-    public AudioClip spikeShoot;
-    public AudioClip arrowShoot;
-    public AudioClip ghostDeath;
+    [Header("Sound Variables")]
+    [SerializeField]
+    AudioClip bossDazed;
+    [SerializeField]
+    AudioClip bossDeath;
+    [SerializeField]
+    AudioClip bossPossess;
+    [SerializeField]
+    AudioClip fireAttack;
 
 
     TRAPSTRATS _MyAttack = TRAPSTRATS.FINDTRAP;
@@ -223,8 +226,6 @@ public class TrapBossGlhost : BossEnemy
         _additionalRot3 = _additionalCam3.transform.localEulerAngles;
         _additionalCam3.gameObject.SetActive(false);
 
-
-        
     }
 
     protected override void PlayIntro()
@@ -388,8 +389,6 @@ public class TrapBossGlhost : BossEnemy
                 _realSpikeAttackSpeed = _hardSpikeAttackSpeed;
                 _realSpikeRetreatSpeed = _hardSpikeRetreatSpeed;
             }
-
-
         }
 
         _introTrap.transform.parent = null;
@@ -414,8 +413,6 @@ public class TrapBossGlhost : BossEnemy
         _totalPercentageFireTrap = _realQuadFirePercentage + _realXAttackPercentage;
 
         _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
-
-        _speaker = this.GetComponent<AudioSource>();
 
         _startAttackTime = Time.time;
         _myAI = BossAI.INTRO;
@@ -602,6 +599,7 @@ public class TrapBossGlhost : BossEnemy
 
         if (trapComplete)
         {
+            _speaker.Stop();
             _xAttack = false;
             _mySkinRenderer.enabled = true;
             gameObject.GetComponent<CapsuleCollider>().enabled = true;
@@ -663,6 +661,9 @@ public class TrapBossGlhost : BossEnemy
         {
             if(_enteringTrap)
             {
+                _speaker.Stop();
+                if(!_speaker.isPlaying)
+                _speaker.PlayOneShot(bossPossess, volSFX);
                 _myAnimations.Play("Dive", 0);
                 _enteringTrap = false;
             }
@@ -686,6 +687,9 @@ public class TrapBossGlhost : BossEnemy
         {
             if (_enteringTrap)
             {
+                _speaker.Stop();
+                if (!_speaker.isPlaying)
+                    _speaker.PlayOneShot(bossPossess, volSFX);
                 _myAnimations.Play("Dive", 0);
                 _enteringTrap = false;
             }
@@ -710,6 +714,9 @@ public class TrapBossGlhost : BossEnemy
         {
             if (_enteringTrap)
             {
+                _speaker.Stop();
+                if (!_speaker.isPlaying)
+                    _speaker.PlayOneShot(bossPossess, volSFX);
                 _myAnimations.Play("Dive", 0);
                 _enteringTrap = false;
             }
@@ -720,6 +727,9 @@ public class TrapBossGlhost : BossEnemy
                 {
 
                     BossFireStatueTrap possessedTrap = currentTrap.GetComponent<Transform>().GetChild(z).GetComponent<BossFireStatueTrap>();
+
+                    if (!_speaker.isPlaying)
+                        _speaker.PlayOneShot(fireAttack, volSFX);
 
                     if (_xAttack)
                     {
@@ -780,12 +790,12 @@ public class TrapBossGlhost : BossEnemy
     {
         _myRoom.CheckForEnd();
 
-        _enemyAgent.enabled = false;
-        _enteringTrap = false;
-
         _speaker.Stop();
         if (!_speaker.isPlaying)
-            _speaker.PlayOneShot(ghostDeath);
+            _speaker.PlayOneShot(bossDeath, volSFX);
+
+        _enemyAgent.enabled = false;
+        _enteringTrap = false;
 
         _playerRef.GoingToOutroCutscene();
 
