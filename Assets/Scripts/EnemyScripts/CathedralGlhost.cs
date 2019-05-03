@@ -115,7 +115,7 @@ public class CathedralGlhost : BasicGlhost {
 
         if(_currProjSpawn >=1)
         {
-            _speaker.Stop();
+            if(!_speaker.isPlaying)
             _speaker.PlayOneShot(shootClip, volSFX);
             _myAnimations.Play("Shoot", 0);
             _currProjSpawn = 0;

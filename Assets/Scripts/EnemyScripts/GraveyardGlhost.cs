@@ -59,7 +59,6 @@ public class GraveyardGlhost : BasicGlhost {
             _invStartTime = Time.time;
         }
 
-        AudioManager.instance.ChaseStart();
     }
     
     protected override void Update()

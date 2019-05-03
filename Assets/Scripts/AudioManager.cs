@@ -234,6 +234,8 @@ public class AudioManager : MonoBehaviour {
     {
         int currentScene = SceneManager.GetActiveScene().buildIndex;
 
+        if (MusicPlayer.enabled)
+        {
 
 
             if (!boss && !chase && !secretBoss)
@@ -286,8 +288,8 @@ public class AudioManager : MonoBehaviour {
                     MusicPlayer.PlayOneShot(BGMSecretBoss, volMusic / 10);
             }
 
-       
 
+        }
 
 
     }
@@ -311,7 +313,7 @@ public class AudioManager : MonoBehaviour {
         float fadeTime = 0;
         RestartMusic();
         MusicPlayer.volume = 0;
-        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(1.8f);
         MusicPlayer.volume = volSFX;
 
     }

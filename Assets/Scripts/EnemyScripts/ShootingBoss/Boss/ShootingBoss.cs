@@ -101,6 +101,18 @@ public class ShootingBoss : BossEnemy
     float _startAttackTime;
     float _currAttackTime;
 
+
+
+    [Header("Sound Variables")]
+    [SerializeField]
+    AudioClip bossShoot;
+    [SerializeField]
+    AudioClip bossSucc;
+    [SerializeField]
+    AudioClip bossDazed;
+    [SerializeField]
+    AudioClip bossDead;
+
     SHOOTERSTATES _MyState = SHOOTERSTATES.FOLLOWING;
 
     //intro cutscene function
@@ -159,6 +171,8 @@ public class ShootingBoss : BossEnemy
         cam1 = transform.position + _camOffset;
         cam1.y = _cameraRef.transform.position.y;
         _cameraRef.AmFollowingPlayer = false;
+
+        _speaker = this.GetComponent<AudioSource>();
 
         _startTimer = Time.time;
         _myAI = BossAI.INTRO;
@@ -254,6 +268,9 @@ public class ShootingBoss : BossEnemy
     //While there is an attacking going, nothing happens.
     private void Attacking()
     {
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(bossShoot, volSFX);
+
         if (_attachedShooter.attackInProgress != true)
         {
             if (_specialPulseAttack == true)                                //Checks to see if he should absorb
@@ -265,6 +282,7 @@ public class ShootingBoss : BossEnemy
             else
             {
                 _myAnimations.Play("Movement", 0);
+                _speaker.Stop();
                 _MyState = SHOOTERSTATES.STUNNED;                           //No secondary attack so he is stunned
                 _startTimer = Time.time;
             }
@@ -273,6 +291,9 @@ public class ShootingBoss : BossEnemy
 
     private void Stunned()
     {
+
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(bossDazed, volSFX);
         float timeTaken = Time.time - _startTimer;
         if (timeTaken >= _stunnedTime)
         {
@@ -293,6 +314,7 @@ public class ShootingBoss : BossEnemy
             _absorbedGhlosts = new List<GameObject>();
             _invinciblesAddad = false;
             _startTimer = Time.time;
+            _speaker.Stop();
             _MyState = SHOOTERSTATES.ABSORB;                                //Start Absorbing - AbsorbAtk();
         }
         
@@ -306,6 +328,9 @@ public class ShootingBoss : BossEnemy
     */
     private void AbsorbAtk()
     {
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(bossSucc, volSFX);
+
         _rotationAngle += 1 * _rotateSpeed * Time.deltaTime;
         transform.eulerAngles = new Vector3(0, transform.eulerAngles.y+ _rotationAngle, 0);
         if (_invinciblesAddad == false)
@@ -343,6 +368,9 @@ public class ShootingBoss : BossEnemy
      */
     private void ShootAtPlayer()
     {
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(bossShoot, volSFX);
+
         if (_ghlostsShot < _absorbedGhlosts.Count)                          //Checks to see if all of the absorbed ghlosts have been shot out
         {
             float timeTaken = Time.time - _startTimer;
@@ -362,6 +390,7 @@ public class ShootingBoss : BossEnemy
         }
         else
         {
+            _speaker.Stop();
             _startTimer = Time.time;
             _MyState = SHOOTERSTATES.STUNNED;                               //Stuns the boss - Stunned();
         }
@@ -492,6 +521,11 @@ public class ShootingBoss : BossEnemy
     //called once the boss is defeated
     protected override void Die()
     {
+
+        _speaker.Stop();
+        if (!_speaker.isPlaying)
+            _speaker.PlayOneShot(bossDead, volSFX);
+
         _myRoom.CheckForEnd();
 
         _enemyAgent.enabled = false;

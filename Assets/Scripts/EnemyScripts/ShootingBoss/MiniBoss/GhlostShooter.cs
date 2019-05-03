@@ -88,9 +88,15 @@ public class GhlostShooter : MonoBehaviour
 
     ATTACKSTATE _attackState = ATTACKSTATE.WAITFORATK;
     float startTime;
-	
-	// Update is called once per frame
-	protected void Update ()
+
+    protected void Awake()
+    {
+        _speaker
+    }
+
+
+    // Update is called once per frame
+    protected void Update ()
     {
 		switch(_attackState)
         {

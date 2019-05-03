@@ -3286,7 +3286,7 @@ AudioSource:
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
+  Priority: 167
   DopplerLevel: 1
   MinDistance: 1
   MaxDistance: 50
@@ -3592,6 +3592,10 @@ MonoBehaviour:
   _absorbingGhlosts: []
   _absorbedGhlosts: []
   _attackInProgress: 0
+  bossShoot: {fileID: 8300000, guid: bb838b9cd2225ca47b7e79b9d8ae674f, type: 3}
+  bossSucc: {fileID: 8300000, guid: e79fc549b0b512a48811a83e6a3262b1, type: 3}
+  bossDazed: {fileID: 8300000, guid: ab44d15d30e530e469ea695b5923092c, type: 3}
+  bossDead: {fileID: 8300000, guid: ce9f3e7bc76414346b33e7bad0799d35, type: 3}
 --- !u!136 &136104999425251486
 CapsuleCollider:
   m_ObjectHideFlags: 1

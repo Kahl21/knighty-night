@@ -106,9 +106,12 @@ public class MiniSpinBoss : BossEnemy
     //protected SkinnedMeshRenderer _mySkinRenderer;
 
     [Header("Sound Variables")]
-    public AudioClip bossSpin;
-    public AudioClip bossDazed;
-    public AudioClip bossDeath;
+    [SerializeField]
+    AudioClip bossSpin;
+    [SerializeField]
+    AudioClip bossDazed;
+    [SerializeField]
+    AudioClip bossDeath;
 
     SPINSTRATS _MyAttack = SPINSTRATS.FOLLOW;
 
@@ -232,7 +235,10 @@ public class MiniSpinBoss : BossEnemy
         rot1 = _bossCamera.transform.localEulerAngles;
         _cameraRef.AmFollowingPlayer = false;
 
-        _speaker = this.transform.GetComponent<AudioSource>();
+
+        _speaker = this.GetComponent<AudioSource>();
+
+
 
         _totalPercentage = _realFollowPercentage + _realPinballAttackPercentage;
 
@@ -242,6 +248,8 @@ public class MiniSpinBoss : BossEnemy
 
     protected override void StartFight()
     {
+
+
         _bossBar.SetActive(true);
         _laggedBossHealthBar.fillAmount = 1;
         _actualBossHealthBar.fillAmount = 1;
@@ -263,6 +271,7 @@ public class MiniSpinBoss : BossEnemy
                 break;
             case BossAI.INTRO:
                 PlayIntro();
+                
                 break;
             case BossAI.FIGHTING:
                 if (_init)
@@ -303,6 +312,9 @@ public class MiniSpinBoss : BossEnemy
 
     private void WhatDoNext()
     {
+        _speaker.UnPause();
+        _speaker.enabled=true;
+        _speaker.volume = volSFX;
         //Debug.Log("thinking");
         _currAttackTime = (Time.time - _startAttackTime) / _realTimeBetweenAttacks;
 
@@ -377,6 +389,8 @@ public class MiniSpinBoss : BossEnemy
         if(_tellPinballing)
         {
 
+         
+
             Vector3 playerPos = _playerRef.transform.position;
             playerPos.y = transform.position.y;
             transform.LookAt(playerPos);
@@ -393,17 +407,15 @@ public class MiniSpinBoss : BossEnemy
         else
         {
 
-
+           if  (!_speaker.isPlaying)
+                _speaker.PlayOneShot(bossSpin, volSFX);
             _currAttackTime = (Time.time - _startAttackTime) / _realPinballAttackDuration;
 
             //Debug.Log("pinballing");
 
             for (int i = 0; i <= _pinballNumOfCasts; i++)
             {
-                if (!_speaker.isPlaying)
-                {
-                    _speaker.PlayOneShot(bossSpin, volSFX);
-                }
+                
 
                 float Xpos = Mathf.Cos(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
                 float Zpos = Mathf.Sin(_calcAngle * Mathf.Deg2Rad) * _bossCollisionDetectDistance;
@@ -433,10 +445,6 @@ public class MiniSpinBoss : BossEnemy
 
             if (Physics.Raycast(transform.position + (Vector3.up * _vertDetectOffset), _moveDir,out hit, _bossCollisionDetectDistance +1f))
             {
-                if (!_speaker.isPlaying)
-                {
-                    _speaker.PlayOneShot(bossSpin, volSFX);
-                }
 
                 Vector3 checkDir = _moveDir;
                 GameObject thingHit = hit.collider.gameObject;

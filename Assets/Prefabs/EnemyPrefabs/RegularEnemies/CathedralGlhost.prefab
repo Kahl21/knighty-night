@@ -3169,7 +3169,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 30
+  MaxDistance: 50
   Pan2D: 0
   rolloffMode: 1
   BypassEffects: 0
@@ -3325,6 +3325,7 @@ MonoBehaviour:
     type: 2}
   _projectileSpawnOffset: 1
   _projectileSpawnWaitTime: 1
+  shootClip: {fileID: 8300000, guid: 76d20f05852a6f94aa48fd4700d17ed9, type: 3}
 --- !u!136 &136091093296632570
 CapsuleCollider:
   m_ObjectHideFlags: 1
