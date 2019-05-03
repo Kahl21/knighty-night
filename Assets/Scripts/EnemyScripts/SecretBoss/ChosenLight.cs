@@ -22,11 +22,15 @@ public class ChosenLight : MonoBehaviour {
     ParticleSystem _myParticle;
 
     PlayerController _playerRef;
+    SecretBoss _myBoss;
 
 	// Use this for initialization
-	public void Init (float damage, float attackDelay, float lifeTime)
+	public void Init (float damage, float attackDelay, float lifeTime, SecretBoss myBossRef)
     {
         _myParticle = GetComponent<ParticleSystem>();
+
+        _myBoss = myBossRef;
+        _myBoss.AddAttack(this);
 
         _damage = damage;
         _lightningStrikeDelay = attackDelay;
@@ -72,8 +76,15 @@ public class ChosenLight : MonoBehaviour {
 
             if(_currLifeTime >= 1f)
             {
-                Destroy(gameObject);
+                RemoveMe();
             }
         }
+    }
+
+    public void RemoveMe()
+    {
+        _init = false;
+        _myBoss.RemoveAttack(this);
+        Destroy(gameObject);
     }
 }

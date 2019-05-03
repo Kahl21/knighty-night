@@ -22,18 +22,27 @@ public class SecretBoss : BossEnemy {
     List<SecretBossCutsceneBosses> _listOfIntroBosses;
     [SerializeField]
     Camera _additionalCamera1;
-    Vector3 _additionalPos1, _additionalRot1;
+    [SerializeField]
+    float _cameraMoveToBossDuration;
+    [SerializeField]
+    float _cameraStayDurationInFrontOfBoss;
+    [SerializeField]
+    Camera _additionalCamera2;
+    Vector3 _additionalPos1, _additionalRot1,_additionalPos2, _additionalRot2;
     bool _cameraInPosition = false;
     bool _animatingBosses = false;
+    bool _changingPlayer = false;
 
 
     [Header("Secret Boss Variables")]
     [Tooltip("Flame Wave Prefab")]
     [SerializeField]
     GameObject _BWPrefab;
+    List<BacklashWave> _waveList;
     [Tooltip("Chosen Light Prefab")]
     [SerializeField]
     GameObject _ChosenLightPrefab;
+    List<ChosenLight> _chosenLightList;
     float _XMin, _XMax, _ZMin, _ZMax;
     [Tooltip("Time to wait before the next ability is used (must be >0)")]
     [SerializeField]
@@ -285,6 +294,16 @@ public class SecretBoss : BossEnemy {
         base.Awake();
         _dashParticle.Stop();
         _InvincibleParticle.Stop();
+
+        _additionalCamera1.transform.parent = null;
+        _additionalPos1 = _additionalCamera1.transform.position;
+        _additionalRot1 = _additionalCamera1.transform.localEulerAngles;
+        _additionalCamera1.gameObject.SetActive(false);
+
+        _additionalCamera2.transform.parent = null;
+        _additionalPos2 = _additionalCamera2.transform.position;
+        _additionalRot2 = _additionalCamera2.transform.localEulerAngles;
+        _additionalCamera2.gameObject.SetActive(false);
     }
 
     //function that is called once the player enters the room
@@ -292,20 +311,64 @@ public class SecretBoss : BossEnemy {
     protected override void PlayIntro()
     {
 
-        if(!_cameraInPosition)
-        {
-            if(_cameraRef.MoveCamera())
-            {
-
-            }
-        }
-        else if(!_animatingBosses)
+        if (!_cameraInPosition)
         {
             if (_cameraRef.MoveCamera())
             {
-                if(CheckForIntroEnd())
+                _currAttackTime = (Time.time - _startAttackTime) / _cameraStayDurationInFrontOfBoss;
+
+                if (_currAttackTime >= 1f)
                 {
 
+                    for (int i = 0; i < _listOfIntroBosses.Count; i++)
+                    {
+                        _listOfIntroBosses[i].Init();
+                    }
+
+                    cam0 = _cameraRef.transform.position;
+                    cam1 = _additionalPos1;
+                    rot0 = _cameraRef.transform.localEulerAngles;
+                    rot1 = _additionalRot1;
+
+                    _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+
+                    _cameraInPosition = true;
+                }
+            }
+        }
+        else if (!_animatingBosses)
+        {
+            if (_cameraRef.MoveCamera())
+            {
+                if (CheckForIntroEnd())
+                {
+                    cam0 = _cameraRef.transform.position;
+                    cam1 = _additionalPos2;
+                    rot0 = _cameraRef.transform.localEulerAngles;
+                    rot1 = _additionalRot2;
+
+                    _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+
+                    _playerRef.StartFinalIntro();
+
+                    _animatingBosses = true;
+                }
+            }
+        }
+        else if (!_changingPlayer)
+        {
+            if (_cameraRef.MoveCamera())
+            {
+                if (_playerRef.FinalIntroDone)
+                {
+                    cam0 = _cameraRef.transform.position;
+                    cam1 = _ogCamPos;
+                    rot0 = _cameraRef.transform.localEulerAngles;
+                    rot1 = _ogCamRot;
+
+                    _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+
+                    _changingPlayer = true;
                 }
             }
         }
@@ -344,6 +407,7 @@ public class SecretBoss : BossEnemy {
             _playerRef = PlayerController.Instance;
             _managerRef = GameManager.Instance;
             _myAnimations = GetComponent<Animator>();
+            _myAnimations.Play("StandingIdle");
             _cameraRef = _playerRef.GetCamera;
             _camOffset = _cameraRef.GetOffset;
 
@@ -451,6 +515,16 @@ public class SecretBoss : BossEnemy {
                 _realLightLifeTime = _hardLightLifeTime;
             }
 
+            _waveList = new List<BacklashWave>();
+            _chosenLightList = new List<ChosenLight>();
+
+            _listOfIntroBosses = new List<SecretBossCutsceneBosses>();
+
+            for (int i = 0; i < _bossHolder.transform.childCount; i++)
+            {
+                _listOfIntroBosses.Add(_bossHolder.transform.GetChild(i).GetComponent<SecretBossCutsceneBosses>());
+            }
+
             _hasInit = true;
         }
 
@@ -469,8 +543,10 @@ public class SecretBoss : BossEnemy {
 
         _totalPercentage = _realFollowPercentage + _realNormalFlameAttackPercentage + _realDashFlameAttackPercentage + _realChosenLightAttackPercentage;
 
-        _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
-        
+        _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraMoveToBossDuration);
+
+        _startAttackTime = Time.time;
+
         _myAI = BossAI.INTRO;
     }
 
@@ -736,7 +812,7 @@ public class SecretBoss : BossEnemy {
             _currAttackTime = 1;
 
             GameObject _newWave = Instantiate<GameObject>(_BWPrefab, transform.position + Vector3.up, transform.rotation);
-            _newWave.GetComponent<BacklashWave>().Init(_realFlameDamage, _realFlameSpeed, _realFlameMaxScale, _realFlameScaleSpeed, _realFlameLifetime);
+            _newWave.GetComponent<BacklashWave>().Init(_realFlameDamage, _realFlameSpeed, _realFlameMaxScale, _realFlameScaleSpeed, _realFlameLifetime, this);
             _myAnimations.Play("SwordSwing", 0);
             _currFlamesSpawned++;
             if(_currFlamesSpawned>=_realHowManyFlames)
@@ -783,7 +859,7 @@ public class SecretBoss : BossEnemy {
             _currDashTime = 1;
 
             GameObject _newWave = Instantiate<GameObject>(_BWPrefab, transform.position + Vector3.up, transform.rotation);
-            _newWave.GetComponent<BacklashWave>().Init(_realDashFlameDamage, _realDashFlameSpeed, _realDashFlameMaxScale, _realDashFlameScaleSpeed, _realDashFlameLifetime);
+            _newWave.GetComponent<BacklashWave>().Init(_realDashFlameDamage, _realDashFlameSpeed, _realDashFlameMaxScale, _realDashFlameScaleSpeed, _realDashFlameLifetime, this);
 
             _myAnimations.Play("SwordSwing", 0);
             _currFlamesSpawned++;
@@ -847,7 +923,7 @@ public class SecretBoss : BossEnemy {
             lightPos.y = transform.position.y;
 
             GameObject _newLight = Instantiate<GameObject>(_ChosenLightPrefab, lightPos, transform.rotation);
-            _newLight.GetComponent<ChosenLight>().Init(_realLightDamage, _realLightStrikingDelay, _realLightLifeTime);
+            _newLight.GetComponent<ChosenLight>().Init(_realLightDamage, _realLightStrikingDelay, _realLightLifeTime, this);
             _currFlamesSpawned++;
             if (_currFlamesSpawned >= _realNumberOfSmitingLights)
             {
@@ -863,6 +939,26 @@ public class SecretBoss : BossEnemy {
 
             _startAttackTime = Time.time;
         }
+    }
+
+    public void AddAttack(BacklashWave _waveToAdd)
+    {
+        _waveList.Add(_waveToAdd);
+    }
+
+    public void AddAttack(ChosenLight _lightToAdd)
+    {
+        _chosenLightList.Add(_lightToAdd);
+    }
+
+    public void RemoveAttack(BacklashWave _waveToRemove)
+    {
+        _waveList.Remove(_waveToRemove);
+    }
+
+    public void RemoveAttack(ChosenLight _lightToRemove)
+    {
+        _chosenLightList.Remove(_lightToRemove);
     }
 
     //once the boss is done with their attack
@@ -998,6 +1094,8 @@ public class SecretBoss : BossEnemy {
         if (_init)
         {
             gameObject.SetActive(true);
+            _InvincibleParticle.Stop();
+            _dashParticle.Stop();
 
             _enemyAgent.enabled = false;
             //Debug.Log("Boss Reset");
@@ -1015,6 +1113,26 @@ public class SecretBoss : BossEnemy {
 
             _bossBar.SetActive(false);
 
+            _cameraInPosition = false;
+            _animatingBosses = false;
+            _changingPlayer = false;
+
+            if(_waveList.Count > 0)
+            {
+                for (int i = 0; i < _waveList.Count; i=0)
+                {
+                    _waveList[i].RemoveMe();
+                }
+            }
+            
+            if(_chosenLightList.Count > 0)
+            {
+                for (int i = 0; i < _chosenLightList.Count; i=0)
+                {
+                    _chosenLightList[i].RemoveMe();
+                }
+            }
+
             _endingPlaying = false;
             _laggingHealth = false;
             _updatingHealth = false;
@@ -1022,6 +1140,7 @@ public class SecretBoss : BossEnemy {
             _amHit = false;
             _invincible = false;
 
+            _myAnimations.Play("StandingIdle");
             _myAI = BossAI.NONE;
             _myAttack = SECRETSTRATS.FOLLOW;
             _init = false;

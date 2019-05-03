@@ -48,12 +48,18 @@ public class SecretBossCutsceneBosses : MonoBehaviour {
         _parentOBJ = transform.parent.gameObject;
         _myBoss = _parentOBJ.GetComponentInParent<BossEnemy>();
         _myAnimations = GetComponent<Animator>();
+        _parentOBJ = transform.parent.gameObject;
+        _myBoss = _parentOBJ.GetComponentInParent<BossEnemy>();
 
         _myBody = transform.GetChild(1).gameObject;
         _myRenderer = _myBody.GetComponent<SkinnedMeshRenderer>();
         _mySpookiness = _myRenderer.materials[1];
         _startingColor = _mySpookiness.color;
         _spookColor = _mySpookiness.color;
+
+        Debug.Log(_myRenderer);
+
+        _myRenderer.enabled = false;
         if (_amColorBoss)
         {
             _myAnimations.Play("Movement", 0);
@@ -66,8 +72,7 @@ public class SecretBossCutsceneBosses : MonoBehaviour {
 
     public void Init()
     {
-        _parentOBJ = transform.parent.gameObject;
-        _myBoss = _parentOBJ.GetComponentInParent<BossEnemy>();
+        _myRenderer.enabled = true;
         transform.parent = null;
         _startPos = transform.position;
         _startRot = transform.rotation;
@@ -98,6 +103,8 @@ public class SecretBossCutsceneBosses : MonoBehaviour {
             if(_currTime >= 1f)
             {
                 _currTime = 1;
+
+                _startTime = Time.time;
                 
                 _moving = false;
             }
@@ -117,10 +124,15 @@ public class SecretBossCutsceneBosses : MonoBehaviour {
             {
                 _currTime = 1;
 
+                c0 = transform.position;
+                c1 = _player.transform.position;
+
+                _startTime = Time.time;
+
                 _disappearing = false;
             }
 
-            _spookColor.a = _currTime - 1;
+            _spookColor.a = 1 - _currTime;
             _mySpookiness.color = _spookColor;
             _mySpookiness = _myRenderer.materials[1];
         }
@@ -132,7 +144,10 @@ public class SecretBossCutsceneBosses : MonoBehaviour {
             {
                 _currTime = 1;
 
+                _myRenderer.enabled = false;
+
                 _secondMove = false;
+                _animating = false;
                 _amDone = true;
             }
 
@@ -149,6 +164,15 @@ public class SecretBossCutsceneBosses : MonoBehaviour {
     {
         transform.position = _startPos;
         transform.rotation = _startRot;
+
+
+        _myRenderer.enabled = true;
+
+        _mySpookiness.color = _startingColor;
+        _mySpookiness = _myRenderer.materials[1];
+
+        _myRenderer.enabled = false;
+
 
         _animating = false;
         _moving = true;

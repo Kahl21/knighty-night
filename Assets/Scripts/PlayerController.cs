@@ -45,6 +45,8 @@ public class PlayerController : MonoBehaviour
     //menu Vars
     bool _inMenu = true;
     bool _inCutscene = false;
+    bool _startFinalIntro = false;
+    bool _isFinalCutsceneDone = false;
     bool _bossCutsceneInit = false;
     float _currCutsceneTime;
     float _startCutsceneTime;
@@ -145,6 +147,36 @@ public class PlayerController : MonoBehaviour
     CameraFollow _cameraRef;
     BossEnemy _bossImFighting;
 
+    [Header("For Final Cutscene")]
+    /*[SerializeField]
+    string _bossName;
+    [SerializeField]
+    string _bossSubTitle;
+    [SerializeField]
+    protected float _healthLagDuration;
+    [SerializeField]
+    protected float _healthUpdateDuration;
+    protected float _currHealthTime;
+    protected float h01;
+    protected GameObject _bossBar;
+    protected Image _actualBossHealthBar;
+    protected Image _laggedBossHealthBar;
+    protected Text _bossNameText;
+    */
+    [SerializeField]
+    float _finalChangeDuration = 1f;
+    [SerializeField]
+    GameObject _evilWavePrefab;
+    [SerializeField]
+    Material _standardMat;
+    [SerializeField]
+    Material _evilMat;
+    [SerializeField]
+    Material _standardSwordMat;
+    [SerializeField]
+    Material _evilSwordMat;
+    List<SkinnedMeshRenderer> _myRenderers;
+
     Interactions _whatImDoing = Interactions.NONE;
     MenuOrient _menuOrient = MenuOrient.VERT;
     
@@ -199,7 +231,7 @@ public class PlayerController : MonoBehaviour
         _currSpecialAmount = 0;
 
         _healthBar = _gameMenus[2].transform.GetChild(0).gameObject;
-        for (int i = 0; i < _healthBar.transform.childCount; i++)
+        for (int i = 0; i < 3; i++)
         {
             _hearts.Add(_healthBar.transform.GetChild(i).GetComponent<HealthTracker>());
             _hearts[i].RegainHealth(_maxHealthValue);
@@ -208,6 +240,14 @@ public class PlayerController : MonoBehaviour
         _specialBar.GetComponent<Image>().fillAmount = 0;
         currentCheckpoint = 0;
         dead = false;
+
+        _myRenderers = new List<SkinnedMeshRenderer>();
+
+        for (int i = 0; i < _myRenderer.transform.childCount; i++)
+        {
+            _myRenderers.Add(_myRenderer.transform.GetChild(i).GetComponent<SkinnedMeshRenderer>());
+        }
+
     }
 
     //Called to reset the Player Stats
@@ -234,6 +274,20 @@ public class PlayerController : MonoBehaviour
         _movingSpecial = false;
         _bossCutsceneInit = false;
         _myRenderer.SetActive(true);
+
+
+        if(_isFinalCutsceneDone)
+        {
+            _isFinalCutsceneDone = false;
+
+            Debug.Log("called");
+
+            _myRenderers[0].material = _standardSwordMat;
+            for (int i = 1; i < _myRenderers.Count; i++)
+            {
+                _myRenderers[i].material = _standardMat;
+            }
+        }
 
         if (reachCheckpoint == true)        //if the player has reached a checkpoint
         {
@@ -276,6 +330,10 @@ public class PlayerController : MonoBehaviour
             if (_isIntroPlaying)                             //if the intro is playing
             {
                 MoveIntoPosition();                         //move player into position function
+            }
+            else if(_startFinalIntro)
+            {
+                FinalIntroChange();
             }
         }
         else
@@ -532,6 +590,78 @@ public class PlayerController : MonoBehaviour
         transform.LookAt(transform.position + Vector3.forward);                                 //make the player look at its current position plus forward
     }
 
+    public void StartFinalIntro()
+    {
+        _isIntroPlaying = false;
+
+        /*_bossBar = _menuRef.GetBossBar;
+        _laggedBossHealthBar = _bossBar.transform.GetChild(1).gameObject.GetComponent<Image>();
+        _laggedBossHealthBar.fillAmount = 1;
+        _actualBossHealthBar = _bossBar.transform.GetChild(2).gameObject.GetComponent<Image>();
+        _actualBossHealthBar.fillAmount = 1;
+        _bossNameText = _bossBar.transform.GetChild(3).gameObject.GetComponent<Text>();
+        _bossNameText.text = _bossName;
+        if (_managerRef.HasSubtitles)
+        {
+            _bossNameText.text += ", " + _bossSubTitle;
+        }
+        */
+        _startCutsceneTime = Time.time;
+        _startFinalIntro = true;
+    }
+
+    private void FinalIntroChange()
+    {
+        _currCutsceneTime = (Time.time - _startCutsceneTime) / _finalChangeDuration;
+
+        if(_currCutsceneTime >=1f)
+        {
+            _currCutsceneTime = 1;
+
+            _startFinalIntro = false;
+
+            _isFinalCutsceneDone = true;
+        }
+
+        _myRenderers[0].material.Lerp(_standardSwordMat, _evilSwordMat, _currCutsceneTime);
+
+        for (int i = 1; i < _myRenderers.Count; i++)
+        {
+            _myRenderers[i].material.Lerp(_standardMat, _evilMat, _currCutsceneTime);
+        }
+    }
+
+    //makes the yellow bar, behind the red bar on the boss healthbar, go down lerp from its current health to its new health
+    /*protected virtual void LagHealthBar()
+    {
+        _currHealthTime = (Time.time - _startHealthTime) / _healthLagDuration;
+
+        if (_currHealthTime >= 1)
+        {
+            _laggingHealth = false;
+            _startHealthTime = Time.time;
+            _updatingHealth = true;
+        }
+    }
+
+    //makes the red bar on the boss healthbar go down lerp from its current health to its new health
+    protected virtual void UpdateHealthBar()
+    {
+        _currHealthTime = (Time.time - _startHealthTime) / _healthUpdateDuration;
+
+        h01 = (1 - _currHealthTime) * h0 + _currHealthTime * h1;
+
+        if (_currHealthTime >= 1)
+        {
+            _currHealthTime = 1;
+
+            _updatingHealth = false;
+        }
+
+        _laggedBossHealthBar.fillAmount = h01 / _actualMaxHealth;
+    }
+    */
+
     //checks for input from the stick and moves the player in that direction
     //casts raycast for collision detection in same direction
     //casts raycast to look below for various things as well
@@ -739,8 +869,16 @@ public class PlayerController : MonoBehaviour
             _myAnimations.Play("SwordSwing", 0);                                                                                    //play the sword swing animation
             IncSpecialMeter(_MaxSpecialAmount, false);                                                                              //empty the special meter
             _doingSomething = true;                                                                                                 //player is set to do something
-            GameObject _newWave = Instantiate<GameObject>(BWPrefab, transform.position + transform.forward + Vector3.up, transform.rotation);             //creates an instance of the special attack prefab
-            _newWave.GetComponent<BacklashWave>().Init();
+            if(_isFinalCutsceneDone)
+            {
+                GameObject _newWave = Instantiate<GameObject>(_evilWavePrefab, transform.position + transform.forward + Vector3.up, transform.rotation);             //creates an instance of the special attack prefab
+                _newWave.GetComponent<BacklashWave>().Init();
+            }
+            else
+            {
+                GameObject _newWave = Instantiate<GameObject>(BWPrefab, transform.position + transform.forward + Vector3.up, transform.rotation);             //creates an instance of the special attack prefab
+                _newWave.GetComponent<BacklashWave>().Init();
+            }
             _SwingStartTime = Time.time;                                                                                            //start the time for the swing
             _whatImDoing = Interactions.WAVESPECIAL;                                                                                //player is using the special slash
             AudioManager.instance.FireAttack();                                                                                     //play the sound of the fire slash
@@ -979,6 +1117,7 @@ public class PlayerController : MonoBehaviour
     public Quaternion GetMenuRot { get { return _playerMenuRot; } set { _playerMenuRot = value; } }
 
     public bool AmInCutscene { get { return _inCutscene; } set { _inCutscene = value; } }
+    public bool FinalIntroDone { get { return _isFinalCutsceneDone; } set { _isFinalCutsceneDone = value; } }
     public void ResetBossCutSceneCheck() { _bossCutsceneInit = false; }
     public BossEnemy BossImFighting { get { return _bossImFighting; } set { _bossImFighting = value; } }
 

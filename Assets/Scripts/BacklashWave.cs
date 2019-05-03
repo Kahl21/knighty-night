@@ -48,6 +48,8 @@ public class BacklashWave : MonoBehaviour {
     GameObject _caster;
     List<GameObject> _effectsObjs;
 
+    SecretBoss _myBoss;
+
     //Init
     public void Init()
     {
@@ -63,8 +65,11 @@ public class BacklashWave : MonoBehaviour {
         _init = true;
     }
 
-    public void Init(float damage, float speed, float largestSize, float scaleSpeed, float lifetime)
+    public void Init(float damage, float speed, float largestSize, float scaleSpeed, float lifetime, SecretBoss myBossRef)
     {
+        _myBoss = myBossRef;
+        _myBoss.AddAttack(this);
+
         _waveDamage = damage;
         _waveSpeed = speed;
         _scaleMultiply = largestSize;
@@ -149,7 +154,14 @@ public class BacklashWave : MonoBehaviour {
 
         if(_currTime >= 1)
         {
-            Destroy(gameObject);
+            if(!_amEvil)
+            {
+                RemoveMe();
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
 
         _calcAngle = 0;
@@ -180,5 +192,10 @@ public class BacklashWave : MonoBehaviour {
     }
 
 
-
+    public void RemoveMe()
+    {
+        _init = false;
+        _myBoss.RemoveAttack(this);
+        Destroy(gameObject);
+    }
 }

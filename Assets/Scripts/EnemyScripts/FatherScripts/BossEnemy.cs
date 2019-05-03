@@ -123,7 +123,7 @@ public class BossEnemy : MonoBehaviour {
     //objects will call this once they are done with their setup
     public virtual bool CheckForIntroEnd()
     {
-
+        return true;
     }
 
     //base Init that is called when the player enters the room
