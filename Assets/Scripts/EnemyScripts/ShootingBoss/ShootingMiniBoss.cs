@@ -87,11 +87,6 @@ public class ShootingMiniBoss : BossEnemy
         {
             if (_myAnimations.IsInTransition(0))
             {
-                for (int i = 0; i < _cutsceneGhosts.Count; i++)
-                {
-                    _cutsceneGhosts[i].HideThineSelf();
-                }
-
                 cam0 = _cameraRef.transform.position;
                 cam1 = _ogCamPos;
                 rot0 = _cameraRef.transform.localEulerAngles;
@@ -107,6 +102,10 @@ public class ShootingMiniBoss : BossEnemy
         {
             if (_cameraRef.MoveCamera())
             {
+                for (int i = 0; i < _cutsceneGhosts.Count; i++)
+                {
+                    _cutsceneGhosts[i].HideThineSelf();
+                }
                 _playerRef.AmInCutscene = false;
                 StartFight();
             }
@@ -407,6 +406,7 @@ public class ShootingMiniBoss : BossEnemy
             {
                 if (_myAnimations.IsInTransition(0))
                 {
+                    _myAnimations.Play("Death", 0);
                     _cameraInPosition = true;
                 }
             }

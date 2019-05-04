@@ -257,39 +257,41 @@ public class ColorBossGlhost : BossEnemy {
                     _startedRunning = true;
 
                 }
+                else
+                {
+                    if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .98f)
+                    {
+                        _myMaterial.color = _introGlhostList[4].GotEaten();
+                        _mySkinRenderer.materials[1] = _myMaterial;
 
-                if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .98f)
-                {
-                    _myMaterial.color = _introGlhostList[4].GotEaten();
-                    _mySkinRenderer.materials[1] = _myMaterial;
+                        cam0 = _cameraRef.transform.position;
+                        cam1 = _additionalPos3;
+                        rot0 = _cameraRef.transform.localEulerAngles;
+                        rot1 = _additionalRot3;
 
-                    cam0 = _cameraRef.transform.position;
-                    cam1 = _additionalPos3;
-                    rot0 = _cameraRef.transform.localEulerAngles;
-                    rot1 = _additionalRot3;
-
-                    _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
-                    _animatingSecond = true;
-                }
-                else if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .88f)
-                {
-                    _myMaterial.color = _introGlhostList[3].GotEaten();
-                    _mySkinRenderer.materials[1] = _myMaterial;
-                }
-                else if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .78f)
-                {
-                    _myMaterial.color = _introGlhostList[2].GotEaten();
-                    _mySkinRenderer.materials[1] = _myMaterial;
-                }
-                else if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .68f)
-                {
-                    _myMaterial.color = _introGlhostList[1].GotEaten();
-                    _mySkinRenderer.materials[1] = _myMaterial;
-                }
-                else if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .58f)
-                {
-                    _myMaterial.color = _introGlhostList[0].GotEaten();
-                    _mySkinRenderer.materials[1] = _myMaterial;
+                        _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+                        _animatingSecond = true;
+                    }
+                    else if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .88f)
+                    {
+                        _myMaterial.color = _introGlhostList[3].GotEaten();
+                        _mySkinRenderer.materials[1] = _myMaterial;
+                    }
+                    else if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .78f)
+                    {
+                        _myMaterial.color = _introGlhostList[2].GotEaten();
+                        _mySkinRenderer.materials[1] = _myMaterial;
+                    }
+                    else if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .68f)
+                    {
+                        _myMaterial.color = _introGlhostList[1].GotEaten();
+                        _mySkinRenderer.materials[1] = _myMaterial;
+                    }
+                    else if (_myAnimations.GetCurrentAnimatorStateInfo(0).normalizedTime > .58f)
+                    {
+                        _myMaterial.color = _introGlhostList[0].GotEaten();
+                        _mySkinRenderer.materials[1] = _myMaterial;
+                    }
                 }
             }
         }
@@ -376,6 +378,11 @@ public class ColorBossGlhost : BossEnemy {
             {
                 _introGlhostList.Add(_colorIntroGlhosts.transform.GetChild(i).GetComponent<ColorIntroGlhost>());
             }
+
+            for (int i = 0; i < _introGlhostList.Count; i++)
+            {
+                _introGlhostList[i].Init();
+            }
         }
 
         _mySkinRenderer.enabled = false;
@@ -402,6 +409,11 @@ public class ColorBossGlhost : BossEnemy {
     //starts fight
     protected override void StartFight()
     {
+        for (int i = 0; i < _introGlhostList.Count; i++)
+        {
+            _introGlhostList[i].ParentYouself();
+        }
+
         _bossBar.SetActive(true);
         _laggedBossHealthBar.fillAmount = 1;
         _actualBossHealthBar.fillAmount = 1;
@@ -881,6 +893,7 @@ public class ColorBossGlhost : BossEnemy {
         _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
 
         _speaker.PlayOneShot(bossDeath, volSFX);
+        _myAnimations.Play("Movement", 0);
 
 
         _startAttackTime = Time.time;
@@ -899,6 +912,7 @@ public class ColorBossGlhost : BossEnemy {
             {
                 if (_myAnimations.IsInTransition(0))
                 {
+                    _myAnimations.Play("Death", 0);
                     _cameraInPosition = true;
                 }
             }
@@ -973,9 +987,17 @@ public class ColorBossGlhost : BossEnemy {
 
             _bossBar.SetActive(false);
             _cameraInPosition = false;
+            _animating = false;
+            _animatingSecond = false;
+            _animatingThird = false;
+            _animatingFourth = false;
+            _breakfastEaten = false;
             _jumpingFinished = false;
+            _lookDone = false;
+            _startedRunning = false;
 
             _endingPlaying = false;
+            _showingDeath = false;
             _laggingHealth = false;
             _updatingHealth = false;
             _dead = false;

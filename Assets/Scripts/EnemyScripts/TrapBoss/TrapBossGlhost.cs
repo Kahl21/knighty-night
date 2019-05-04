@@ -224,7 +224,6 @@ public class TrapBossGlhost : BossEnemy
             {
                 _cameraInPosition = true;
 
-                _myAnimations.Play("BigIntro1", 0);
 
                 cam0 = _cameraRef.transform.position;
                 cam1 = _additionalPos1;
@@ -386,6 +385,8 @@ public class TrapBossGlhost : BossEnemy
         _DartZMin = (_myRoom.transform.position.z - (_myRoom.transform.localScale.z * 4.5f));
         _DartXMax = (_myRoom.transform.position.x + (_myRoom.transform.localScale.x * 4.5f));
         _DartZMax = (_myRoom.transform.position.z + (_myRoom.transform.localScale.z * 4.5f));
+
+        _myAnimations.Play("BigIntro1", 0);
 
         //_ogCamPos = _cameraRef.transform.position;
         _ogCamPos = _cameraRef.transform.position;
@@ -781,8 +782,8 @@ public class TrapBossGlhost : BossEnemy
         _cameraRef.AmFollowingPlayer = false;
 
         _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+        _myAnimations.Play("Idle", 0);
 
-        
         _startAttackTime = Time.time;
         _cameraInPosition = false;
         _endingPlaying = true;
@@ -799,6 +800,7 @@ public class TrapBossGlhost : BossEnemy
             {
                 if(_myAnimations.IsInTransition(0))
                 {
+                    _myAnimations.Play("Death", 0);
                     _cameraInPosition = true;
                 }
             }
@@ -877,6 +879,7 @@ public class TrapBossGlhost : BossEnemy
             _bossBar.SetActive(false);
 
             _endingPlaying = false;
+            _showingDeath = false;
             _laggingHealth = false;
             _updatingHealth = false;
             _dead = false;

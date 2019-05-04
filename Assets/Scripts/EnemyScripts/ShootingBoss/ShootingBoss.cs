@@ -614,6 +614,7 @@ public class ShootingBoss : BossEnemy
             {
                 if (_myAnimations.IsInTransition(0))
                 {
+                    _myAnimations.Play("Death", 0);
                     _cameraInPosition = true;
                 }
             }

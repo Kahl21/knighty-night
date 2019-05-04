@@ -6,9 +6,12 @@ public class ShootCutsceneGhost : MonoBehaviour
 {
     Animator _myAnims;
 
+    SkinnedMeshRenderer _myrenderer;
+
     private void Awake()
     {
         _myAnims = GetComponent<Animator>();
+        _myrenderer = transform.GetChild(1).GetComponent<SkinnedMeshRenderer>();
     }
 
     public void StartBigBoss()
@@ -23,12 +26,13 @@ public class ShootCutsceneGhost : MonoBehaviour
 
     public void HideThineSelf()
     {
-        gameObject.SetActive(false);
+        _myrenderer.enabled = false;
     }
     
     public void MyReset()
     {
-        gameObject.SetActive(true);
+        _myrenderer.enabled = true;
+
         _myAnims.Play("Idle", 0);
     }
 }

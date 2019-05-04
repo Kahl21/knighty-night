@@ -511,7 +511,12 @@ public class MiniSpinBoss : BossEnemy
         cam0 = _cameraRef.transform.position;
         cam1 = transform.position + _camOffset;
         cam1.y = _cameraRef.transform.position.y;
+        rot0 = _cameraRef.transform.localEulerAngles;
+        rot1 = _cameraRef.transform.localEulerAngles;
         _cameraRef.AmFollowingPlayer = false;
+
+        _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+        _myAnimations.Play("Idle", 0);
 
 
         _startAttackTime = Time.time;
@@ -529,6 +534,7 @@ public class MiniSpinBoss : BossEnemy
             {
                 if (_myAnimations.IsInTransition(0))
                 {
+                    _myAnimations.Play("Death", 0);
                     _cameraInPosition = true;
                 }
             }

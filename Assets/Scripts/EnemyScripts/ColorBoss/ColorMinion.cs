@@ -34,7 +34,7 @@ public class ColorMinion : BasicGlhost {
 
         _myCapCollider = GetComponent<CapsuleCollider>();
         _mySpawner.AddEnemy(this);
-        _myAnimations.Play("Nothing", 0);
+        _myAnimations.Play("Idle", 0);
         _goingToBoss = false;
         _chillin = false;
         _myAgent.enabled = false;

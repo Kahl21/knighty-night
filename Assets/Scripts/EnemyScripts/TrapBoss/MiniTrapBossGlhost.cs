@@ -220,6 +220,8 @@ public class MiniTrapBossGlhost : BossEnemy
             }
         }
 
+        _myAnimations.Play("MiniIntro1", 0);
+
         _ogCamPos = _cameraRef.transform.position;
         _ogCamRot = _cameraRef.transform.localEulerAngles;
         cam0 = _cameraRef.transform.position;
@@ -233,7 +235,6 @@ public class MiniTrapBossGlhost : BossEnemy
         _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
 
 
-        _myAnimations.Play("MiniIntro1", 0);
 
         _startAttackTime = Time.time;
         _myAI = BossAI.INTRO;
@@ -464,14 +465,18 @@ public class MiniTrapBossGlhost : BossEnemy
         _playerRef.GoingToOutroCutscene();
         _enteringTrap = false;
 
+        _ogCamPos = _cameraRef.transform.position;
         cam0 = _cameraRef.transform.position;
-        cam1 = _bossCameraPos;
+        cam1 = transform.position + _camOffset;
+        cam1.y = _cameraRef.transform.position.y;
         rot0 = _cameraRef.transform.localEulerAngles;
-        rot1 = _bossCameraRot;
+        rot1 = _cameraRef.transform.localEulerAngles;
         _cameraRef.AmFollowingPlayer = false;
 
 
         _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
+
+        _myAnimations.Play("Idle", 0);
 
 
         _startAttackTime = Time.time;
@@ -490,10 +495,10 @@ public class MiniTrapBossGlhost : BossEnemy
             {
                 if (_myAnimations.IsInTransition(0))
                 {
+                    _myAnimations.Play("Death", 0);
                     _cameraInPosition = true;
                 }
             }
-
         }
         else if (!_showingDeath)
         {
@@ -564,6 +569,7 @@ public class MiniTrapBossGlhost : BossEnemy
             _animatingSecond = false;
 
             _endingPlaying = false;
+            _showingDeath = false;
             _laggingHealth = false;
             _updatingHealth = false;
             _dead = false;

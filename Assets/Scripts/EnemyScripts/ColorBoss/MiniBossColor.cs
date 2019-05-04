@@ -608,6 +608,8 @@ public class MiniBossColor : BossEnemy
         
         _cameraRef.BossIntroActive(cam0, cam1, rot0, rot1, _cameraIntroDuration);
 
+        _myAnimations.Play("Movement", 0);
+
         _startAttackTime = Time.time;
         _cameraInPosition = false;
         _endingPlaying = true;
@@ -624,6 +626,7 @@ public class MiniBossColor : BossEnemy
             {
                 if (_myAnimations.IsInTransition(0))
                 {
+                    _myAnimations.Play("Death", 0);
                     _cameraInPosition = true;
                 }
             }
@@ -699,6 +702,7 @@ public class MiniBossColor : BossEnemy
             _jumpingFinished = false;
 
             _endingPlaying = false;
+            _showingDeath = false;
             _laggingHealth = false;
             _updatingHealth = false;
             _dead = false;
